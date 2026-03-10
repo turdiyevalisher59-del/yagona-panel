@@ -1,0 +1,218 @@
+{
+  "_v": 41,
+  "_lastModified": 1741000000000,
+  "_cloudUrl": "https://api.npoint.io/73a6a46079966e775e20",
+  
+  "leaders": [
+    {
+      "ci": 0,
+      "id": "fayzullaxojayev",
+      "ini": "JF",
+      "name": "J.X.Fayzullaxo'jayev",
+      "role": "Bosh boshqarma boshlig'i",
+      "departments": [
+        {
+          "id": "d1",
+          "name": "Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",
+          "boss": "Nishanaliev Islombek Valisherovich",
+          "bossRole": "Shu'ba mudiri",
+          "dashboards": [
+            {"id": "db1", "name": "Scoring Banking", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
+            {"id": "db2", "name": "Sirli mijoz tahlili", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/sirli_mijoz_final.html"},
+            {"id": "db3", "name": "Angren moliyaviy xizmatlar xaritasi", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/angren-xarita-mediapipe-gesture.html"}
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "Ijro apparati",
+          "boss": "Axatjanov Abduraxmon Kudratillaevich",
+          "bossRole": "Apparat boshlig'i",
+          "dashboards": [
+            {"id": "db4", "name": "Ijro nazorati", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/index.html", "xl": "_data/murojatlar_yillik.xlsx"},
+            {"id": "db5", "name": "Murojatlar dashboard", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/murojatlar_dashboard.html", "xl": "_data/murojatlar_yillik.xlsx"}
+          ]
+        },
+        {
+          "id": "d_komplaens",
+          "name": "Komplaens Nazorati",
+          "boss": "Turdiyev A.T",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db_komplaens", "name": "Korrupsiya Monitoring", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Komplaens Nazorati/corruption-monitoring.html"}
+          ]
+        }
+      ]
+    },
+    {
+      "ci": 1,
+      "id": "nuraliyev",
+      "ini": "BN",
+      "name": "B.F.Nuraliyev",
+      "role": "Bosh boshqarma boshlig'i o'rinbosari",
+      "departments": [
+        {
+          "id": "d5",
+          "name": "Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi",
+          "boss": "Matboboev Utkirjon Rustamovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db6", "name": "Valyuta monitoringi", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/index.html"},
+            {"id": "db7", "name": "Eksport-Import valyuta", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/export import/valyuta_dashboard.html", "xl": "_data/export_import_slayd.xls"},
+            {"id": "db8", "name": "Valyuta XPU", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/Valyuta XPU/valyuta_hpu.html", "xl": "_data/valyuta_xpu_jami.xlsx"}
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "Kredit tashkilotlarini inspeksiya qilish boshqarmasi",
+          "boss": "Yusupov Murod Abduraxmanovich",
+          "bossRole": "Boshqarma boshlig'i",
+          "dashboards": []
+        },
+        {
+          "id": "d7",
+          "name": "Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi",
+          "boss": "Tangirov Xasan Davlatboevich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db9", "name": "NPL Risk Rating", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/NPL_Risk_Rating_100.html"},
+            {"id": "db10", "name": "NPL Risk tizimi", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/npl_risk_system_v11_full_edit.html"},
+            {"id": "db11", "name": "NPL Tizimi (sayt)", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/saytga yuklash/npl_tizimi.html"}
+          ]
+        }
+      ]
+    },
+    {
+      "ci": 2,
+      "id": "irgashev",
+      "ini": "ShI",
+      "name": "Sh.R.Irgashev",
+      "role": "Bosh boshqarma boshlig'i o'rinbosari",
+      "departments": [
+        {
+          "id": "d8",
+          "name": "Hududlarni ijtimoiy-iqtisodiy rivojlantirish borasida tijorat banklari faoliyatini monitoring qilish bo'limi",
+          "boss": "Tursunov Normumin Abduxamidovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db12", "name": "Parkentsoy Voice Assistant", "type": "html", "path": "I.R.Irgashev yo'nalishi/Hududlarni ijtimoiy-iqtisodiy rivojlantirish borasida tijorat banklari faoliyatini monitoring qilish bo'limi/parkentsoy/parkentsoy_voice.html"}
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi",
+          "boss": "Karshibaev Ulugbek Baxodir o'g'li",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db13", "name": "Tadbirkorlik monitoringi", "type": "html", "path": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/index.html", "xl": "_data/eng_ohiri_dasturlar.xlsx"},
+            {"id": "db14", "name": "Banklar tahlili", "type": "html", "path": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_tahlili.html", "xl": "_data/banklar_reyting.xlsx"},
+            {"id": "db15", "name": "Mahallalar tahlili", "type": "html", "path": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v17_mahalla_count.html", "xl": "_data/eng_ohiri_mahalla.xlsx"}
+          ]
+        }
+      ]
+    },
+    {
+      "ci": 3,
+      "id": "jurayev",
+      "ini": "AJ",
+      "name": "A.A.Jurayev",
+      "role": "Bosh boshqarma boshlig'i o'rinbosari",
+      "departments": [
+        {
+          "id": "d10",
+          "name": "Naqd pul muomalasini tashkil etish boshqarmasi",
+          "boss": "Sobirov Sobitxon Saidburxon o'g'li",
+          "bossRole": "Boshqarma boshlig'i",
+          "dashboards": [
+            {"id": "db16", "name": "Naqd pullar dashboard", "type": "html", "path": "A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar.html", "xl": "_data/Dastur_uchun.xlsx"}
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi",
+          "boss": "Umarov Mirzoxid Mirxilolovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": []
+        },
+        {
+          "id": "d2",
+          "name": "Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi",
+          "boss": "Karimov Alisher Saydumarovich",
+          "bossRole": "Boshqarma boshlig'i",
+          "dashboards": [
+            {"id": "db17", "name": "Buxgalteriya dashboard", "type": "html", "path": "A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/buxgalteriya_dashboard.html"},
+            {"id": "db18", "name": "Buxgalteriya Tahlili", "type": "html", "path": "A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/buxgalteriya_tahlil.html", "xl": "_data/umumiy_jadval.xlsx"}
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "Narxlar va iqtisodiy kutilmalarni o'rganish bo'limi",
+          "boss": "Shomirov Abdulaziz Abdurashidovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": []
+        }
+      ]
+    }
+  ],
+
+  "_tasks": {
+    "overdue": [
+      {"id": 7, "title": "Markaziy bankka choraklik hisobot", "assignee": "B.F.Nuraliyev", "deadline": "2025-02-08", "leaderId": "nuraliyev", "priority": "yuqori"}
+    ],
+    "pending": [
+      {"id": 1, "title": "Haftalik NPL hisobotini tayyorlash", "assignee": "B.F.Nuraliyev", "deadline": "2025-02-12", "leaderId": "nuraliyev", "priority": "yuqori"},
+      {"id": 2, "title": "Yangi kredit siyosati loyihasini ko'rib chiqish", "assignee": "Sh.R.Irgashev", "deadline": "2025-02-14", "leaderId": "irgashev", "priority": "o'rta"},
+      {"id": 3, "title": "Filiallar audit natijalarini tahlil qilish", "assignee": "B.F.Nuraliyev", "deadline": "2025-02-13", "leaderId": "nuraliyev", "priority": "yuqori"},
+      {"id": 4, "title": "Xodimlar treningi rejasini tasdiqlash", "assignee": "J.X.Fayzullaxo'jayev", "deadline": "2025-02-15", "leaderId": "fayzullaxojayev", "priority": "past"},
+      {"id": 5, "title": "Oylik moliyaviy hisobot", "assignee": "A.A.Jurayev", "deadline": "2025-02-20", "leaderId": "jurayev", "priority": "o'rta"},
+      {"id": 6, "title": "Risk matritsasini yangilash", "assignee": "B.F.Nuraliyev", "deadline": "2025-02-18", "leaderId": "nuraliyev", "priority": "yuqori"}
+    ],
+    "completed": [
+      {"id": 8, "title": "Yanvar oyi NPL tahlili", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-02-05"},
+      {"id": 9, "title": "Kredit portfeli monitoring", "assignee": "Sh.R.Irgashev", "leaderId": "irgashev", "completedDate": "2025-02-06"},
+      {"id": 10, "title": "Filiallar reytingi hisoblash", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-02-07"},
+      {"id": 11, "title": "Xodimlar attestatsiyasi", "assignee": "J.X.Fayzullaxo'jayev", "leaderId": "fayzullaxojayev", "completedDate": "2025-02-04"},
+      {"id": 12, "title": "IT infratuzilma tekshiruvi", "assignee": "A.A.Jurayev", "leaderId": "jurayev", "completedDate": "2025-02-03"},
+      {"id": 13, "title": "Mijozlar shikoyatlarini ko'rib chiqish", "assignee": "J.X.Fayzullaxo'jayev", "leaderId": "fayzullaxojayev", "completedDate": "2025-02-02"},
+      {"id": 14, "title": "Valyuta operatsiyalari tahlili", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-02-01"},
+      {"id": 15, "title": "Kichik biznes kreditlari monitoring", "assignee": "Sh.R.Irgashev", "leaderId": "irgashev", "completedDate": "2025-01-31"},
+      {"id": 16, "title": "Antikorrupsiya treningi", "assignee": "J.X.Fayzullaxo'jayev", "leaderId": "fayzullaxojayev", "completedDate": "2025-01-30"},
+      {"id": 17, "title": "Bank filiallari reytingi", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-01-29"},
+      {"id": 18, "title": "Ipoteka kreditlari tahlili", "assignee": "Sh.R.Irgashev", "leaderId": "irgashev", "completedDate": "2025-01-28"},
+      {"id": 19, "title": "Likvidlik hisoboti", "assignee": "A.A.Jurayev", "leaderId": "jurayev", "completedDate": "2025-01-27"},
+      {"id": 20, "title": "Xavfsizlik auditi", "assignee": "A.A.Jurayev", "leaderId": "jurayev", "completedDate": "2025-01-26"},
+      {"id": 21, "title": "Kredit komiteti bayonnomasi", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-01-25"},
+      {"id": 22, "title": "Moliyaviy rejani tasdiqlash", "assignee": "Sh.R.Irgashev", "leaderId": "irgashev", "completedDate": "2025-01-24"},
+      {"id": 23, "title": "Xodimlar rag'batlantirish tizimi", "assignee": "J.X.Fayzullaxo'jayev", "leaderId": "fayzullaxojayev", "completedDate": "2025-01-23"},
+      {"id": 24, "title": "Yangi mahsulotlar taqdimoti", "assignee": "Sh.R.Irgashev", "leaderId": "irgashev", "completedDate": "2025-01-22"},
+      {"id": 25, "title": "Raqamli xizmatlar monitoring", "assignee": "A.A.Jurayev", "leaderId": "jurayev", "completedDate": "2025-01-21"},
+      {"id": 26, "title": "Mijozlar bazasi tahlili", "assignee": "Sh.R.Irgashev", "leaderId": "irgashev", "completedDate": "2025-01-20"},
+      {"id": 27, "title": "Risk baholash metodologiyasi", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-01-19"},
+      {"id": 28, "title": "Yillik hisobot tayyorlash", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-01-18"},
+      {"id": 29, "title": "Ichki nazorat tizimi", "assignee": "J.X.Fayzullaxo'jayev", "leaderId": "fayzullaxojayev", "completedDate": "2025-01-17"},
+      {"id": 30, "title": "Kredit sifati monitoring", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-01-16"},
+      {"id": 31, "title": "Bank kapitali hisob-kitobi", "assignee": "A.A.Jurayev", "leaderId": "jurayev", "completedDate": "2025-01-15"},
+      {"id": 32, "title": "Depozit bazasi tahlili", "assignee": "Sh.R.Irgashev", "leaderId": "irgashev", "completedDate": "2025-01-14"},
+      {"id": 33, "title": "Filiallar samaradorligi", "assignee": "B.F.Nuraliyev", "leaderId": "nuraliyev", "completedDate": "2025-01-13"}
+    ]
+  },
+
+  "meetings": [
+    {"id": "m1", "day": 3, "who": "B.F.Nuraliyev, Valyuta bo'limi", "time": "10:00", "month": "Fev", "title": "Valyuta nazorati yig'ilishi", "urgency": "urgent"},
+    {"id": "m2", "day": 5, "who": "Moliyaviy tahlil guruhi", "time": "14:30", "month": "Fev", "title": "NPL monitoring tahlili", "urgency": "normal"},
+    {"id": "m3", "day": 7, "who": "Barcha rahbarlar", "time": "09:00", "month": "Fev", "title": "Haftalik operativ yig'ilish", "urgency": "urgent"},
+    {"id": "m4", "day": 10, "who": "Sh.R.Irgashev, Bo'lim boshliqlari", "time": "11:00", "month": "Fev", "title": "Tadbirkorlik dasturi natijalar", "urgency": "normal"},
+    {"id": "m5", "day": 12, "who": "J.X.Fayzullaxo'jayev", "time": "15:00", "month": "Fev", "title": "Moliyaviy savodxonlik hisoboti", "urgency": "done"},
+    {"id": "m6", "day": 14, "who": "A.A.Jurayev, IT bo'limi", "time": "10:30", "month": "Fev", "title": "IT infratuzilma yangilanishi", "urgency": "normal"}
+  ],
+
+  "_documents": [
+    {"id": 1, "org": "Agrobank ATB", "name": "Kredit shartnomasi #1245", "status": "urgent", "comment": "Shoshilinch imzo talab etiladi", "assignee": "nuraliyev", "deadline": "2025-02-12"},
+    {"id": 2, "org": "Markaziy bank", "name": "Haftalik moliyaviy hisobot", "status": "normal", "comment": "", "assignee": "nuraliyev", "deadline": "2025-02-14"},
+    {"id": 3, "org": "Tashqi audit", "name": "Audit xulosasi 2024", "status": "urgent", "comment": "Bugun imzolanishi shart", "assignee": "irgashev", "deadline": "2025-02-10"},
+    {"id": 4, "org": "MB Boshqaruvi", "name": "Kredit siyosati yangilanishi", "status": "normal", "comment": "Ko'rib chiqish va imzolash", "assignee": "jurayev", "deadline": "2025-02-15"},
+    {"id": 5, "org": "Tahlil bo'limi", "name": "Filiallar reytingi hisoboti", "status": "normal", "comment": "", "assignee": "nuraliyev", "deadline": "2025-02-13"}
+  ],
+
+  "_emergencyMsgs": [],
+  "_contacts": null
+}

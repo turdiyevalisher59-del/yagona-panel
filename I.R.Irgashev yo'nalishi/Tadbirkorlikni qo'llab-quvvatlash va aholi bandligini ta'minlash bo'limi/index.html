@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oilaviy Kreditlar Bo'limi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .dashboard-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 20px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 15px;
+        }
+        .dashboard-link:last-child { margin-bottom: 0; }
+        .dashboard-link.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .dashboard-link.green:hover {
+            box-shadow: 0 10px 30px rgba(56, 239, 125, 0.4);
+        }
+        .dashboard-link.blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .dashboard-link.blue:hover {
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+        .dashboard-link:hover {
+            transform: translateY(-3px);
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-top: 20px;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Oilaviy Kreditlar Bo'limi</h1>
+        <div class="card">
+            <a href="banklar_tahlili.html" class="dashboard-link green">
+                Banklar Tahlili
+            </a>
+            <a href="kredit_dashboard_v17_mahalla_count.html" class="dashboard-link blue">
+                Kredit Dashboard (Mahalla)
+            </a>
+        </div>
+        <a href="../" class="back-link">← Bosh sahifaga qaytish</a>
+    </div>
+</body>
+</html>

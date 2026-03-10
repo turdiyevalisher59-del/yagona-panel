@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valyuta Tahlili Bo'limi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .dashboard-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 20px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 15px;
+        }
+        .dashboard-link:last-child { margin-bottom: 0; }
+        .dashboard-link.gold {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+        }
+        .dashboard-link.gold:hover {
+            box-shadow: 0 10px 30px rgba(245, 175, 25, 0.4);
+        }
+        .dashboard-link.purple {
+            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+        }
+        .dashboard-link.purple:hover {
+            box-shadow: 0 10px 30px rgba(142, 45, 226, 0.4);
+        }
+        .dashboard-link:hover {
+            transform: translateY(-3px);
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-top: 20px;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Valyuta Tahlili Bo'limi</h1>
+        <div class="card">
+            <a href="valyuta_dashboard.html" class="dashboard-link gold">
+                Toshkent Viloyati Valyuta Dashboard
+            </a>
+            <a href="valyuta_hpu.html" class="dashboard-link purple">
+                Valyuta HPU
+            </a>
+        </div>
+        <a href="../" class="back-link">← Bosh sahifaga qaytish</a>
+    </div>
+</body>
+</html>
