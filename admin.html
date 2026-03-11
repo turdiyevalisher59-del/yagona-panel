@@ -1380,15 +1380,29 @@ function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t
     +'</div></div>'
     +'<hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'
     +'<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--ac);margin-bottom:4px">\uD83E\uDD16 Suniy intellekt</div>'
-    +'<div style="font-size:11px;color:var(--t2);margin-bottom:10px">Claude AI — ovozli assistent uchun aqlli javoblar</div>'
-    +'<div class="fg"><label class="fl">Anthropic API kalit</label><input class="fi" id="aiKeyInp" type="password" value="'+((localStorage.getItem('aiApiKey')||'')?'••••••••••':'')+'" placeholder="sk-ant-api03-..." style="font-size:12px"></div>'
+    +'<div style="font-size:11px;color:var(--t2);margin-bottom:10px">Gemini (brauzerdan ishlaydi) + Claude (zaxira)</div>'
+    +'<div id="apiStatusPanel" style="background:var(--card-s);border:1px solid var(--brd2);border-radius:var(--radius);padding:14px;margin-bottom:14px">'
+    +'<div style="font-size:12px;font-weight:800;color:var(--t0);margin-bottom:10px">📡 API holatlari</div>'
+    +'<div style="display:grid;gap:8px">'
+    +'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-radius:8px"><span id="stClaude" style="width:10px;height:10px;border-radius:50%;background:#6b7280;flex-shrink:0"></span><span style="flex:1;font-size:12px;font-weight:600">Claude AI</span><span id="stClaudeTxt" style="font-size:10px;color:var(--t2)">Tekshirilmagan</span></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-radius:8px"><span id="stGemini" style="width:10px;height:10px;border-radius:50%;background:#6b7280;flex-shrink:0"></span><span style="flex:1;font-size:12px;font-weight:600">Gemini AI</span><span id="stGeminiTxt" style="font-size:10px;color:var(--t2)">Tekshirilmagan</span></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-radius:8px"><span id="stAzure" style="width:10px;height:10px;border-radius:50%;background:#6b7280;flex-shrink:0"></span><span style="flex:1;font-size:12px;font-weight:600">Azure Speech</span><span id="stAzureTxt" style="font-size:10px;color:var(--t2)">Tekshirilmagan</span></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-radius:8px"><span id="stCloud" style="width:10px;height:10px;border-radius:50%;background:#6b7280;flex-shrink:0"></span><span style="flex:1;font-size:12px;font-weight:600">Bulut sinxronizatsiya</span><span id="stCloudTxt" style="font-size:10px;color:var(--t2)">Tekshirilmagan</span></div>'
+    +'</div>'
+    +'<button class="btn btn-p btn-sm" onclick="checkAllApis()" style="margin-top:10px;width:100%">🔄 Barchasini tekshirish</button>'
+    +'</div>'
+    +'<div class="fg"><label class="fl">AI Provider</label><select class="fs" id="aiProviderSel" onchange="localStorage.setItem(\'aiProvider\',this.value);toast(\'AI: \'+this.value,\'ok\')"><option value="gemini"'+((_aiProvider()==='gemini')?' selected':'')+'>Gemini (Google) — tavsiya</option><option value="claude"'+((_aiProvider()==='claude')?' selected':'')+'>Claude (Anthropic)</option></select></div>'
+    +'<div class="fg"><label class="fl">Gemini API kalit (BEPUL)</label><input class="fi" id="geminiKeyInp" type="password" value="'+((_getGeminiKey())?'••••••••••':'')+'" placeholder="AIzaSy..." style="font-size:12px"></div>'
+    +'<div class="fg"><label class="fl">Claude API kalit (ixtiyoriy)</label><input class="fi" id="aiKeyInp" type="password" value="'+((_getAiKey())?'••••••••••':'')+'" placeholder="sk-ant-api03-..." style="font-size:12px"></div>'
     +'<div style="display:flex;gap:6px;margin-bottom:8px">'
     +'<button class="btn btn-p btn-sm" onclick="saveAiKey()">💾 Saqlash</button>'
+    +'<button class="btn btn-s btn-sm" onclick="testAi()">🔍 Test</button>'
     +'</div>'
     +'<div style="background:var(--card-s);border:1px solid var(--brd2);border-radius:var(--radius);padding:12px;margin-bottom:14px">'
     +'<div style="font-size:10px;color:var(--t2);line-height:1.6">'
-    +'API kalit: <a href="https://console.anthropic.com/" target="_blank" style="color:var(--ac)">console.anthropic.com</a> dan oling<br>'
-    +'Yoki Netlify env: <code>ANTHROPIC_API_KEY</code> qo\'shing'
+    +'<b>Gemini (tavsiya):</b> <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac)">aistudio.google.com/apikey</a> — BEPUL<br>'
+    +'<b>Claude:</b> <a href="https://console.anthropic.com/" target="_blank" style="color:var(--ac)">console.anthropic.com</a><br>'
+    +'💡 Gemini brauzerdan to\'g\'ridan-to\'g\'ri ishlaydi, server kerak emas!'
     +'</div></div>'
     +'<hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'
     +'<div style="font-family:var(--ffd);font-size:15px;font-weight:800;color:var(--ac);margin-bottom:12px">🎙 Azure Speech</div><div class="fg"><label class="fl">Azure Region</label><select class="fs" id="azReg" onchange="localStorage.setItem(\'azRegion\',this.value);AZ_REGION=this.value;azSpeechCfg=null;toast(\'Region yangilandi\',\'ok\')"><option value="eastus"'+(AZ_REGION==='eastus'?' selected':'')+'>East US</option><option value="westus"'+(AZ_REGION==='westus'?' selected':'')+'>West US</option><option value="westeurope"'+(AZ_REGION==='westeurope'?' selected':'')+'>West Europe</option><option value="southeastasia"'+(AZ_REGION==='southeastasia'?' selected':'')+'>Southeast Asia</option><option value="centralindia"'+(AZ_REGION==='centralindia'?' selected':'')+'>Central India</option><option value="eastasia"'+(AZ_REGION==='eastasia'?' selected':'')+'>East Asia</option><option value="northeurope"'+(AZ_REGION==='northeurope'?' selected':'')+'>North Europe</option><option value="uksouth"'+(AZ_REGION==='uksouth'?' selected':'')+'>UK South</option></select></div><div class="fg"><label class="fl">TTS Ovoz</label><select class="fs" id="azVoice" onchange="localStorage.setItem(\'azVoice\',this.value);azSpeechCfg=null;toast(\'Ovoz yangilandi\',\'ok\')"><option value="uz-UZ-MadinaNeural"'+((localStorage.getItem('azVoice')||'uz-UZ-MadinaNeural')==='uz-UZ-MadinaNeural'?' selected':'')+'>Madina (ayol)</option><option value="uz-UZ-SardorNeural"'+((localStorage.getItem('azVoice')||'')==='uz-UZ-SardorNeural'?' selected':'')+'>Sardor (erkak)</option></select></div><div class="fg"><label class="fl">Test</label><button class="btn btn-p btn-sm" onclick="vSpeak(\'Assalomu alaykum! Azure ovozli yordamchi ishlayapti.\')">🔊 Ovozni sinash</button></div>'
@@ -1620,16 +1634,156 @@ window.saveAddDash=function(){
 function toast(msg,t){t=t||'nf';var c=$('toasts'),el=document.createElement('div');el.className='toast '+t;el.innerHTML='<span>'+(t==='ok'?'✓':t==='er'?'✕':'ℹ')+'</span><span>'+msg+'</span>';c.appendChild(el);setTimeout(function(){el.style.opacity='0';el.style.transform='translateX(16px)';el.style.transition='all .3s';setTimeout(function(){el.remove()},300)},3500)}
 
 /* ═══ BULUT BOSHQARISH FUNKSIYALARI ═══ */
-var AI_KEY='';
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AI TIZIMI v2 — GEMINI (brauzerdan CORS OK) + CLAUDE (proxy/direct)
+   ═══════════════════════════════════════════════════════════════════════════ */
+var AI_KEY='';var GEMINI_KEY='';
 function _getAiKey(){return AI_KEY||localStorage.getItem('aiApiKey')||''}
+function _getGeminiKey(){return GEMINI_KEY||localStorage.getItem('geminiApiKey')||''}
+function _aiProvider(){return localStorage.getItem('aiProvider')||'gemini'}
+
+/* Kontekst — dashboard ma'lumotlaridan */
+function _buildAiContext(){
+  var ctx=[];
+  ctx.push('Bugun: '+new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
+  ctx.push('Soat: '+new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'}));
+  ctx.push('Tizim: Markaziy Bank Toshkent viloyati bosh boshqarmasi dashboard');
+  if(D&&D.leaders){ctx.push('\nRahbarlar:');D.leaders.forEach(function(l){
+    var dc=l.departments?l.departments.length:0;
+    var dbc=l.departments?l.departments.reduce(function(s,d){return s+(d.dashboards?d.dashboards.length:0)},0):0;
+    ctx.push('- '+l.name+' ('+l.role+'), '+dc+' bo\'lim, '+dbc+' dashboard');
+    if(l.departments)l.departments.forEach(function(d){ctx.push('  * '+d.name+(d.boss?' — '+d.boss:''))});
+  })}
+  if(D&&D.meetings&&D.meetings.length){ctx.push('\nUchrashuvlar:');D.meetings.forEach(function(m){
+    ctx.push('- '+m.day+' '+m.month+', '+m.time+': '+m.title+' ('+m.who+') ['+m.urgency+']');
+  })}
+  var nB=$('nListB');if(nB){var it=nB.querySelectorAll('.n-txt');if(it.length){ctx.push('\nBankers.uz:');for(var i=0;i<Math.min(it.length,5);i++)ctx.push('- '+it[i].textContent)}}
+  var nK=$('nListK');if(nK){var it2=nK.querySelectorAll('.n-txt');if(it2.length){ctx.push('\nKun.uz:');for(var i=0;i<Math.min(it2.length,5);i++)ctx.push('- '+it2[i].textContent)}}
+  var wt=$('wTemp');if(wt&&wt.textContent!=='--°')ctx.push('\nOb-havo: '+wt.textContent);
+  return ctx.join('\n');
+}
+
+/* ═══ GEMINI API — brauzerdan to'g'ridan-to'g'ri (CORS OK) ═══ */
+async function _callGeminiDirect(prompt,context,apiKey){
+  if(!apiKey)throw new Error('Gemini API kalit yo\'q');
+  var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey;
+  var body={
+    contents:[{parts:[{text:prompt}]}],
+    systemInstruction:{parts:[{text:'Sen Markaziy Bank Toshkent viloyati bosh boshqarmasi AI yordamchisan. O\'zbek tilida qisqa, aniq javob ber. Bank terminologiyasini bil.\n\n'+context}]},
+    generationConfig:{temperature:0.7,topP:0.9,topK:40,maxOutputTokens:500},
+    safetySettings:[{category:'HARM_CATEGORY_HARASSMENT',threshold:'BLOCK_NONE'},{category:'HARM_CATEGORY_HATE_SPEECH',threshold:'BLOCK_NONE'},{category:'HARM_CATEGORY_SEXUALLY_EXPLICIT',threshold:'BLOCK_NONE'},{category:'HARM_CATEGORY_DANGEROUS_CONTENT',threshold:'BLOCK_NONE'}]
+  };
+  var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok){var e=await r.json().catch(function(){return{}});throw new Error((e.error&&e.error.message)||('HTTP '+r.status))}
+  var d=await r.json();
+  if(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)
+    return d.candidates[0].content.parts.map(function(p){return p.text||''}).join('');
+  throw new Error('Gemini javob bermadi');
+}
+
+/* ═══ CLAUDE API — proxy yoki direct (anthropic-dangerous-direct-browser-access) ═══ */
+async function _callClaudeProxy(prompt,context,apiKey){
+  if(!apiKey)throw new Error('Claude API kalit yo\'q');
+  try{var r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt,context:context,apiKey:apiKey,provider:'claude'}),signal:AbortSignal.timeout(12000)});if(r.ok){var d=await r.json();if(d.text)return d.text}}catch(e){}
+  try{
+    var r2=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,
+        system:'Sen MB Toshkent viloyati AI yordamchisan. O\'zbek tilida qisqa javob ber.\n\n'+context,
+        messages:[{role:'user',content:prompt}]}),signal:AbortSignal.timeout(15000)});
+    if(r2.ok){var d2=await r2.json();if(d2.content&&d2.content[0])return d2.content[0].text}
+    else{var eb=await r2.json().catch(function(){return{}});throw new Error((eb.error&&eb.error.message)||('HTTP '+r2.status))}
+  }catch(e){throw e}
+  throw new Error('Claude javob bermadi');
+}
+
+/* ═══ Universal AI chaqirish — avval tanlangan, keyin zaxira ═══ */
+async function _callAI(prompt,context){
+  var prov=_aiProvider(),errors=[];
+  if(prov==='gemini'){
+    var gk=_getGeminiKey();if(gk){try{return await _callGeminiDirect(prompt,context,gk)}catch(e){errors.push('Gemini: '+e.message)}}else errors.push('Gemini: kalit yo\'q');
+    var ck=_getAiKey();if(ck){try{return await _callClaudeProxy(prompt,context,ck)}catch(e){errors.push('Claude: '+e.message)}}
+  }else{
+    var ck2=_getAiKey();if(ck2){try{return await _callClaudeProxy(prompt,context,ck2)}catch(e){errors.push('Claude: '+e.message)}}else errors.push('Claude: kalit yo\'q');
+    var gk2=_getGeminiKey();if(gk2){try{return await _callGeminiDirect(prompt,context,gk2)}catch(e){errors.push('Gemini: '+e.message)}}
+  }
+  throw new Error(errors.length?errors.join(' | '):'API kalit kiritilmagan. Sozlamalar → AI → Gemini kalitini kiriting.');
+}
+
+/* ═══ Fallback — API kalitsiz oddiy javob ═══ */
+function _fallbackAnswer(txt){
+  var t=txt.toLowerCase();
+  if(D&&D.leaders){
+    for(var i=0;i<D.leaders.length;i++){
+      if(t.includes(D.leaders[i].name.toLowerCase().split('.').pop().split(' ')[0].toLowerCase())){
+        var l=D.leaders[i];return l.name+' — '+l.role+'. '+l.departments.length+' ta bo\'lim boshqaradi.';
+      }
+    }
+  }
+  if(t.includes('uchrashuv')&&D&&D.meetings){return D.meetings.length+' ta uchrashuv rejada. Keyingisi: '+(D.meetings[0]?D.meetings[0].day+' '+D.meetings[0].month+' soat '+D.meetings[0].time+' — '+D.meetings[0].title:'yo\'q')}
+  return 'AI uchun Sozlamalar → Suniy intellekt → Gemini API kalitini kiriting (bepul: aistudio.google.com/apikey).';
+}
+
+/* ═══ AI javob — ovozli yordamchi uchun ═══ */
+async function aiAnswer(userText){
+  var st=$('vSt');if(st)st.textContent='🤖 O\'ylayapman...';
+  var loadMsg=document.createElement('div');loadMsg.className='vmsg bot';loadMsg.innerHTML='<span style="animation:pulse 1s infinite">🤖 ...</span>';
+  var log=$('vLog');if(log){log.appendChild(loadMsg);log.scrollTop=log.scrollHeight}
+  try{
+    var ctx=_buildAiContext();var aiText=await _callAI(userText,ctx);
+    if(loadMsg.parentNode)loadMsg.remove();
+    if(typeof vMsg==='function')vMsg('bot','🤖 '+aiText);else{var m2=document.createElement('div');m2.className='vmsg bot';m2.textContent='🤖 '+aiText;if(log){log.appendChild(m2);log.scrollTop=log.scrollHeight}}
+  }catch(e){
+    if(loadMsg.parentNode)loadMsg.remove();
+    var fb=_fallbackAnswer(userText);
+    if(typeof vMsg==='function')vMsg('bot',fb);else{var m3=document.createElement('div');m3.className='vmsg bot';m3.textContent=fb;if(log){log.appendChild(m3);log.scrollTop=log.scrollHeight}}
+  }
+  if(st)st.textContent='Tayyor';
+}
+
+/* ═══ AI test ═══ */
+async function testAi(){
+  var prov=_aiProvider();toast('🤖 '+prov+' test...','nf');
+  try{
+    var result;
+    if(prov==='gemini'){var gk=_getGeminiKey();if(!gk){toast('❌ Gemini kalit yo\'q','er');return}result=await _callGeminiDirect('1 gapda javob: sen kimsan?','Test.',gk)}
+    else{var ck=_getAiKey();if(!ck){toast('❌ Claude kalit yo\'q','er');return}result=await _callClaudeProxy('1 gapda javob: sen kimsan?','Test.',ck)}
+    toast('✅ '+prov+': '+(result||'').slice(0,80),'ok');
+  }catch(e){toast('❌ '+prov+': '+e.message.slice(0,100),'er')}
+}
+
+/* ═══ AI kalit saqlash ═══ */
 function saveAiKey(){
-  var inp=$('aiKeyInp');if(!inp)return;
-  var key=inp.value.trim();
-  if(key&&key.includes('••'))return toast('Yangi kalit kiriting','er');
-  if(key&&!key.startsWith('sk-')){toast('Kalit sk- bilan boshlanishi kerak','er');return}
-  localStorage.setItem('aiApiKey',key);AI_KEY=key;
-  toast(key?'🤖 AI kalit saqlandi':'⚪ AI o\'chirildi','ok');
-  if(key)inp.value='••••••••••';
+  var inp=$('aiKeyInp');if(inp){var k=inp.value.trim();if(k&&!k.includes('••')){localStorage.setItem('aiApiKey',k);AI_KEY=k;inp.value='••••••••••';toast('🤖 Claude kalit saqlandi','ok')}}
+  var gi=$('geminiKeyInp');if(gi){var g=gi.value.trim();if(g&&!g.includes('••')){localStorage.setItem('geminiApiKey',g);GEMINI_KEY=g;gi.value='••••••••••';toast('✨ Gemini kalit saqlandi','ok')}}
+}
+
+/* ═══ AI kunlik tahlil ═══ */
+async function generateAIDigest(){
+  var el=$('aiDigestText');if(!el)return;
+  el.textContent='⏳ AI tahlil...';
+  if(!_getGeminiKey()&&!_getAiKey()){el.textContent='AI uchun Sozlamalar → Gemini API kalitini kiriting (bepul: aistudio.google.com/apikey)';return}
+  try{
+    var ctx=_buildAiContext();
+    var txt=await _callAI('MB Toshkent viloyati uchun bugungi qisqa tahlil: muhim ko\'rsatkichlar, xavflar, tavsiyalar. 3 gap. O\'zbekcha.',ctx);
+    el.textContent=txt;
+  }catch(e){el.textContent='AI tahlil yuklanmadi. '+e.message.slice(0,60)}
+}
+
+/* ═══ API status tekshirish ═══ */
+async function checkAllApis(){
+  toast('🔄 Tekshirilmoqda...','nf');
+  function _ss(id,ok,msg){var d=$(id),t=$(id+'Txt');if(d)d.style.background=ok===true?'#22c55e':ok===false?'#ef4444':'#f59e0b';if(t){t.textContent=msg;t.style.color=ok===true?'#22c55e':ok===false?'#ef4444':'#f59e0b'}}
+  /* Claude */
+  var ck=_getAiKey();if(!ck)_ss('stClaude',false,'Kalit yo\'q');else{try{await _callClaudeProxy('test','',ck);_ss('stClaude',true,'Ishlayapti ✓')}catch(e){_ss('stClaude',false,e.message.slice(0,40))}}
+  /* Gemini */
+  var gk=_getGeminiKey();if(!gk)_ss('stGemini',false,'Kalit yo\'q');else{try{await _callGeminiDirect('test','',gk);_ss('stGemini',true,'Ishlayapti ✓')}catch(e){_ss('stGemini',false,e.message.slice(0,40))}}
+  /* Azure */
+  try{var ar=await fetch('https://'+AZ_REGION+'.api.cognitive.microsoft.com/sts/v1.0/issueToken',{method:'POST',headers:{'Ocp-Apim-Subscription-Key':AZ_KEY,'Content-Length':'0'}});_ss('stAzure',ar.ok,ar.ok?'Ishlayapti ✓':'Xato: '+ar.status)}catch(e){_ss('stAzure',false,'Ulanib bo\'lmadi')}
+  /* Cloud */
+  var cu=_getCloudUrl();if(!cu)_ss('stCloud',false,'URL yo\'q');else{try{var cr=await fetch(cu);if(cr.ok){var cd=await cr.json();_ss('stCloud',true,'OK (v'+(cd._v||'?')+')')}else _ss('stCloud',false,'Xato '+cr.status)}catch(e){_ss('stCloud',false,'Ulanib bo\'lmadi')}}
+  toast('✅ Tugadi','ok');
 }
 function saveCloudUrl(){
   var url=($('cloudUrlInp')||{}).value||'';
