@@ -1426,10 +1426,33 @@ function save(){
   
   /* localStorage ga saqlash */
   try{
-    localStorage.setItem('cbNE', JSON.stringify(D));
+    /* Katta keshlarni tozalash (localStorage to'lib ketmasligi uchun) */
+    var saveData = JSON.parse(JSON.stringify(D));
+    if(saveData.leaders){
+      saveData.leaders.forEach(function(l){
+        if(l.departments) l.departments.forEach(function(d){
+          if(d.dashboards) d.dashboards.forEach(function(db){
+            delete db._htmlCache;
+            delete db._xlCache;
+          });
+        });
+      });
+    }
+    delete saveData._files;
+    localStorage.setItem('cbNE', JSON.stringify(saveData));
     console.log('💾 localStorage ga saqlandi ✓');
   }catch(e){
-    console.error('💾 localStorage xatosi:', e);
+    if(e.name==='QuotaExceededError'){
+      console.warn('💾 localStorage TO\'LDI! Tozalanmoqda...');
+      try{
+        localStorage.removeItem('cbNE');
+        var minData={_v:D._v,leaders:D.leaders,meetings:D.meetings,_contacts:D._contacts,_tgLink:D._tgLink};
+        localStorage.setItem('cbNE',JSON.stringify(minData));
+        console.log('💾 Minimal versiya saqlandi');
+      }catch(e2){console.error('💾 localStorage butunlay to\'ldi!')}
+    }else{
+      console.error('💾 localStorage xatosi:', e);
+    }
   }
   
   /* Bulutga yuklash */
@@ -1801,7 +1824,11 @@ async function forceSyncFromCloud(){
       
       /* LocalStorage ga saqlash */
       try{
-        localStorage.setItem('cbNE', JSON.stringify(D));
+        localStorage.removeItem('cbNE');
+        var _sData=JSON.parse(JSON.stringify(D));
+        if(_sData.leaders)_sData.leaders.forEach(function(l){if(l.departments)l.departments.forEach(function(d){if(d.dashboards)d.dashboards.forEach(function(db){delete db._htmlCache;delete db._xlCache})})});
+        delete _sData._files;
+        localStorage.setItem('cbNE', JSON.stringify(_sData));
         console.log('💾 LocalStorage yangilandi');
       }catch(e){
         console.warn('LocalStorage xatosi:', e);
@@ -4390,7 +4417,7 @@ function checkMeetingAlerts(){
 
 /* Sahifa yuklanganda uchrashuvlarni tekshirish — FAQAT chatga yozish, ovozda aytmaslik */
 setTimeout(function(){
-  if(!D.meetings||!D.meetings.length)return;
+  if(!D||!D.meetings||!D.meetings.length)return;
   var now=new Date();
   var today=now.getDate(),todayM=now.getMonth()+1;
   var curHour=now.getHours(),curMin=now.getMinutes();
@@ -5044,7 +5071,11 @@ document.addEventListener('DOMContentLoaded',async function(){
       
       /* localStorage ga zaxira sifatida saqlash */
       try{ 
-        localStorage.setItem('cbNE', JSON.stringify(D));
+        localStorage.removeItem('cbNE');
+        var _cSave=JSON.parse(JSON.stringify(D));
+        if(_cSave.leaders)_cSave.leaders.forEach(function(l){if(l.departments)l.departments.forEach(function(d){if(d.dashboards)d.dashboards.forEach(function(db){delete db._htmlCache;delete db._xlCache})})});
+        delete _cSave._files;
+        localStorage.setItem('cbNE', JSON.stringify(_cSave));
         console.log('💾 localStorage ga zaxiralandi');
       }catch(e){
         console.warn('💾 localStorage saqlash xatosi:', e);
@@ -5497,6 +5528,7 @@ function renderTodayMeetings(){
   var container = document.getElementById('todayMeetings');
   var dateEl = document.getElementById('todayDate');
   if(!container) return;
+  if(!D||!D.meetings){container.innerHTML='<div style="text-align:center;padding:20px;color:var(--t2);font-size:11px">Yuklanmoqda...</div>';return}
   
   var today = new Date();
   if(dateEl) dateEl.textContent = today.toLocaleDateString('uz', {weekday: 'long', day: 'numeric', month: 'long'});
@@ -5585,6 +5617,7 @@ var _TASKS = {pending:[], overdue:[], completed:[]};
 
 /* D dan sinxronlash funksiyasi */
 function syncTasksFromD(){
+  if(!D||!D.leaders){console.log('⏳ syncTasksFromD: D null');return}
   /* D da bor bo'lsa — undan olish */
   if(D._tasks && D._tasks.pending){
     _TASKS = D._tasks;
@@ -5624,6 +5657,7 @@ function saveTasksToD(){
 
 /* Sahifa yuklanganda D dan olish va kerak bo'lsa bulutga saqlash */
 setTimeout(function(){
+  if(!D||!D.leaders){console.log('⏳ Tasks sync: D kutilmoqda...');setTimeout(arguments.callee,2000);return}
   var needsSave = !D._tasks || !D._documents;
   syncTasksFromD();
   console.log('📋 Tasks/Docs synced from D');
@@ -6704,6 +6738,7 @@ function closeAlert(msgId){
 
 /* Rahbar kartochkalariga KPI qo'shish */
 function addKPItoRahbarCards(){
+  if(!D||!D.leaders)return;
   var kpiData = {
     'B.F.Nuraliyev': {label: 'NPL', value: '3.2%', status: 'warn'},
     'I.R.Irgashev': {label: 'Kredit reja', value: '94%', status: 'ok'},
@@ -6728,6 +6763,7 @@ function addKPItoRahbarCards(){
 
 /* KPI Dashboard init */
 async function initKPIDashboard(){
+  if(!D||!D.leaders){console.log('⏳ initKPIDashboard: D kutilmoqda');return}
   /* Avval NPL dan ma'lumot olish */
   await loadNPLData();
   
@@ -6751,14 +6787,15 @@ async function initKPIDashboard(){
 
 /* Sahifa yuklanganda init */
 setTimeout(function(){
+  if(!D||!D.leaders){console.log('⏳ KPI init: D kutilmoqda...');setTimeout(arguments.callee,2000);return}
   initKPIDashboard();
-  setTimeout(addKPItoRahbarCards, 500);
+  setTimeout(function(){if(D&&D.leaders)addKPItoRahbarCards()}, 500);
   /* Foydalanuvchi rolini qo'llash */
-  setTimeout(applyUserRole, 100);
+  setTimeout(function(){if(D&&D.leaders)applyUserRole()}, 100);
   /* Hujjatlar sonini yangilash */
-  setTimeout(updateDocsCount, 200);
+  setTimeout(function(){if(D)updateDocsCount()}, 200);
   /* O'rinbosar uchun favqulodda xabarlarni tekshirish */
-  setTimeout(checkEmergencyAlerts, 1500);
+  setTimeout(function(){if(D)checkEmergencyAlerts()}, 1500);
   /* ESLATMA: Bulut sinxronlash login orqali amalga oshiriladi */
 }, 1000);
 
