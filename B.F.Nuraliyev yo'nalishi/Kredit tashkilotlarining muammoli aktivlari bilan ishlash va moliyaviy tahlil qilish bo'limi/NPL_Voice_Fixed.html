@@ -531,7 +531,7 @@ tbody tr:nth-child(10){animation-delay:.32s}
   <button class="nav-btn" data-sec="clients">Mijozlar</button>
   <button class="nav-btn" data-sec="measures">Choralar</button>
   <button class="nav-btn" data-sec="reserves">Zahiralar</button>
-  <button class="nav-btn" data-sec="compare">2024 vs 2025</button>
+  <button class="nav-btn" data-sec="compare"><span id="navCompareText">Solishtirma</span></button>
   <button class="nav-btn" data-sec="yirik">Yirik Mijozlar</button>
   <button class="nav-btn" data-sec="export">Eksport/Import</button>
   <button class="nav-btn" data-sec="forecast">Prognoz</button>
@@ -548,12 +548,12 @@ tbody tr:nth-child(10){animation-delay:.32s}
   </div>
   <div class="grid g5" id="overviewCards"></div>
   <div class="grid g2" style="margin-top:16px">
-    <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(0,212,255,0.12)">📈</span>NPL Dinamikasi 2025</div><div class="chart-wrap"><canvas id="cTrend"></canvas></div></div>
+    <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(0,212,255,0.12)">📈</span><span id="trendTitle">NPL Dinamikasi</span></div><div class="chart-wrap"><canvas id="cTrend"></canvas></div></div>
     <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(123,97,255,0.12)">🍩</span>Mijoz Turlari NPL <span style="font-size:9px;color:var(--orange);font-weight:400">(Viloyat ahamiyatidagi)</span></div><div class="chart-wrap"><canvas id="cClient"></canvas></div></div>
   </div>
   <div class="grid g3" style="margin-top:16px">
-    <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(255,170,44,0.12)">📊</span>NPL Klassi</div><div style="font-size:9px;color:var(--text2);margin:-4px 0 6px 0">Yirik mijozlarning kredit tasnifi taqsimoti. Ustiga bosib summa va ulushini ko'ring. Legend — «Summasi» ni yoqib summalar grafigiga o'ting.</div><div class="chart-wrap chart-sm"><canvas id="cClass"></canvas></div></div>
-    <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(0,230,138,0.12)">📅</span>Yillar Bo'yicha NPL</div><div style="font-size:9px;color:var(--text2);margin:-4px 0 6px 0">Kredit berilgan yil bo'yicha yuridik va jismoniy NPL summasi. «&lt;2020» — 2020-yildan oldin berilgan kreditlar.</div><div class="chart-wrap chart-sm"><canvas id="cYears"></canvas></div></div>
+    <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(255,170,44,0.12)">📊</span>Aktivlar tasnifi</div><div style="font-size:9px;color:var(--text2);margin:-4px 0 6px 0">Yirik mijozlarning kredit tasnifi taqsimoti. Ustiga bosib summa va ulushini ko'ring. Legend — «Summasi» ni yoqib summalar grafigiga o'ting.</div><div class="chart-wrap chart-sm"><canvas id="cClass"></canvas></div></div>
+    <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(0,230,138,0.12)">📅</span>Yillar Bo'yicha NPL</div><div style="font-size:9px;color:var(--text2);margin:-4px 0 6px 0">Kredit berilgan yil bo'yicha NPL soni, summasi va ulushi. «&lt;2020» — 2020-yildan oldin berilgan kreditlar.</div><div class="chart-wrap chart-sm"><canvas id="cYears"></canvas></div></div>
     <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(255,77,106,0.12)">📋</span>Asosiy Ko'rsatkichlar</div><div id="keyMetrics"></div></div>
   </div>
 </div>
@@ -662,7 +662,7 @@ tbody tr:nth-child(10){animation-delay:.32s}
     <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(0,212,255,0.12)">📈</span>Banklar NPL Ulushi (%)</div><div class="chart-wrap"><canvas id="cBanksPct"></canvas></div></div>
   </div>
   <!-- Bank NPL Trend -->
-  <div class="card reveal" style="margin-top:16px"><div class="card-title"><span class="icon" style="background:rgba(123,97,255,0.12)">📉</span>Banklar NPL O'sish Trendi (2024 → 2025)</div><div class="chart-wrap"><canvas id="cBanksTrend"></canvas></div></div>
+  <div class="card reveal" style="margin-top:16px"><div class="card-title"><span class="icon" style="background:rgba(123,97,255,0.12)">📉</span><span id="bankTrendTitle">Banklar NPL O'sish Trendi</span></div><div class="chart-wrap"><canvas id="cBanksTrend"></canvas></div></div>
   <!-- Top Filials chart -->
   <div class="card reveal" style="margin-top:16px"><div class="card-title"><span class="icon" style="background:rgba(0,230,138,0.12)">🏢</span>Top 25 Filiallar NPL Bo'yicha</div><div class="chart-wrap" style="height:550px"><canvas id="cFilials"></canvas></div></div>
   <!-- Detailed table -->
@@ -882,8 +882,8 @@ tbody tr:nth-child(10){animation-delay:.32s}
 
 <!-- ===== COMPARE ===== -->
 <div class="section" id="sec-compare">
-  <div class="sec-header"><h2><span class="emoji">📈</span> 2024 — 2025 Solishtirma</h2><p>Ikki yil bo'yicha NPL dinamikasining oyma-oy qiyosiy tahlili.</p></div>
-  <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(255,170,44,0.12)">📈</span>NPL % Trend (2024 vs 2025)</div><div style="font-size:9px;color:var(--text2);margin:-4px 0 8px;padding:0 4px">📊 Ikki yil NPL foizining oyma-oy solishtirilishi. <strong style="color:#ffaa2c">Sariq</strong> = 2024, <strong style="color:#ff4d6a">Qizil</strong> = 2025. Grafik ustiga bosib batafsil ma'lumot oling.</div><div class="chart-wrap"><canvas id="cComp"></canvas></div></div>
+  <div class="sec-header"><h2><span class="emoji">📈</span> <span id="compareHeaderTitle">Solishtirma</span></h2><p>Ikki yil bo'yicha NPL dinamikasining oyma-oy qiyosiy tahlili.</p></div>
+  <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(255,170,44,0.12)">📈</span><span id="compareTrendTitle">NPL % Trend</span></div><div style="font-size:9px;color:var(--text2);margin:-4px 0 8px;padding:0 4px">📊 Ikki yil NPL foizining oyma-oy solishtirilishi. <span id="compareYearColors"><strong style="color:#ffaa2c">Sariq</strong> = oldingi yil, <strong style="color:#ff4d6a">Qizil</strong> = joriy yil</span>. Grafik ustiga bosib batafsil ma'lumot oling.</div><div class="chart-wrap"><canvas id="cComp"></canvas></div></div>
   <div class="grid g2" style="margin-top:16px">
     <div class="card reveal"><div class="card-title"><span class="icon" style="background:rgba(0,212,255,0.12)">📊</span>NPL va Portfel Summasi (trln)</div><div style="font-size:9px;color:var(--text2);margin:-4px 0 8px;padding:0 4px">📊 <strong>Bar</strong> = NPL summasi (trln), <strong>Chiziq</strong> = Umumiy portfel (trln). Yillik o'zgarishni kuzatish uchun grafik ustiga bosing.</div><div class="chart-wrap"><canvas id="cCompBar"></canvas></div></div>
     <div class="card reveal"><div class="table-wrap"><table id="tComp"></table></div></div>
@@ -1231,7 +1231,7 @@ tbody tr:nth-child(10){animation-delay:.32s}
 </div><!-- /container -->
 
 <div class="footer">
-  NPL Risk Analytics · Toshkent viloyati · 01.12.2025 · Barcha ma'lumotlar mln. so'mda · Powered by AI
+  NPL Risk Analytics · Toshkent viloyati · Barcha ma'lumotlar mln. so'mda · Powered by Inhouse app from Tashkent region Central bank
 </div>
 <script>
 let D = null;
@@ -1452,9 +1452,26 @@ function handleFile(file){
 function parseWorkbook(wb){
   console.log('Available sheets:', wb.SheetNames);
   
+  // ===== DYNAMIC YEAR DETECTION =====
+  // Find all year sheets (2024, 2025, 2026, etc.)
+  const yearSheets = wb.SheetNames.filter(sn => /^20\d{2}$/.test(sn.trim()) || /Солиштирма\s*20\d{2}/i.test(sn) || /solishtirma\s*20\d{2}/i.test(sn));
+  const detectedYears = yearSheets.map(sn => {
+    const match = sn.match(/20\d{2}/);
+    return match ? parseInt(match[0]) : null;
+  }).filter(Boolean).sort((a,b) => b - a); // Descending - newest first
+  
+  const CURRENT_YEAR = detectedYears[0] || 2025;
+  const PREV_YEAR = detectedYears[1] || CURRENT_YEAR - 1;
+  window._CURRENT_YEAR = CURRENT_YEAR;
+  window._PREV_YEAR = PREV_YEAR;
+  console.log('Detected years:', detectedYears, '| Current:', CURRENT_YEAR, '| Previous:', PREV_YEAR);
+  
   // ===== SMART SHEET DETECTION =====
-  const s2024 = findSheet(wb, ['2024','Солиштирма 2024','solishtirma2024']);
-  const s2025 = findSheet(wb, ['2025','Солиштирма 2025','solishtirma2025']);
+  const sCurrent = findSheet(wb, [String(CURRENT_YEAR), 'Солиштирма '+CURRENT_YEAR, 'solishtirma'+CURRENT_YEAR]);
+  const sPrev = findSheet(wb, [String(PREV_YEAR), 'Солиштирма '+PREV_YEAR, 'solishtirma'+PREV_YEAR]);
+  // Keep backward compatibility
+  const s2024 = sPrev;
+  const s2025 = sCurrent;
   const sBoshqa = findSheet(wb, ['Бошқа','Boshqa','boshqa','other']);
   const sSoha = findSheet(wb, ['Соҳа','Soha','soha','sector']);
   const sChora = findSheet(wb, ['Чора','Chora','chora','measure']);
@@ -2162,12 +2179,15 @@ function parseWorkbook(wb){
       // Bankrot count
       if(isBankrot){ bankrotCnt++; bankrotSum += portfel; }
       
-      // Bank yirik aggregation
-      if(!bankYirik[bank]) bankYirik[bank] = {cnt:0, sum:0, npl4:0, npl5:0};
+      // Bank yirik aggregation - all 5 classes
+      if(!bankYirik[bank]) bankYirik[bank] = {cnt:0, sum:0, npl4:0, npl5:0, c1:0, c2:0, c3:0, c4:0, c5:0, s1:0, s2:0, s3:0, s4:0, s5:0};
       bankYirik[bank].cnt++;
       bankYirik[bank].sum += portfel;
-      if(tasnif === '4') bankYirik[bank].npl4 += portfel;
-      if(tasnif === '5') bankYirik[bank].npl5 += portfel;
+      if(tasnif === '1'){ bankYirik[bank].c1++; bankYirik[bank].s1 += portfel; }
+      if(tasnif === '2'){ bankYirik[bank].c2++; bankYirik[bank].s2 += portfel; }
+      if(tasnif === '3'){ bankYirik[bank].c3++; bankYirik[bank].s3 += portfel; }
+      if(tasnif === '4'){ bankYirik[bank].c4++; bankYirik[bank].s4 += portfel; bankYirik[bank].npl4 += portfel; }
+      if(tasnif === '5'){ bankYirik[bank].c5++; bankYirik[bank].s5 += portfel; bankYirik[bank].npl5 += portfel; }
       
       // Export/Import - faqat unikal mijozlarni qo'shamiz (dublikatlarni olib tashlash)
       // Bir xil mijoz bir xil bankda bir necha marta kredit olgan bo'lishi mumkin
@@ -2249,6 +2269,24 @@ function renderAll(){
   document.body.appendChild(errBox);
   function logErr(fn,e){errBox.style.display='block';errBox.innerHTML+='<div style="margin:3px 0"><b style="color:#ff4d6a">\u274c '+fn+':</b> '+e.message+'</div>';}
   if(!D||!ADV){errBox.style.display='block';errBox.innerHTML='<div style="color:#ff4d6a;font-size:14px">D='+!!D+' ADV='+!!ADV+'</div>';return;}
+
+  // ===== UPDATE DYNAMIC YEAR LABELS =====
+  var CY = window._CURRENT_YEAR || 2025;
+  var PY = window._PREV_YEAR || 2024;
+  try {
+    var trendTitleEl = document.getElementById('trendTitle');
+    if(trendTitleEl) trendTitleEl.textContent = 'NPL Dinamikasi ' + CY;
+    var navCompareEl = document.getElementById('navCompareText');
+    if(navCompareEl) navCompareEl.textContent = PY + ' vs ' + CY;
+    var compareHeaderEl = document.getElementById('compareHeaderTitle');
+    if(compareHeaderEl) compareHeaderEl.textContent = PY + ' — ' + CY + ' Solishtirma';
+    var compareTrendEl = document.getElementById('compareTrendTitle');
+    if(compareTrendEl) compareTrendEl.textContent = 'NPL % Trend (' + PY + ' vs ' + CY + ')';
+    var compareColorsEl = document.getElementById('compareYearColors');
+    if(compareColorsEl) compareColorsEl.innerHTML = '<strong style="color:#ffaa2c">Sariq</strong> = ' + PY + ', <strong style="color:#ff4d6a">Qizil</strong> = ' + CY;
+    var bankTrendEl = document.getElementById('bankTrendTitle');
+    if(bankTrendEl) bankTrendEl.textContent = 'Banklar NPL O\'sish Trendi (' + PY + ' → ' + CY + ')';
+  } catch(e) { console.warn('Year label update error:', e); }
 
   // ===== LAZY RENDERING: only render active section =====
   window._sectionRendered={};
@@ -2520,11 +2558,11 @@ function renderOverview(){
   const vilCnt = o.vil_cnt || 0;
   const respPct = o.npl_pct > 0 ? (vilPct / o.npl_pct * 100).toFixed(0) : 0;
   const cards=[
-    {label:'Jami Portfel',val:fmt(o.total_portfolio_sum),sub:(o.total_portfolio_cnt||0).toLocaleString()+' ta kredit',color:'var(--accent)',glow:'rgba(0,212,255,0.3)'},
-    {label:'NPL Summasi',val:fmt(o.total_npl_sum),sub:(o.total_npl_cnt||0).toLocaleString()+' ta kredit',color:'var(--red)',glow:'rgba(255,77,106,0.3)'},
-    {label:'NPL Ulushi',val:o.npl_pct.toFixed(2)+'%',sub:(o.total_npl_cnt||0).toLocaleString()+' ta muammoli kredit',color:o.npl_pct>5?'var(--red)':'var(--green)',glow:o.npl_pct>5?'rgba(255,77,106,0.3)':'rgba(0,230,138,0.3)'},
-    {label:'Viloyat ahamiyatidagi NPL',val:fmt(vilSum),sub:'Viloyat ahamiyatidagi kreditlar',color:'var(--orange)',glow:'rgba(255,170,44,0.3)'},
-    {label:'Viloyat NPL Ulushi',val:vilPct.toFixed(2)+'%',sub:(vilCnt||0).toLocaleString()+' ta kredit | Viloyat ahamiyatidagi',color:'var(--accent2)',glow:'rgba(123,97,255,0.3)'}
+    {label:'Kredit portfel',val:fmt(o.total_portfolio_sum),sub:(o.total_portfolio_cnt||0).toLocaleString()+' ta kredit',color:'var(--accent)',glow:'rgba(0,212,255,0.3)'},
+    {label:'Jami NPL',val:fmt(o.total_npl_sum),sub:(o.total_npl_cnt||0).toLocaleString()+' ta muammoli kredit',color:'var(--red)',glow:'rgba(255,77,106,0.3)'},
+    {label:'Jami NPL ulushi',val:o.npl_pct.toFixed(2)+'%',sub:'Portfeldagi muammoli kreditlar ulushi',color:o.npl_pct>5?'var(--red)':'var(--green)',glow:o.npl_pct>5?'rgba(255,77,106,0.3)':'rgba(0,230,138,0.3)'},
+    {label:'NPL banklar bo\'yicha',val:fmt(vilSum),sub:(vilCnt||0).toLocaleString()+' ta kredit',color:'var(--orange)',glow:'rgba(255,170,44,0.3)'},
+    {label:'Portfeldagi NPL ulushi',val:vilPct.toFixed(2)+'%',sub:'Jami NPLdagi ulushi',color:'var(--accent2)',glow:'rgba(123,97,255,0.3)'}
   ];
   let h='';
   cards.forEach((c,i)=>{
@@ -2664,14 +2702,29 @@ function renderOverview(){
       {label:'Jismoniy NPL',data:yl.map(y=>(yrs[y].jis_npl||0)),backgroundColor:'#00e68a80',borderRadius:4}
     ]},
     options:{responsive:true,maintainAspectRatio:false,scales:{...defScales(),y:{stacked:true,ticks:{color:tc(),callback:v=>fmt(v)},grid:{color:gc()}},x:{stacked:true,ticks:{color:tc()},grid:{color:gc()}}},plugins:{legend:defLegend(),tooltip:{callbacks:{
-      label:function(ctx){return ctx.dataset.label+': '+fmt(ctx.raw);},
+      label:function(ctx){return ctx.dataset.label+': '+fmt(ctx.raw)+' (trln so\'m)';},
       afterBody:function(items){
         var idx=items[0].dataIndex;
         var y=yl[idx];
         var d=yrs[y];
         var lines=[];
-        lines.push('Yuridik portfel: '+fmt(d.yur_sum)+' ('+d.yur_cnt+' ta)');
-        lines.push('Jismoniy portfel: '+fmt(d.jis_sum)+' ('+d.jis_cnt+' ta)');
+        var totalNpl=(d.yur_npl||0)+(d.jis_npl||0);
+        var yurPct=(d.yur_sum||0)>0?((d.yur_npl||0)/(d.yur_sum||1)*100).toFixed(2):0;
+        var jisPct=(d.jis_sum||0)>0?((d.jis_npl||0)/(d.jis_sum||1)*100).toFixed(2):0;
+        var jamiPort=(d.yur_sum||0)+(d.jis_sum||0);
+        var jamiPct=jamiPort>0?(totalNpl/jamiPort*100).toFixed(2):0;
+        lines.push('───────────────────');
+        lines.push('📊 Yuridik shaxslar:');
+        lines.push('   • Muammoli kreditlar: '+(d.yur_npl_cnt||d.yur_cnt||0)+' ta');
+        lines.push('   • NPL summasi: '+fmt(d.yur_npl)+' trln so\'m');
+        lines.push('   • NPL foizi: '+yurPct+'%');
+        lines.push('📊 Jismoniy shaxslar:');
+        lines.push('   • Muammoli kreditlar: '+(d.jis_npl_cnt||d.jis_cnt||0)+' ta');
+        lines.push('   • NPL summasi: '+fmt(d.jis_npl)+' trln so\'m');
+        lines.push('   • NPL foizi: '+jisPct+'%');
+        lines.push('───────────────────');
+        lines.push('📈 Jami NPL: '+fmt(totalNpl)+' trln so\'m');
+        lines.push('📈 Jami NPL foizi: '+jamiPct+'%');
         if(y==='2020 gacha') lines.push('ℹ️ 2020-yildan oldin berilgan kreditlar');
         return lines;
       }
@@ -2865,9 +2918,11 @@ function renderBanks(){
   // === 3. BANK NPL TREND 2024→2025 (real per-bank monthly data) ===
   var m24=D.monthly_2024||[];
   var m25=D.monthly_2025||[];
+  var CY = window._CURRENT_YEAR || 2025;
+  var PY = window._PREV_YEAR || 2024;
   var allMonthLabels=[];
-  m24.forEach(function(m){allMonthLabels.push('2024/'+m.month);});
-  m25.forEach(function(m){allMonthLabels.push('2025/'+m.month);});
+  m24.forEach(function(m){allMonthLabels.push(PY+'/'+m.month);});
+  m25.forEach(function(m){allMonthLabels.push(CY+'/'+m.month);});
   if(allMonthLabels.length>1){
     var trendDatasets=[];
     var tColors=['#ff4d6a','#00d4ff','#00e68a','#7b61ff','#ffaa2c','#ff6ba0','#00bcd4','#e91e63','#4caf50','#ff9800','#9c27b0','#3f51b5','#795548','#607d8b','#cddc39','#009688','#f44336','#2196f3'];
@@ -3816,7 +3871,7 @@ function renderClients(){
   }}});
   // Bank breakdown table by client type
   if(ADV&&ADV.bank_metrics){
-    let bt='<thead><tr><th>Bank</th><th>Yuridik NPL%</th><th>YATT NPL%</th><th>Jismoniy NPL%</th><th>Jami Portfel</th><th>Jami NPL%</th></tr></thead><tbody>';
+    let bt='<thead><tr><th>Bank</th><th>Yuridik NPL%</th><th>YATT NPL%</th><th>Jismoniy NPL%</th><th>Kredit portfel</th><th>Jami NPL%</th></tr></thead><tbody>';
     ADV.bank_metrics.sort((a,b)=>(b.npl_pct||0)-(a.npl_pct||0)).forEach(bk=>{
       const nplP=(bk.npl_pct||0);
       const bg=nplP>10?'b-red':nplP>5?'b-orange':'b-green';
@@ -4367,18 +4422,20 @@ function drillResBank(bankName){
 
 function renderYearCompare(){
   if(!D||!D.monthly_2024||!D.monthly_2025||!D.monthly_2024.length) return;
+  const CY = window._CURRENT_YEAR || 2025;
+  const PY = window._PREV_YEAR || 2024;
   const m24=D.monthly_2024,m25=D.monthly_2025,months=m24.map(m=>m.month);
   new Chart(document.getElementById('cComp'),{type:'line',data:{labels:months,datasets:[
-    {label:'2024 NPL%',data:m24.map(m=>m.npl_pct),borderColor:'#ffaa2c',backgroundColor:'rgba(255,170,44,0.08)',fill:true,tension:.4,pointRadius:5,borderWidth:3},
-    {label:'2025 NPL%',data:m25.map(m=>m.npl_pct),borderColor:'#ff4d6a',backgroundColor:'rgba(255,77,106,0.08)',fill:true,tension:.4,pointRadius:5,borderWidth:3}
+    {label:PY+' NPL%',data:m24.map(m=>m.npl_pct),borderColor:'#ffaa2c',backgroundColor:'rgba(255,170,44,0.08)',fill:true,tension:.4,pointRadius:5,borderWidth:3},
+    {label:CY+' NPL%',data:m25.map(m=>m.npl_pct),borderColor:'#ff4d6a',backgroundColor:'rgba(255,77,106,0.08)',fill:true,tension:.4,pointRadius:5,borderWidth:3}
   ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:defScales(null,true),plugins:{legend:defLegend()}}});
   new Chart(document.getElementById('cCompBar'),{type:'bar',data:{labels:months,datasets:[
-    {label:'2024 NPL (trln)',data:m24.map(m=>m.npl_sum),backgroundColor:'rgba(255,170,44,0.6)',borderColor:'rgba(255,170,44,1)',borderWidth:1,borderRadius:6},
-    {label:'2025 NPL (trln)',data:m25.map(m=>m.npl_sum),backgroundColor:'rgba(255,77,106,0.6)',borderColor:'rgba(255,77,106,1)',borderWidth:1,borderRadius:6},
-    {label:'2024 Portfel (trln)',data:m24.map(m=>m.total_sum),backgroundColor:'transparent',borderColor:'rgba(255,170,44,0.8)',borderWidth:2,type:'line',tension:.3,pointRadius:4,pointBackgroundColor:'#ffaa2c',borderDash:[6,3],yAxisID:'y'},
-    {label:'2025 Portfel (trln)',data:m25.map(m=>m.total_sum),backgroundColor:'transparent',borderColor:'rgba(255,77,106,0.8)',borderWidth:2,type:'line',tension:.3,pointRadius:4,pointBackgroundColor:'#ff4d6a',borderDash:[6,3],yAxisID:'y'}
+    {label:PY+' NPL (trln)',data:m24.map(m=>m.npl_sum),backgroundColor:'rgba(255,170,44,0.6)',borderColor:'rgba(255,170,44,1)',borderWidth:1,borderRadius:6},
+    {label:CY+' NPL (trln)',data:m25.map(m=>m.npl_sum),backgroundColor:'rgba(255,77,106,0.6)',borderColor:'rgba(255,77,106,1)',borderWidth:1,borderRadius:6},
+    {label:PY+' Portfel (trln)',data:m24.map(m=>m.total_sum),backgroundColor:'transparent',borderColor:'rgba(255,170,44,0.8)',borderWidth:2,type:'line',tension:.3,pointRadius:4,pointBackgroundColor:'#ffaa2c',borderDash:[6,3],yAxisID:'y'},
+    {label:CY+' Portfel (trln)',data:m25.map(m=>m.total_sum),backgroundColor:'transparent',borderColor:'rgba(255,77,106,0.8)',borderWidth:2,type:'line',tension:.3,pointRadius:4,pointBackgroundColor:'#ff4d6a',borderDash:[6,3],yAxisID:'y'}
   ]},options:{responsive:true,maintainAspectRatio:false,scales:defScales(),plugins:{legend:defLegend()}}});
-  let t='<thead><tr><th>Oy</th><th>2024 NPL%</th><th>2024 NPL (trln)</th><th>2025 NPL%</th><th>2025 NPL (trln)</th><th>NPL% Farq</th><th>Summa Farq</th><th>Holat</th></tr></thead><tbody>';
+  let t='<thead><tr><th>Oy</th><th>'+PY+' NPL%</th><th>'+PY+' NPL (trln)</th><th>'+CY+' NPL%</th><th>'+CY+' NPL (trln)</th><th>NPL% Farq</th><th>Summa Farq</th><th>Holat</th></tr></thead><tbody>';
   months.forEach((m,i)=>{
     const d4=m24[i]||{},d5=m25[i]||{};
     const ch=((d5.npl_pct||0)-(d4.npl_pct||0)).toFixed(2);
@@ -4649,13 +4706,21 @@ window.renderBankDrillModal=function(){
   
   var h='';
   
+  // Calculate sums by class
+  var sum1=clients.filter(function(c){return Number(c.npl_class)===1;}).reduce(function(s,c){return s+(c.portfolio||0);},0);
+  var sum2=clients.filter(function(c){return Number(c.npl_class)===2;}).reduce(function(s,c){return s+(c.portfolio||0);},0);
+  var sum3=clients.filter(function(c){return Number(c.npl_class)===3;}).reduce(function(s,c){return s+(c.portfolio||0);},0);
+  var sum4=clients.filter(function(c){return Number(c.npl_class)===4;}).reduce(function(s,c){return s+(c.portfolio||0);},0);
+  var sum5=clients.filter(function(c){return Number(c.npl_class)===5;}).reduce(function(s,c){return s+(c.portfolio||0);},0);
+  var nplPct=totalPort>0?(totalOtg/totalPort*100):0;
+  
   // Stats grid with better labels
   h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px">';
   [{l:'Mijozlar soni',v:filtered.length+' / '+clients.length,c:'var(--accent)',t:'Filtrlangan / Jami'},
-   {l:'Jami portfel',v:fmt(totalPort),c:'var(--cyan)',t:'Umumiy kredit qoldig\'i'},
+   {l:'Kredit portfel',v:fmt(totalPort),c:'var(--cyan)',t:'Umumiy kredit qoldig\'i'},
    {l:'Muddatli kredit',v:fmt(totalMud),c:'var(--green)',t:'Muddati o\'tmagan kredit qoldig\'i'},
    {l:'Muddati o\'tgan',v:fmt(totalOtg),c:'var(--red)',t:'Kechiktirilgan to\'lovlar summasi'},
-   {l:'Tushum (to\'lov)',v:fmt(totalTush),c:'var(--gold)',t:'Mijozlardan tushgan to\'lovlar'},
+   {l:'NPL foizi',v:nplPct.toFixed(1)+'%',c:nplPct>10?'var(--red)':nplPct>5?'var(--orange)':'var(--green)',t:'Muammoli kreditlar ulushi'},
    {l:'Samaradorlik',v:samar.toFixed(1)+'%',c:samarC,t:'Tushum / Portfel × 100%'},
    {l:'Zahira fondi',v:fmt(totalZah),c:'var(--orange)',t:'Yo\'qotishlarni qoplash zahirasi'},
    {l:'Garov qiymati',v:fmt(totalGar),c:'var(--green)',t:'Garovga qo\'yilgan mol-mulk'}
@@ -4666,11 +4731,22 @@ window.renderBankDrillModal=function(){
   });
   h+='</div>';
   
-  // Warnings
-  if(npl45>0||bankrot>0){
+  // Aktivlar tasnifi - class breakdown
+  h+='<div style="margin-bottom:14px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--glass)">';
+  h+='<div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:8px">📊 Aktivlar tasnifi bo\'yicha taqsimot:</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center">';
+  [{l:'Standart',cnt:cnt1,sum:sum1,c:'var(--green)'},{l:'Substandart',cnt:cnt2,sum:sum2,c:'var(--cyan)'},{l:'Qoniqarsiz',cnt:cnt3,sum:sum3,c:'var(--orange)'},{l:'Shubhali',cnt:cnt4,sum:sum4,c:'#ff6b6b'},{l:'Umidsiz',cnt:cnt5,sum:sum5,c:'var(--red)'}].forEach(function(cl){
+    h+='<div style="padding:6px;border-radius:6px;border:1px solid '+cl.c+'30;background:'+cl.c+'10">';
+    h+='<div style="font-size:9px;color:'+cl.c+';font-weight:600">'+cl.l+'</div>';
+    h+='<div style="font-size:12px;font-weight:800;color:'+cl.c+'">'+cl.cnt+' ta</div>';
+    h+='<div style="font-size:9px;color:var(--text2)">'+fmt(cl.sum)+'</div></div>';
+  });
+  h+='</div></div>';
+  
+  // Warnings - bankrot only
+  if(bankrot>0){
     h+='<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">';
-    if(npl45>0) h+='<span class="badge b-red" style="font-size:10px">⚠️ '+npl45+' ta Xavfli/Umidsiz (Sinf 4-5)</span>';
-    if(bankrot>0) h+='<span class="badge b-orange" style="font-size:10px">🔻 '+bankrot+' ta Bankrot</span>';
+    h+='<span class="badge b-orange" style="font-size:10px">🔻 '+bankrot+' ta Bankrot</span>';
     h+='</div>';
   }
   
@@ -4794,7 +4870,7 @@ function drillYirikStat(type){
     var totalGarov=all.reduce(function(s,c){return s+(c.collateral||0);},0);
     var totalTushum=all.reduce(function(s,c){return s+(c.tushum||0);},0);
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px">';
-    [{l:'Jami Portfel',v:fmt(totalPort),c:'var(--accent)'},{l:'Muddatli',v:fmt(totalMuddatli),c:'var(--green)'},{l:'Muddati o\'tgan',v:fmt(totalOtgan),c:'var(--red)'},{l:'Shartlar o\'zgargan',v:fmt(totalShartlar),c:'var(--orange)'},{l:'Sud jarayonida',v:fmt(totalSud),c:'var(--accent2)'},{l:'Zahira',v:fmt(totalZahira),c:'var(--pink)'},{l:'Garov',v:fmt(totalGarov),c:'var(--green)'},{l:'Tushum',v:fmt(totalTushum),c:'var(--gold)'}].forEach(function(m){
+    [{l:'Kredit portfel',v:fmt(totalPort),c:'var(--accent)'},{l:'Muddatli',v:fmt(totalMuddatli),c:'var(--green)'},{l:'Muddati o\'tgan',v:fmt(totalOtgan),c:'var(--red)'},{l:'Shartlar o\'zgargan',v:fmt(totalShartlar),c:'var(--orange)'},{l:'Sud jarayonida',v:fmt(totalSud),c:'var(--accent2)'},{l:'Zahira',v:fmt(totalZahira),c:'var(--pink)'},{l:'Garov',v:fmt(totalGarov),c:'var(--green)'},{l:'Tushum',v:fmt(totalTushum),c:'var(--gold)'}].forEach(function(m){
       h+='<div style="padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--glass);text-align:center">';
       h+='<div style="font-size:8px;color:var(--text2);text-transform:uppercase;font-weight:600;margin-bottom:3px">'+m.l+'</div>';
       h+='<div style="font-size:15px;font-weight:800;color:'+m.c+'" class="mono">'+m.v+'</div></div>';
@@ -7001,6 +7077,47 @@ function riskDrill(type){
   }
 }
 
+// ===== YIRIK BANK DETAIL (shows 5 classes) =====
+function showYirikBankDetail(idx){
+  var bkArr=window._yirikBankArr;
+  if(!bkArr||!bkArr[idx]) return;
+  var b=bkArr[idx];
+  var h='<div style="padding:14px;border-radius:12px;border:2px solid var(--accent)30;background:var(--glass);margin-top:12px">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+  h+='<div style="font-size:14px;font-weight:700;color:var(--accent)">🏦 '+b.bank+'</div>';
+  h+='<button onclick="this.parentNode.parentNode.remove()" style="border:none;background:var(--border);color:var(--text);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:10px">✕ Yopish</button>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">';
+  h+='<div style="font-size:11px"><span style="color:var(--text2)">Mijozlar:</span> <strong>'+b.cnt+'</strong> ta</div>';
+  h+='<div style="font-size:11px"><span style="color:var(--text2)">Jami portfel:</span> <strong class="mono" style="color:var(--accent)">'+fmt(b.sum)+'</strong></div>';
+  h+='</div>';
+  h+='<div style="font-size:11px;font-weight:600;margin-bottom:8px;color:var(--text2)">📊 Aktivlar tasnifi bo\'yicha taqsimot:</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center">';
+  [{l:'Standart',cnt:b.c1||0,sum:b.s1||0,c:'var(--green)'},{l:'Substandart',cnt:b.c2||0,sum:b.s2||0,c:'var(--cyan)'},{l:'Qoniqarsiz',cnt:b.c3||0,sum:b.s3||0,c:'var(--orange)'},{l:'Shubhali',cnt:b.c4||0,sum:b.s4||0,c:'#ff6b6b'},{l:'Umidsiz',cnt:b.c5||0,sum:b.s5||0,c:'var(--red)'}].forEach(function(cl){
+    h+='<div style="padding:8px 4px;border-radius:8px;border:1px solid '+cl.c+'40;background:'+cl.c+'12">';
+    h+='<div style="font-size:10px;color:'+cl.c+';font-weight:700">'+cl.l+'</div>';
+    h+='<div style="font-size:16px;font-weight:800;color:'+cl.c+';margin:4px 0">'+cl.cnt+' ta</div>';
+    h+='<div style="font-size:10px;color:var(--text2)">'+fmt(cl.sum)+'</div></div>';
+  });
+  h+='</div></div>';
+  // Insert into modal
+  var modal=document.querySelector('.ai-modal-body');
+  if(modal){
+    // Remove any existing detail
+    var existing=modal.querySelector('.yirik-bank-detail');
+    if(existing) existing.remove();
+    // Find the clicked row and insert after
+    var rows=modal.querySelectorAll('.yirik-bank-row');
+    if(rows[idx]){
+      var detail=document.createElement('div');
+      detail.className='yirik-bank-detail';
+      detail.innerHTML=h;
+      rows[idx].insertAdjacentElement('afterend',detail);
+      detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  }
+}
+
 // ===== KEY METRICS DRILL-DOWN =====
 function keyDrill(type){
   var d=window._keyData;
@@ -7071,17 +7188,17 @@ function keyDrill(type){
   }
   else if(type==='banks'){
     h+='<div class="ai-modal-summary"><h4 style="color:var(--cyan)">Banklar soni: '+banks.length+'</h4>';
-    h+='<p>Faqat viloyat ahamiyatidagi kreditlar</p></div>';
+    h+='<p>Banklar kesimida NPL taqsimoti</p></div>';
     var sorted=[...banks].sort(function(a,b){return(b.vil_sum||0)-(a.vil_sum||0);});
     var totalVil=sorted.reduce(function(s,b){return s+(b.vil_sum||0);},0)||1;
-    h+='<table style="width:100%;font-size:10px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:4px">#</th><th style="text-align:left;padding:4px">Bank</th><th style="text-align:right;padding:4px">Viloyat NPL</th><th style="text-align:right;padding:4px">Ulushi</th><th style="text-align:right;padding:4px">Vil NPL%</th><th style="text-align:right;padding:4px">Kreditlar</th></tr></thead><tbody>';
+    h+='<table style="width:100%;font-size:10px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:4px">#</th><th style="text-align:left;padding:4px">BANK</th><th style="text-align:right;padding:4px">KREDITLAR</th><th style="text-align:right;padding:4px">NPL SUMMA</th><th style="text-align:right;padding:4px">JAMI NPLdagi ULUSHI</th><th style="text-align:right;padding:4px">PORTFELDAGI NPL ULUSHI</th></tr></thead><tbody>';
     sorted.forEach(function(b,i){
       var bC=(b.vil_pct||0)>10?'var(--red)':(b.vil_pct||0)>5?'var(--orange)':'var(--green)';
       var vilPct=(b.vil_sum/totalVil*100).toFixed(1);
-      h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:3px">'+(i+1)+'</td><td style="padding:3px">'+b.bank+'</td><td style="padding:3px;text-align:right;color:var(--red)" class="mono">'+fmt(b.vil_sum||0)+'</td><td style="padding:3px;text-align:right;color:var(--accent)">'+vilPct+'%</td><td style="padding:3px;text-align:right;color:'+bC+';font-weight:700">'+(b.vil_pct||0).toFixed(2)+'%</td><td style="padding:3px;text-align:right" class="mono">'+(b.vil_cnt||0).toLocaleString()+'</td></tr>';
+      h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:3px">'+(i+1)+'</td><td style="padding:3px">'+b.bank+'</td><td style="padding:3px;text-align:right" class="mono">'+(b.vil_cnt||0).toLocaleString()+'</td><td style="padding:3px;text-align:right;color:var(--red)" class="mono">'+fmt(b.vil_sum||0)+'</td><td style="padding:3px;text-align:right;color:var(--accent)">'+vilPct+'%</td><td style="padding:3px;text-align:right;color:'+bC+';font-weight:700">'+(b.vil_pct||0).toFixed(2)+'%</td></tr>';
     });
     h+='</tbody></table>';
-    openAiModal('🏦 Viloyat ahamiyatidagi NPL — Banklar',h);
+    openAiModal('🏦 NPL banklar bo\'yicha',h);
   }
   else if(type==='yirik'){
     var nc=d.nc||{};
@@ -7095,23 +7212,30 @@ function keyDrill(type){
       var v=nc[k];
       var clC=k>='4'?'var(--red)':k>='3'?'var(--orange)':k>='2'?'var(--cyan)':'var(--green)';
       h+='<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px">';
-      h+='<span style="width:50px;color:'+clC+';font-weight:700">'+getNplClassName(k)+'</span>';
+      h+='<span style="width:70px;color:'+clC+';font-weight:700">'+getNplClassName(k)+'</span>';
       h+='<span class="mono" style="width:50px">'+v.cnt+' ta</span>';
       h+='<span class="mono" style="width:80px;color:var(--text2)">'+fmt(v.sum)+'</span>';
       h+='<div style="flex:1;height:8px;border-radius:4px;background:var(--border)"><div style="width:'+(v.cnt/totalCl*100).toFixed(0)+'%;height:100%;border-radius:4px;background:'+clC+'"></div></div>';
       h+='<span style="width:40px;text-align:right;font-size:10px">'+(v.cnt/totalCl*100).toFixed(0)+'%</span></div>';
     });
-    // Banks
+    // Banks with NPL foizi and click handler
     h+='<div style="font-size:12px;font-weight:700;margin:16px 0 6px">Banklar kesimida yirik mijozlar:</div>';
-    var bkArr=Object.keys(bk).map(function(k){return{bank:k,cnt:bk[k].cnt,sum:bk[k].sum,npl4:bk[k].npl4||0,npl5:bk[k].npl5||0};}).sort(function(a,b){return b.sum-a.sum;});
+    var bkArr=Object.keys(bk).map(function(k){
+      var bankData=bk[k];
+      var nplPct=bankData.sum>0?((bankData.npl4||0)+(bankData.npl5||0))/bankData.sum*100:0;
+      return{bank:k,cnt:bankData.cnt,sum:bankData.sum,npl4:bankData.npl4||0,npl5:bankData.npl5||0,nplPct:nplPct,c1:bankData.c1||0,c2:bankData.c2||0,c3:bankData.c3||0,c4:bankData.c4||0,c5:bankData.c5||0,s1:bankData.s1||0,s2:bankData.s2||0,s3:bankData.s3||0,s4:bankData.s4||0,s5:bankData.s5||0};
+    }).sort(function(a,b){return b.sum-a.sum;});
+    // Store for click handler
+    window._yirikBankArr=bkArr;
     bkArr.forEach(function(b,i){
-      h+='<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px;border-bottom:1px solid var(--border)">';
+      var nplC=b.nplPct>10?'var(--red)':b.nplPct>5?'var(--orange)':'var(--green)';
+      h+='<div class="yirik-bank-row" data-idx="'+i+'" onclick="showYirikBankDetail('+i+')" style="display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:11px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" onmouseenter="this.style.background=\'var(--glass)\'" onmouseleave="this.style.background=\'\'">';
       h+='<span style="width:18px;color:var(--text2)">'+(i+1)+'</span>';
-      h+='<span style="flex:1">'+b.bank+'</span>';
-      h+='<span class="mono">'+b.cnt+' mijoz</span>';
-      h+='<span class="mono" style="color:var(--accent)">'+fmt(b.sum)+'</span>';
-      if(b.npl4>0) h+='<span style="color:var(--orange);font-size:9px" title="Shubhali sinf (4-sinf) summasi">Shubhali: '+fmt(b.npl4)+'</span>';
-      if(b.npl5>0) h+='<span style="color:var(--red);font-size:9px" title="Umidsiz sinf (5-sinf) summasi">Umidsiz: '+fmt(b.npl5)+'</span>';
+      h+='<span style="flex:1;font-weight:600">'+b.bank+'</span>';
+      h+='<span class="mono" style="color:var(--text2)">'+b.cnt+' mijoz</span>';
+      h+='<span class="mono" style="color:var(--accent);font-weight:700">'+fmt(b.sum)+'</span>';
+      // NPL foizi instead of Shubhali/Umidsiz
+      h+='<span style="color:'+nplC+';font-size:10px;padding:2px 8px;background:'+nplC+'15;border-radius:4px;font-weight:600">NPL: '+b.nplPct.toFixed(1)+'%</span>';
       h+='</div>';
     });
     openAiModal('👔 Yirik mijozlar tafsilotlari',h);
@@ -7281,19 +7405,19 @@ function drilldownCard(type){
   // Sort banks by relevant metric descending
   var title='',colHead='',valFn,subFn,sortFn,brValFn,brSubFn,brSortFn;
   if(type==='portfel'){
-    title='📊 Jami Portfel — Banklar Kesimida';
+    title='📊 Kredit portfel — Banklar Kesimida';
     colHead='Portfel';
-    sortFn=function(a,b){return b.total_sum-a.total_sum;};
-    valFn=function(b){return fmt(b.vil_sum||0);};
-    subFn=function(b){return (b.vil_cnt||0).toLocaleString()+' ta kredit | '+(o.total_portfolio_sum>0?(b.total_sum/o.total_portfolio_sum*100).toFixed(1):'0')+'%';};
+    sortFn=function(a,b){return (b.total_sum||0)-(a.total_sum||0);};
+    valFn=function(b){return fmt(b.total_sum||0);};
+    subFn=function(b){return (b.total_cnt||0).toLocaleString()+' ta kredit | '+(o.total_portfolio_sum>0?((b.total_sum||0)/o.total_portfolio_sum*100).toFixed(1):'0')+'%';};
     brSortFn=function(a,b){return (b.total_credit_sum||0)-(a.total_credit_sum||0);};
     brValFn=function(f){return fmt(f.total_credit_sum||0);};
     brSubFn=function(f){return (f.total_credit_cnt||0).toLocaleString()+' kredit | NPL: '+fmt(f.npl_sum||0)+' ('+(f.npl_pct||0).toFixed(1)+'%)';};
   } else if(type==='npl'){
-    title='⚠️ NPL Summasi — Banklar Kesimida';
+    title='⚠️ Jami NPL — Banklar Kesimida';
     colHead='NPL summa';
-    sortFn=function(a,b){return (b.vil_sum||0)-(a.vil_sum||0);};
-    valFn=function(b){return fmt(b.vil_sum||0);};
+    sortFn=function(a,b){return (b.npl_sum||0)-(a.npl_sum||0);};
+    valFn=function(b){return fmt(b.npl_sum||0);};
     subFn=function(b){return (b.npl_cnt||0).toLocaleString()+' ta kredit | Portfelda: '+(b.npl_pct||0).toFixed(2)+'%';};
     brSortFn=function(a,b){return (b.npl_sum||0)-(a.npl_sum||0);};
     brValFn=function(f){return fmt(f.npl_sum||0);};
@@ -7301,31 +7425,31 @@ function drilldownCard(type){
   } else if(type==='npl_pct'){
     title='📈 NPL Ulushi — Banklar Kesimida';
     colHead='NPL %';
-    sortFn=function(a,b){return b.npl_pct-a.npl_pct;};
+    sortFn=function(a,b){return (b.npl_pct||0)-(a.npl_pct||0);};
     valFn=function(b){return (b.npl_pct||0).toFixed(2)+'%';};
-    subFn=function(b){return 'NPL: '+fmt(b.vil_sum||0)+' | Portfel: '+fmt(b.vil_sum||0);};
+    subFn=function(b){return 'NPL: '+fmt(b.npl_sum||0)+' | Portfel: '+fmt(b.total_sum||0);};
     brSortFn=function(a,b){return (b.npl_pct||0)-(a.npl_pct||0);};
     brValFn=function(f){return (f.npl_pct||0).toFixed(2)+'%';};
     brSubFn=function(f){return 'NPL: '+fmt(f.npl_sum||0)+' | Portfel: '+fmt(f.total_credit_sum||0);};
   } else if(type==='viloyat'){
-    title='🏘️ Viloyat ahamiyatidagi NPL — Banklar Kesimida';
-    colHead='Viloyat NPL';
-    // Use actual viloyat data (vil_sum, vil_cnt) from parsing — viloyat share)
+    title='🏦 NPL banklar bo\'yicha';
+    colHead='NPL summa';
+    // Use actual viloyat data (vil_sum, vil_cnt) from parsing
     sortFn=function(a,b){return (b.vil_sum||0)-(a.vil_sum||0);};
     valFn=function(b){return fmt(b.vil_sum||0);};
-    subFn=function(b){return (b.vil_cnt||0).toLocaleString()+' ta viloyat kredit | '+(b.vil_pct||0).toFixed(1)+'%';};
+    subFn=function(b){return (b.vil_cnt||0).toLocaleString()+' ta kredit | Jami NPLdagi ulushi: '+(b.vil_pct||0).toFixed(1)+'%';};
     brSortFn=function(a,b){return (b.vil_sum||0)-(a.vil_sum||0);};
     brValFn=function(f){return fmt(f.vil_sum||0);};
-    brSubFn=function(f){return (f.vil_cnt||0).toLocaleString()+' viloyat kredit';};
+    brSubFn=function(f){return (f.vil_cnt||0).toLocaleString()+' ta kredit';};
   } else if(type==='viloyat_pct'){
-    title='🏘️ Viloyat NPL Ulushi — Banklar Kesimida';
-    colHead='Viloyat NPL %';
+    title='🏦 Portfeldagi NPL ulushi — Banklar bo\'yicha';
+    colHead='NPL %';
     sortFn=function(a,b){return (b.vil_pct||0)-(a.vil_pct||0);};
     valFn=function(b){return (b.vil_pct||0).toFixed(2)+'%';};
-    subFn=function(b){return 'Viloyat NPL: '+fmt(b.vil_sum||0)+' | '+((b.vil_cnt||0)).toLocaleString()+' ta kredit';};
+    subFn=function(b){return 'NPL: '+fmt(b.vil_sum||0)+' | '+((b.vil_cnt||0)).toLocaleString()+' ta kredit';};
     brSortFn=function(a,b){return (b.vil_pct||0)-(a.vil_pct||0);};
     brValFn=function(f){return (f.vil_pct||0).toFixed(2)+'%';};
-    brSubFn=function(f){return 'Viloyat NPL: '+fmt(f.vil_sum||0)+' | '+(f.vil_cnt||0)+' kredit';};
+    brSubFn=function(f){return 'NPL: '+fmt(f.vil_sum||0)+' | '+(f.vil_cnt||0)+' kredit';};
   }
   banks.sort(sortFn);
   // Group branches by bank
@@ -9156,11 +9280,16 @@ function handleVoiceResult(text, mode){
     }
     
   } else if(mode === 'pentaBank'){
-    // Check matching bank checkboxes
+    // Check for clear command
+    if(searchText.includes('tozala') || searchText.includes('reset') || searchText.includes("o'chir") || searchText.includes('yangi')){
+      document.querySelectorAll('#bankCheckboxWrap input[type="checkbox"]').forEach(cb => cb.checked = false);
+      renderBankCmp();
+      return;
+    }
+    
+    // Check matching bank checkboxes (multiple selection allowed - don't clear previous)
     const checkboxes = document.querySelectorAll('#bankCheckboxWrap input[type="checkbox"]');
     let found = 0;
-    // First uncheck all
-    checkboxes.forEach(cb => cb.checked = false);
     
     checkboxes.forEach(cb => {
       const labelEl = cb.parentElement?.querySelector('span') || cb.nextElementSibling;
@@ -9192,13 +9321,23 @@ function handleVoiceResult(text, mode){
     if(found > 0) renderBankCmp();
     
   } else if(mode === 'pentaBranch'){
-    // Check matching branch checkboxes
+    // Check for clear command
+    if(searchText.includes('tozala') || searchText.includes('reset') || searchText.includes("o'chir") || searchText.includes('yangi')){
+      document.querySelectorAll('#branchCheckboxWrap input[type="checkbox"]').forEach(cb => cb.checked = false);
+      renderCompare();
+      return;
+    }
+    
+    // Check matching branch checkboxes (multiple selection allowed - max 5 total)
     const checkboxes = document.querySelectorAll('#branchCheckboxWrap input[type="checkbox"]');
     let found = 0;
-    // First uncheck all
-    checkboxes.forEach(cb => cb.checked = false);
+    // Count already selected
+    let alreadySelected = 0;
+    checkboxes.forEach(cb => { if(cb.checked) alreadySelected++; });
     
     checkboxes.forEach(cb => {
+      if(cb.checked) return; // Skip already selected
+      
       const labelEl = cb.parentElement?.querySelector('span');
       const label = labelEl?.textContent?.toLowerCase() || '';
       const bankPart = label.split('—')[0]?.trim() || '';
@@ -9221,7 +9360,7 @@ function handleVoiceResult(text, mode){
         });
       }
       
-      if(match && found < 5){
+      if(match && (alreadySelected + found) < 5){
         cb.checked = true;
         found++;
       }
@@ -9790,7 +9929,7 @@ function renderClaudeContent(){
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
           <div style="background:var(--glass);padding:14px;border-radius:12px;border:1px solid var(--border)">
             <div style="font-weight:700;color:var(--accent);font-size:12px;margin-bottom:6px">📊 Umumiy Ko'rinish</div>
-            <div style="font-size:11px;color:var(--text2)">Jami portfel, NPL summasi va ulushi, trend grafiklari</div>
+            <div style="font-size:11px;color:var(--text2)">Kredit portfel, NPL summasi va ulushi, trend grafiklari</div>
           </div>
           <div style="background:var(--glass);padding:14px;border-radius:12px;border:1px solid var(--border)">
             <div style="font-weight:700;color:var(--red);font-size:12px;margin-bottom:6px">⚠️ Risk Tahlili</div>
@@ -9818,7 +9957,7 @@ function renderClaudeContent(){
       <div style="margin-bottom:24px">
         <h3 style="color:var(--accent);font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:8px">📐 Asosiy Ko'rsatkichlar</h3>
         <div style="font-size:12px;color:var(--text);line-height:1.8">
-          <div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:var(--accent);font-weight:700;min-width:120px">NPL %</span><span>Muammoli kreditlar ulushi = NPL summa ÷ Jami portfel × 100</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:var(--accent);font-weight:700;min-width:120px">NPL %</span><span>Muammoli kreditlar ulushi = NPL summa ÷ Kredit portfel × 100</span></div>
           <div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:var(--accent);font-weight:700;min-width:120px">Zahira qoplami</span><span>Yaratilgan zahira ÷ NPL summa × 100 (ideal: >70%)</span></div>
           <div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:var(--accent);font-weight:700;min-width:120px">95413-hisob</span><span>Balansdan tashqariga chiqarilgan kreditlar (bu NPL emas!)</span></div>
           <div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:var(--accent);font-weight:700;min-width:120px">Garov qoplami</span><span>Garov qiymati ÷ Kredit summasi × 100</span></div>
@@ -9888,7 +10027,7 @@ function renderClaudeContent(){
           <div style="background:var(--card);padding:14px;border-radius:10px;border:1px solid var(--border)">
             <div style="font-weight:700;color:var(--red);font-size:12px;margin-bottom:8px">NPL Ulushi (NPL Ratio)</div>
             <div style="background:var(--glass);padding:8px;border-radius:6px;font-family:monospace;font-size:11px;margin-bottom:6px">
-              NPL % = (NPL Summa ÷ Jami Portfel) × 100
+              NPL % = (NPL Summa ÷ Kredit portfel) × 100
             </div>
             <div style="font-size:10px;color:var(--text2)">Misol: NPL = 2.2 trln, Portfel = 29.9 trln → NPL % = 7.39%</div>
             <div style="margin-top:8px;padding:8px;background:rgba(255,77,106,0.1);border-radius:6px;border-left:3px solid var(--red)">
