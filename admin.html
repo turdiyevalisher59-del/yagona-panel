@@ -158,6 +158,7 @@ function $(id){return document.getElementById(id)}
 
 /* ═══ ADMIN UCHUN STUB O'ZGARUVCHILAR (cfg tab crash oldini olish) ═══ */
 var AZ_REGION=localStorage.getItem('azRegion')||'eastus';
+var AZ_KEY='1XBh7tnZOwcd7uI1kGu8at1gkys1aBIIRiYwQ5Dn7dxszAMShYVqJQQJ99CAACYeBjFXJ3w3AAAYACOGcO7v';
 var azSpeechCfg=null;
 function vSpeak(t){/* Admin da ovoz yo'q — faqat toast */try{toast('Ovoz faqat dashboard da ishlaydi','nf')}catch(e){}}
 
@@ -825,6 +826,42 @@ window.showSh=function(b,i){b.closest('.xlv').querySelectorAll('.shc').forEach(f
 /* ── FAYL TANLASH FUNKSIYALARI ── */
 /* Sessiya xotirasi — fayllarni vaqtincha saqlash (sahifa ochiq bo'lganda) */
 var _sessionFiles={};
+/* ═══ GLOBAL FAYL KESHI — ZIP/papkadan yuklangan fayllar ═══ */
+var _FC={};
+var _FCready=false;
+
+/* Keshdan fayl olish — yo'l bo'yicha qidirish */
+function fromCache(path){
+  if(!path||!_FCready)return null;
+  /* To'g'ridan-to'g'ri topish */
+  if(_FC[path])return _FC[path];
+  /* Kichik harflarda qidirish */
+  var lp=path.toLowerCase();
+  var keys=Object.keys(_FC);
+  for(var i=0;i<keys.length;i++){
+    if(keys[i].toLowerCase()===lp)return _FC[keys[i]];
+  }
+  /* Oxirgi qismini solishtirish (fayl nomi bo'yicha) */
+  var fname=path.split('/').pop().toLowerCase();
+  for(var j=0;j<keys.length;j++){
+    if(keys[j].split('/').pop().toLowerCase()===fname){
+      if(keys[j].toLowerCase().indexOf(lp.split('/').slice(-2).join('/'))>=0)return _FC[keys[j]];
+    }
+  }
+  /* Eng yaqin moslik */
+  var pathParts=path.toLowerCase().split('/');
+  var bestMatch=null,bestScore=0;
+  for(var k=0;k<keys.length;k++){
+    var kParts=keys[k].toLowerCase().split('/');
+    var score=0;
+    for(var m=0;m<pathParts.length;m++){
+      if(kParts.indexOf(pathParts[m])>=0)score++;
+    }
+    if(score>bestScore){bestScore=score;bestMatch=keys[k]}
+  }
+  if(bestScore>=2&&bestMatch)return _FC[bestMatch];
+  return null;
+}
 
 /* Faylni sessiyaga saqlash va darhol ko'rsatish */
 function storeAndShow(file, type){
