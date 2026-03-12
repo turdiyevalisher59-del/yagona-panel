@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════════
@@ -1459,393 +1460,348 @@ function save(){
   cloudPush();
 }
 
-/* ═══ BULUT SINXRONIZATSIYA — npoint.io orqali barcha qurilmalar orasida sync ═══ */
-var CLOUD_URL=localStorage.getItem('cloudUrl')||'https://api.npoint.io/73a6a46079966e775e20';
-var _cloudSyncing=false;
-function _getCloudUrl(){
-  /* DOIM hardcoded URL qaytaradi — ishonchli sinxronizatsiya uchun */
-  return 'https://api.npoint.io/73a6a46079966e775e20';
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUPABASE BULUT SINXRONIZATSIYA
+   npoint.io → Supabase Database + Storage
+   
+   Afzalliklari:
+   ✅ 500MB database (npoint 200KB)
+   ✅ 1GB fayl saqlash (HTML/Excel)
+   ✅ Real-time sinxronizatsiya
+   ✅ localStorage to'lmaydi
+   ✅ Tezkor (edge CDN)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Supabase config */
+var SUPABASE_URL = localStorage.getItem('sb_url') || 'https://nywnogjogqlmhthsgkvz.supabase.co';
+var SUPABASE_KEY = localStorage.getItem('sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55d25vZ2pvZ3FsbWh0aHNna3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyODM0NTIsImV4cCI6MjA4ODg1OTQ1Mn0.kXq0GmWzuPIY2huL4BJQuvx9wZ8HgczB6-eaEFnCAw4';
+var _sb = null; /* Supabase client */
+var _cloudSyncing = false;
+
+/* Supabase client yaratish */
+function _initSupabase(){
+  if(_sb) return _sb;
+  if(!SUPABASE_URL || !SUPABASE_KEY){
+    console.log('⚠️ Supabase sozlanmagan');
+    return null;
+  }
+  try{
+    _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('🟢 Supabase client yaratildi');
+    return _sb;
+  }catch(e){
+    console.error('Supabase init xato:', e);
+    return null;
+  }
 }
 
-/* Bulutdan ma'lumot olish */
+/* ═══ Eski API bilan moslik (index.html ning boshqa joylari ishlatadi) ═══ */
+var CLOUD_URL = SUPABASE_URL;
+function _getCloudUrl(){ return SUPABASE_URL; }
+
+/* ═══ BULUTDAN MA'LUMOT OLISH ═══ */
 async function cloudPull(){
-  var url=_getCloudUrl();if(!url)return null;
+  var sb = _initSupabase();
+  if(!sb) return _fallbackCloudPull();
+  
   try{
-    var r=await fetch(url,{cache:'no-store'});
-    if(!r.ok)return null;
-    var data=await r.json();
-    if(data&&data.leaders&&data.leaders.length>0){
-      console.log('☁ Cloud pull OK - ' + data.leaders.length + ' rahbar');
+    var {data, error} = await sb.from('dashboard_config').select('data').eq('id','main').single();
+    if(error){
+      console.warn('Supabase pull xato:', error.message);
+      return _fallbackCloudPull();
+    }
+    if(data && data.data && data.data.leaders && data.data.leaders.length > 0){
+      console.log('🟢 Supabase pull OK: v' + (data.data._v||0) + ', ' + data.data.leaders.length + ' rahbar');
+      return data.data;
+    }
+    return null;
+  }catch(e){
+    console.warn('Supabase pull exception:', e);
+    return _fallbackCloudPull();
+  }
+}
+
+/* npoint.io fallback (agar Supabase sozlanmagan bo'lsa) */
+async function _fallbackCloudPull(){
+  var url = 'https://api.npoint.io/73a6a46079966e775e20';
+  try{
+    var r = await fetch(url, {cache:'no-store'});
+    if(!r.ok) return null;
+    var data = await r.json();
+    if(data && data.leaders && data.leaders.length > 0){
+      console.log('☁ npoint fallback pull OK');
       return data;
     }
-  }catch(e){console.warn('Cloud pull xatosi:',e)}
+  }catch(e){}
   return null;
 }
 
-/* Bulutga ma'lumot yuklash */
+/* ═══ BULUTGA MA'LUMOT YUKLASH ═══ */
 async function cloudPush(){
-  var url = _getCloudUrl();
-  if(!url){
-    console.warn('☁️ cloudPush: URL mavjud emas');
-    return false;
-  }
-  if(_cloudSyncing){
-    console.log('☁️ cloudPush: allaqachon sinxronlanmoqda...');
-    return false;
-  }
-  if(!D || !D.leaders){
-    console.error('☁️ cloudPush: D mavjud emas!');
-    return false;
-  }
-  
+  if(_cloudSyncing || !D || !D.leaders) return false;
   _cloudSyncing = true;
-  console.log('☁️ BULUTGA YUKLANMOQDA...');
   
-  try{
-    var dataToSend = JSON.stringify(D);
-    console.log('☁️ Yuborilmoqda: ' + (dataToSend.length/1024).toFixed(1) + ' KB');
-    
-    var response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      },
-      body: dataToSend
+  /* Keshlarni tozalash */
+  var cleanD = JSON.parse(JSON.stringify(D));
+  if(cleanD.leaders){
+    cleanD.leaders.forEach(function(l){
+      if(l.departments) l.departments.forEach(function(d){
+        if(d.dashboards) d.dashboards.forEach(function(db){
+          delete db._htmlCache; delete db._xlCache;
+        });
+      });
     });
-    
-    if(response.ok){
-      console.log('☁️ ═══════════════════════════════════════════');
-      console.log('☁️ ✅ BULUTGA MUVAFFAQIYATLI SAQLANDI!');
-      console.log('☁️    📊 Versiya: v' + D._v);
-      console.log('☁️    👥 Rahbarlar: ' + D.leaders.length);
-      console.log('☁️    📁 Bo\'limlar: ' + D.leaders.reduce(function(s,l){return s+(l.departments?l.departments.length:0)},0));
-      console.log('☁️ ═══════════════════════════════════════════');
+  }
+  delete cleanD._files;
+  if(cleanD._tasks){
+    ['pending','overdue','completed'].forEach(function(k){
+      if(cleanD._tasks[k]) cleanD._tasks[k].forEach(function(t){ delete t.reportFile; });
+    });
+    if(cleanD._tasks.completed && cleanD._tasks.completed.length > 30)
+      cleanD._tasks.completed = cleanD._tasks.completed.slice(0, 30);
+  }
+  
+  var sb = _initSupabase();
+  if(sb){
+    try{
+      var {error} = await sb.from('dashboard_config').upsert({
+        id: 'main',
+        data: cleanD,
+        updated_at: new Date().toISOString()
+      });
+      if(error) throw error;
+      console.log('🟢 Supabase push OK: v' + D._v);
       showCloudStatus('ok');
       _cloudSyncing = false;
       return true;
-    }else{
-      console.error('☁️ Sinxronlash xatosi: HTTP ' + response.status);
+    }catch(e){
+      console.warn('Supabase push xato:', e.message);
+      /* npoint fallback */
+      await _fallbackCloudPush(cleanD);
       _cloudSyncing = false;
       return false;
     }
-  }catch(e){
-    console.error('☁️ Ulanish xatosi:', e.message);
+  }else{
+    await _fallbackCloudPush(cleanD);
     _cloudSyncing = false;
     return false;
   }
 }
 
+/* npoint.io fallback push */
+async function _fallbackCloudPush(cleanD){
+  try{
+    var url = 'https://api.npoint.io/73a6a46079966e775e20';
+    await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(cleanD)});
+    console.log('☁ npoint fallback push OK');
+    showCloudStatus('ok');
+  }catch(e){ console.warn('npoint push xato:', e); }
+}
+
 /* Cloud status ko'rsatish */
 function showCloudStatus(status){
-  var existing=document.getElementById('cloudStatusToast');
-  if(existing)existing.remove();
-  if(status==='ok'){
-    var div=document.createElement('div');
-    div.id='cloudStatusToast';
-    div.style.cssText='position:fixed;bottom:80px;right:20px;background:#22c55e;color:#fff;padding:8px 16px;border-radius:8px;font-size:11px;z-index:9999;animation:fadeIn .3s';
-    div.innerHTML='☁️ Bulutga saqlandi';
+  var existing = document.getElementById('cloudStatusToast');
+  if(existing) existing.remove();
+  if(status === 'ok'){
+    var div = document.createElement('div');
+    div.id = 'cloudStatusToast';
+    div.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#22c55e;color:#fff;padding:8px 16px;border-radius:8px;font-size:11px;z-index:9999;animation:fadeIn .3s';
+    div.innerHTML = '🟢 Supabase ga saqlandi';
     document.body.appendChild(div);
-    setTimeout(function(){div.remove()},2000);
+    setTimeout(function(){ div.remove(); }, 2000);
   }
 }
 
 /* Qo'lda sinxronlash */
 async function manualSync(){
-  var url=_getCloudUrl();
-  if(!url){
-    toast('⚠️ Bulut URL o\'rnatilmagan! Sozlamalar → Bulut sinxronizatsiya','er');
-    openAdm();
-    setTimeout(function(){admTab('cfg')},100);
+  if(!SUPABASE_URL){
+    toast('⚠️ Supabase sozlanmagan! Sozlamalar → Bulut','er');
+    openAdm(); setTimeout(function(){admTab('cfg')},100);
     return;
   }
-  
-  var btn=document.getElementById('syncBtn');
-  var status=document.getElementById('syncStatus');
-  if(btn)btn.disabled=true;
-  if(status)status.textContent='...';
-  
+  var btn = document.getElementById('syncBtn');
+  var status = document.getElementById('syncStatus');
+  if(btn) btn.disabled = true;
+  if(status) status.textContent = '...';
   try{
-    /* Avval bulutga yuklash */
     await cloudPush();
-    /* Keyin bulutdan olish */
-    await syncOnLoad();
-    if(status)status.textContent='✓';
-    toast('☁️ Sinxronlandi!','ok');
+    var cloud = await cloudPull();
+    if(cloud && cloud.leaders){ D = cloud; go('home'); }
+    if(status) status.textContent = '✓';
+    toast('🟢 Sinxronlandi!','ok');
   }catch(e){
-    if(status)status.textContent='✗';
-    toast('Sinxronlash xatosi','er');
+    if(status) status.textContent = '✗';
+    toast('Xato','er');
   }
-  
-  if(btn)btn.disabled=false;
-  setTimeout(function(){if(status)status.textContent='Sinxron'},3000);
+  if(btn) btn.disabled = false;
+  setTimeout(function(){ if(status) status.textContent = 'Sinxron'; }, 3000);
 }
 
-
-
-
-
-/* Bulut sozlash MAJBURIY */
-function showCloudSetupRequired(){
-  var html = '<div id="cloudRequiredModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">'
-    + '<div style="background:var(--card-s);border-radius:16px;max-width:500px;width:100%;overflow:hidden">'
-    + '<div style="background:linear-gradient(135deg,#dc2626,#b91c1c);padding:24px;color:#fff;text-align:center">'
-    + '<div style="font-size:50px;margin-bottom:10px">☁️</div>'
-    + '<div style="font-size:22px;font-weight:800">Bulut Sinxronizatsiya</div>'
-    + '<div style="font-size:12px;opacity:.8;margin-top:6px">Bir martalik sozlash — 1 daqiqa!</div>'
-    + '</div>'
-    + '<div style="padding:24px">'
-    + '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:14px;margin-bottom:16px">'
-    + '<div style="font-weight:700;color:#92400e;margin-bottom:6px">⚠️ Nima uchun kerak?</div>'
-    + '<div style="font-size:12px;color:#a16207">Bulut sozlanmasa, qo\'shgan dashboardlaringiz boshqa kompyuterda ko\'rinmaydi!</div>'
-    + '</div>'
-    + '<div style="font-weight:700;color:var(--t0);margin-bottom:12px">📋 3 ta oson qadam:</div>'
-    + '<div style="background:var(--bg2);border-radius:8px;padding:16px;margin-bottom:16px">'
-    + '<div style="font-size:13px;color:var(--t1);line-height:2.2">'
-    + '<b>1.</b> <a href="https://www.npoint.io/" target="_blank" style="color:#3b82f6;text-decoration:underline;font-weight:600">👉 npoint.io saytini oching</a><br>'
-    + '<b>2.</b> <span style="color:#22c55e;font-weight:600">"Create JSON Bin"</span> bosing → <code style="background:var(--brd);padding:3px 8px;border-radius:4px;font-size:12px">{}</code> yozing → <span style="color:#22c55e;font-weight:600">"Save"</span><br>'
-    + '<b>3.</b> URL ni nusxalab pastga joylang'
-    + '</div>'
-    + '</div>'
-    + '<div style="margin-bottom:16px">'
-    + '<label style="font-size:12px;font-weight:600;color:var(--t0);display:block;margin-bottom:8px">npoint.io URL:</label>'
-    + '<input type="text" id="requiredCloudUrl" placeholder="https://api.npoint.io/xxxxxxxxx" style="width:100%;padding:14px;border:2px solid var(--ac);border-radius:8px;font-size:14px;background:var(--bg);color:var(--t1)">'
-    + '<div style="font-size:10px;color:var(--t3);margin-top:6px">Masalan: https://api.npoint.io/abc123def456</div>'
-    + '</div>'
-    + '<button onclick="saveRequiredCloud()" style="width:100%;padding:16px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px">✅ Saqlash va davom etish</button>'
-    + '<div style="text-align:center">'
-    + '<button onclick="skipCloudSetup()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;text-decoration:underline">Keyinroq sozlayman (tavsiya etilmaydi)</button>'
-    + '</div>'
-    + '</div>'
-    + '</div></div>';
-  
-  document.body.insertAdjacentHTML('beforeend', html);
-  
-  /* URL inputga focus */
-  setTimeout(function(){
-    var inp = document.getElementById('requiredCloudUrl');
-    if(inp) inp.focus();
-  }, 500);
-}
-
-/* Majburiy bulut sozlashni saqlash */
-async function saveRequiredCloud(){
-  var urlInput = document.getElementById('requiredCloudUrl');
-  var url = urlInput ? urlInput.value.trim() : '';
-  
-  if(!url){
-    toast('URL kiriting!', 'er');
-    urlInput.style.borderColor = '#dc2626';
-    return;
-  }
-  
-  if(!url.startsWith('https://api.npoint.io/')){
-    toast('Noto\'g\'ri URL! npoint.io dan oling', 'er');
-    urlInput.style.borderColor = '#dc2626';
-    return;
-  }
-  
-  /* Saqlash */
-  localStorage.setItem('cloudUrl', url);
-  CLOUD_URL = url;
-  
-  /* Test va yuklash */
-  try{
-    toast('⏳ Ulanmoqda...', 'nf');
-    
-    var r = await fetch(url);
-    if(r.ok){
-      /* Ma'lumotlarni yuklash */
-      D._v = (D._v || 0) + 1;
-      D._lastSync = Date.now();
-      
-      await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(D)
-      });
-      
-      toast('✅ Bulut ulandi! Ma\'lumotlar sinxronlandi.', 'ok');
-      
-      /* Modalni yopish */
-      var modal = document.getElementById('cloudRequiredModal');
-      if(modal) modal.remove();
-      
-      /* Sahifani yangilash */
-      renderHome();
-    }else{
-      toast('URL ishlamayapti. Tekshiring!', 'er');
-      urlInput.style.borderColor = '#dc2626';
-    }
-  }catch(e){
-    toast('Xatolik: ' + e.message, 'er');
-    urlInput.style.borderColor = '#dc2626';
-  }
-}
-
-/* Bulut sozlashni o'tkazib yuborish */
-function skipCloudSetup(){
-  var modal = document.getElementById('cloudRequiredModal');
-  if(modal) modal.remove();
-  toast('⚠️ Bulut sozlanmadi. Sozlamalardan sozlashingiz mumkin.', 'nf');
-}
-
-
-/* Tez bulut sozlash */
-function quickCloudSetup(){
-  var banner = document.getElementById('cloudSetupBanner');
-  if(banner) banner.remove();
-  
-  var html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">'
-    + '<div style="background:var(--card-s);border-radius:16px;max-width:500px;width:100%;overflow:hidden">'
-    + '<div style="background:linear-gradient(135deg,#22c55e,#16a34a);padding:20px;color:#fff">'
-    + '<div style="font-size:20px;font-weight:800">☁️ Bulut Sinxronizatsiya</div>'
-    + '<div style="font-size:12px;opacity:.8;margin-top:4px">3 qadam bilan sozlang — 1 daqiqa!</div>'
-    + '</div>'
-    + '<div style="padding:20px">'
-    + '<div style="background:var(--bg2);border-radius:8px;padding:16px;margin-bottom:16px">'
-    + '<div style="font-weight:700;color:var(--t0);margin-bottom:12px">📋 Qadamlar:</div>'
-    + '<div style="font-size:12px;color:var(--t1);line-height:2">'
-    + '<b>1.</b> <a href="https://www.npoint.io/" target="_blank" style="color:var(--ac);text-decoration:underline">npoint.io</a> saytiga o\'ting<br>'
-    + '<b>2.</b> "Create JSON Bin" bosing → <code style="background:var(--brd);padding:2px 6px;border-radius:4px">{}</code> yozing → "Save"<br>'
-    + '<b>3.</b> URL ni nusxalang va quyiga joylang'
-    + '</div>'
-    + '</div>'
-    + '<div style="margin-bottom:16px">'
-    + '<label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:6px">npoint.io URL:</label>'
-    + '<input type="text" id="quickCloudUrl" placeholder="https://api.npoint.io/xxxxxxxxx" style="width:100%;padding:12px;border:2px solid var(--brd2);border-radius:8px;font-size:13px;background:var(--bg);color:var(--t1)">'
-    + '</div>'
-    + '<button onclick="saveQuickCloud()" style="width:100%;padding:14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">✅ Saqlash va sinxronlash</button>'
-    + '<div style="text-align:center;margin-top:12px">'
-    + '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer">Bekor qilish</button>'
-    + '</div>'
-    + '</div>'
-    + '</div></div>';
-  
-  document.body.insertAdjacentHTML('beforeend', html);
-}
-
-/* Tez sozlashni saqlash */
-async function saveQuickCloud(){
-  var urlInput = document.getElementById('quickCloudUrl');
-  var url = urlInput ? urlInput.value.trim() : '';
-  
-  if(!url){
-    toast('URL kiriting!', 'er');
-    return;
-  }
-  
-  if(!url.startsWith('https://api.npoint.io/')){
-    toast('Noto\'g\'ri URL! npoint.io dan oling', 'er');
-    return;
-  }
-  
-  /* Saqlash */
-  localStorage.setItem('cloudUrl', url);
-  CLOUD_URL = url;
-  
-  /* Test qilish */
-  try{
-    toast('⏳ Tekshirilmoqda...', 'nf');
-    var r = await fetch(url);
-    if(r.ok){
-      /* Ma'lumotlarni yuklash */
-      await cloudPush();
-      toast('✅ Bulut ulandi va ma\'lumotlar yuklandi!', 'ok');
-      
-      /* Modalni yopish */
-      var modal = document.querySelector('div[style*="position:fixed"]');
-      if(modal) modal.remove();
-    }else{
-      toast('URL ishlamayapti. Tekshiring!', 'er');
-    }
-  }catch(e){
-    toast('Xatolik: ' + e.message, 'er');
-  }
-}
-
-/* Sahifa yuklanganda bulutdan tekshirish */
-async function syncOnLoad(){
-  var cloudData=await cloudPull();
-  if(cloudData){
-    var localVersion=D._v||0;
-    var cloudVersion=cloudData._v||0;
-    var localSync=D._lastSync||0;
-    var cloudSync=cloudData._lastSync||0;
-    
-    /* Agar bulut versiyasi yangi bo'lsa */
-    if(cloudVersion>localVersion || cloudSync>localSync){
-      console.log('☁ Bulutdan yangilanmoqda (cloud v'+cloudVersion+' > local v'+localVersion+')');
-      D=cloudData;
-      try{localStorage.setItem('cbNE',JSON.stringify(D))}catch(e){}
-      renderHome();
-      toast('☁ Bulutdan sinxronlandi','ok');
-    }else{
-      console.log('✓ Local versiya yangi yoki teng');
-    }
-  }
-}
-
-/* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi */
+/* Bulutdan MAJBURIY sinxronlash */
 async function forceSyncFromCloud(){
-  var url = _getCloudUrl();
-  if(!url){
-    console.log('Cloud URL yo\'q');
-    return false;
-  }
-  
   try{
-    console.log('🔄 Bulutdan yuklanmoqda: ' + url);
-    var r = await fetch(url + '?t=' + Date.now(), {
-      cache: 'no-store',
-      headers: {'Cache-Control': 'no-cache'}
-    });
-    
-    if(!r.ok){
-      console.warn('Cloud fetch failed:', r.status);
-      return false;
-    }
-    
-    var cloudData = await r.json();
-    console.log('📥 Cloud javob:', cloudData ? 'OK' : 'BO\'SH', cloudData ? ('v' + (cloudData._v||0)) : '');
-    
+    console.log('🔄 Supabase dan yuklanmoqda...');
+    var cloudData = await cloudPull();
     if(cloudData && cloudData.leaders && cloudData.leaders.length > 0){
-      console.log('✅ MAJBURIY YANGILASH: ' + cloudData.leaders.length + ' rahbar, v' + (cloudData._v || 0));
-      
-      /* MAJBURIY - bulut ma'lumotini ishlatish, versiya tekshiruvisiz */
+      console.log('✅ MAJBURIY YANGILASH: ' + cloudData.leaders.length + ' rahbar');
       D = cloudData;
-      
-      /* Agar D da cloudUrl bo'lsa, localStorage ga saqlash */
-      if(D._cloudUrl && !localStorage.getItem('cloudUrl')){
-        localStorage.setItem('cloudUrl', D._cloudUrl);
-        CLOUD_URL = D._cloudUrl;
-        console.log('🔗 CloudUrl yangilandi: ' + D._cloudUrl);
-      }
-      
-      /* LocalStorage ga saqlash */
+      /* localStorage ga minimal saqlash */
       try{
         localStorage.removeItem('cbNE');
-        var _sData=JSON.parse(JSON.stringify(D));
-        if(_sData.leaders)_sData.leaders.forEach(function(l){if(l.departments)l.departments.forEach(function(d){if(d.dashboards)d.dashboards.forEach(function(db){delete db._htmlCache;delete db._xlCache})})});
+        var _sData = JSON.parse(JSON.stringify(D));
+        if(_sData.leaders) _sData.leaders.forEach(function(l){if(l.departments)l.departments.forEach(function(d){if(d.dashboards)d.dashboards.forEach(function(db){delete db._htmlCache;delete db._xlCache})})});
         delete _sData._files;
         localStorage.setItem('cbNE', JSON.stringify(_sData));
-        console.log('💾 LocalStorage yangilandi');
-      }catch(e){
-        console.warn('LocalStorage xatosi:', e);
-      }
-      
-      toast('☁️ Ma\'lumotlar yuklandi!', 'ok');
+      }catch(e){ console.warn('localStorage:', e); }
+      toast('🟢 Supabase dan yuklandi!','ok');
       return true;
-    }else{
-      console.log('⚠️ Bulutda ma\'lumot yo\'q yoki bo\'sh');
-      return false;
     }
+    return false;
   }catch(e){
-    console.warn('Cloud sync error:', e);
-    toast('Bulut xatosi: ' + e.message, 'er');
+    console.warn('Sync xato:', e);
     return false;
   }
 }
+
+/* Bulut sozlash MAJBURIY — o'tkazib yuboriladi agar Supabase bor */
+function showCloudSetupRequired(){
+  if(SUPABASE_URL) return; /* Supabase bor — kerak emas */
+  /* Agar npoint dan D yuklangan bo'lsa — hech narsa qilmaslik */
+  if(D && D.leaders && D.leaders.length > 0) return;
+}
+
+/* Tez bulut sozlash — Supabase versiya */
+function quickCloudSetup(){
+  openAdm(); setTimeout(function(){admTab('cfg')},100);
+}
+function saveRequiredCloud(){ quickCloudSetup(); }
+function skipCloudSetup(){}
+
+/* Bulut sozlash saqlash funksiyalari */
+function saveCloudUrl(){
+  var url = (document.getElementById('sbUrlInp')||{}).value||'';
+  var key = (document.getElementById('sbKeyInp')||{}).value||'';
+  url = url.trim(); key = key.trim();
+  
+  if(url && !url.startsWith('https://')){toast('URL https:// bilan boshlanishi kerak','er');return}
+  
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  SUPABASE_URL = url;
+  SUPABASE_KEY = key;
+  CLOUD_URL = url;
+  _sb = null; /* Qayta yaratish uchun */
+  
+  var ind = document.getElementById('cloudInd');
+  if(ind){
+    if(url && key){ind.textContent='🟢 Supabase ulangan';ind.style.color='#22c55e'}
+    else{ind.textContent='⚪ Ulanmagan';ind.style.color='var(--t3)'}
+  }
+  toast(url?'🟢 Supabase saqlandi':'⚪ Ulanish o\'chirildi','ok');
+}
+
+async function testCloud(){
+  if(!SUPABASE_URL || !SUPABASE_KEY){toast('Avval URL va Key kiriting','er');return}
+  toast('🔍 Supabase test...','nf');
+  var sb = _initSupabase();
+  if(!sb){toast('❌ Supabase client yaratilmadi','er');return}
+  try{
+    var {data, error} = await sb.from('dashboard_config').select('id').limit(1);
+    if(error) throw error;
+    toast('✅ Supabase ishlayapti! Jadval mavjud.','ok');
+  }catch(e){
+    if(e.message && e.message.includes('does not exist')){
+      toast('❌ "dashboard_config" jadvali topilmadi. SQL ni ishga tushiring!','er');
+    }else{
+      toast('❌ Xato: ' + e.message.slice(0,80),'er');
+    }
+  }
+}
+
+async function pushAllToCloud(){
+  if(!SUPABASE_URL){toast('Avval Supabase sozlang','er');return}
+  toast('⬆ Yuklanmoqda...','nf');
+  D._v = (D._v||0) + 1;
+  var ok = await cloudPush();
+  if(ok) toast('✅ Supabase ga yuklandi (v'+D._v+')','ok');
+  else toast('⚠️ Supabase xato, npoint ga yuklandi','nf');
+}
+
+/* Eski syncOnLoad — cloudPull wrapper */
+async function syncOnLoad(){
+  var cloud = await cloudPull();
+  if(cloud && cloud._v && cloud._v > (D?D._v||0:0)){
+    D = cloud;
+    try{localStorage.setItem('cbNE',JSON.stringify(D))}catch(e){}
+    renderHome();
+    console.log('🟢 Supabase dan yangilandi v'+cloud._v);
+  }
+}
+
+/* ═══ SUPABASE STORAGE — FAYLLAR SAQLASH ═══ */
+async function sbUploadFile(filePath, file){
+  var sb = _initSupabase();
+  if(!sb){toast('Supabase sozlanmagan','er');return null}
+  try{
+    var {data, error} = await sb.storage.from('dashboard-files').upload(filePath, file, {
+      upsert: true,
+      contentType: file.type || 'application/octet-stream'
+    });
+    if(error) throw error;
+    /* Public URL olish */
+    var {data: urlData} = sb.storage.from('dashboard-files').getPublicUrl(filePath);
+    console.log('🟢 Fayl yuklandi:', filePath);
+    return urlData.publicUrl;
+  }catch(e){
+    console.error('Fayl yuklash xato:', e);
+    toast('Fayl yuklash xato: '+e.message.slice(0,50),'er');
+    return null;
+  }
+}
+
+async function sbDownloadFile(filePath){
+  var sb = _initSupabase();
+  if(!sb) return null;
+  try{
+    var {data, error} = await sb.storage.from('dashboard-files').download(filePath);
+    if(error) throw error;
+    return data; /* Blob */
+  }catch(e){
+    console.warn('Fayl yuklab olish xato:', filePath, e.message);
+    return null;
+  }
+}
+
+async function sbDeleteFile(filePath){
+  var sb = _initSupabase();
+  if(!sb) return false;
+  try{
+    var {error} = await sb.storage.from('dashboard-files').remove([filePath]);
+    if(error) throw error;
+    toast('✅ Fayl o\'chirildi','ok');
+    return true;
+  }catch(e){
+    toast('Xato: '+e.message,'er');
+    return false;
+  }
+}
+
+async function sbListFiles(folder){
+  var sb = _initSupabase();
+  if(!sb) return [];
+  try{
+    var {data, error} = await sb.storage.from('dashboard-files').list(folder || '', {limit: 100});
+    if(error) throw error;
+    return data || [];
+  }catch(e){
+    console.warn('Fayllar ro\'yxati xato:', e);
+    return [];
+  }
+}
+
+
+
+
 
 function fL(id){return D.leaders.find(function(l){return l.id===id})}
 function fDp(lid,did){var l=fL(lid);return l?l.departments.find(function(d){return d.id===did}):null}
@@ -3283,7 +3239,7 @@ function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t
       + '</div></div>';
     setTimeout(function(){ renderGitHubFilesPanel(); }, 100);
   }
-  else if(tab==='cfg'){var cUrl=_getCloudUrl();b.innerHTML='<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:4px">📦 Loyihani yuklash</div>'
+  else if(tab==='cfg'){b.innerHTML='<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:4px">📦 Loyihani yuklash</div>'
     +'<div style="font-size:11px;color:var(--t2);margin-bottom:10px">ZIP yoki papka yuklang — barcha dashboard va Excel fayllar avtomatik ishlaydi</div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">'
     +'<button class="btn btn-p" onclick="loadProjectZip()">📦 ZIP tanlash</button>'
@@ -3292,23 +3248,30 @@ function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t
     +'<div id="zipProgress" style="display:none;margin-bottom:10px;background:var(--brd);border-radius:6px;height:6px;overflow:hidden"><div id="zipBar" style="background:var(--ac);height:100%;width:0;border-radius:6px;transition:width .3s"></div></div>'
     +'<div id="zipStatus" style="font-size:10px;color:var(--t2);margin-bottom:16px;display:none"></div>'
     +'<hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'
-    +'<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--ac);margin-bottom:4px">☁ Bulut sinxronizatsiya</div>'
-    +'<div style="font-size:11px;color:var(--t2);margin-bottom:10px">Ma\'lumotlar bulutda saqlanadi — barcha foydalanuvchilar ko\'radi</div>'
-    +(!cUrl?'<div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius);padding:14px;margin-bottom:12px;color:#fff"><div style="font-weight:700;margin-bottom:6px">⚠️ Bulut ulanmagan!</div><div style="font-size:11px;opacity:.9;margin-bottom:10px">Boshqa qurilmalarda o\'zgarishlar ko\'rinmaydi</div><button onclick="quickCloudSetup()" style="padding:10px 20px;background:#fff;color:#d97706;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;width:100%">🚀 Tez sozlash (1 daqiqa)</button></div>':'<div id="cloudInd" style="font-size:12px;font-weight:700;margin-bottom:10px;color:#22c55e">☁ Bulut ulangan ✓</div>')
-    +'<div class="fg"><label class="fl">npoint.io URL</label><input class="fi" id="cloudUrlInp" value="'+(cUrl||'')+'" placeholder="https://api.npoint.io/xxxxxxxxx" style="font-size:12px"></div>'
+    +'<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--ac);margin-bottom:4px">🟢 Supabase Bulut</div>'
+    +'<div style="font-size:11px;color:var(--t2);margin-bottom:10px">Ma\'lumotlar Supabase da saqlanadi — 500MB DB + 1GB Storage</div>'
+    +((!SUPABASE_URL)?'<div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius);padding:14px;margin-bottom:12px;color:#fff"><div style="font-weight:700;margin-bottom:6px">⚠️ Supabase ulanmagan!</div><div style="font-size:11px;opacity:.9;margin-bottom:10px">npoint.io fallback ishlamoqda (200KB limit)</div></div>':'<div id="cloudInd" style="font-size:12px;font-weight:700;margin-bottom:10px;color:#22c55e">🟢 Supabase ulangan ✓</div>')
+    +'<div class="fg"><label class="fl">Supabase URL</label><input class="fi" id="sbUrlInp" value="'+(SUPABASE_URL||'')+'" placeholder="https://xxxxx.supabase.co" style="font-size:12px"></div>'
+    +'<div class="fg"><label class="fl">Supabase Anon Key</label><input class="fi" id="sbKeyInp" type="password" value="'+(SUPABASE_KEY?'••••••••••':'')+'" placeholder="eyJhbGciOi..." style="font-size:12px"></div>'
     +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'
     +'<button class="btn btn-p btn-sm" onclick="saveCloudUrl()">💾 Saqlash</button>'
     +'<button class="btn btn-s btn-sm" onclick="testCloud()">🔍 Test</button>'
     +'<button class="btn btn-s btn-sm" onclick="pushAllToCloud()">⬆ Hamma ma\'lumotni yuklash</button>'
     +'</div>'
     +'<div style="background:var(--card-s);border:1px solid var(--brd2);border-radius:var(--radius);padding:12px;margin-bottom:14px">'
-    +'<div style="font-size:11px;font-weight:700;color:var(--t0);margin-bottom:6px">📋 Sozlash qadamlari:</div>'
-    +'<div style="font-size:10px;color:var(--t2);line-height:1.6">'
-    +'1. <a href="https://www.npoint.io/" target="_blank" style="color:var(--ac);text-decoration:underline">npoint.io</a> ga o\'ting<br>'
-    +'2. "Create JSON Bin" bosing → <code>{}</code> yozing → "Save" bosing<br>'
-    +'3. API URL ni nusxalang (masalan: https://api.npoint.io/abc123)<br>'
-    +'4. Yuqoridagi maydonga joylang va "Saqlash" bosing<br>'
-    +'5. "Hamma ma\'lumotni yuklash" bosing — tamom! ✅'
+    +'<div style="font-size:11px;font-weight:700;color:var(--t0);margin-bottom:6px">📋 Supabase sozlash (3 qadam):</div>'
+    +'<div style="font-size:10px;color:var(--t2);line-height:1.8">'
+    +'<b>1.</b> <a href="https://supabase.com/dashboard" target="_blank" style="color:var(--ac);text-decoration:underline">supabase.com</a> da yangi loyiha yarating (BEPUL)<br>'
+    +'<b>2.</b> SQL Editor da shu kodni ishga tushiring:<br>'
+    +'<code style="display:block;background:var(--bg2);padding:8px;border-radius:6px;font-size:9px;margin:6px 0;line-height:1.5;word-break:break-all">'
+    +'CREATE TABLE dashboard_config (id text PRIMARY KEY DEFAULT \\'main\\', data jsonb NOT NULL DEFAULT \\'{}\\', updated_at timestamptz DEFAULT now());<br>'
+    +'ALTER TABLE dashboard_config ENABLE ROW LEVEL SECURITY;<br>'
+    +'CREATE POLICY \"Allow all\" ON dashboard_config FOR ALL USING (true) WITH CHECK (true);<br>'
+    +'INSERT INTO storage.buckets (id,name,public) VALUES (\\'dashboard-files\\',\\'dashboard-files\\',true) ON CONFLICT DO NOTHING;<br>'
+    +'CREATE POLICY \"Public files\" ON storage.objects FOR ALL USING (bucket_id=\\'dashboard-files\\') WITH CHECK (bucket_id=\\'dashboard-files\\');'
+    +'</code>'
+    +'<b>3.</b> Settings → API dan URL va anon key ni nusxalab yuqoriga joylang<br>'
+    +'💡 <b>npoint.io fallback:</b> Supabase sozlanmasa, eski npoint.io avtomatik ishlatiladi'
     +'</div></div>'
     +'<hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'
     +'<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--ac);margin-bottom:4px">\uD83E\uDD16 Suniy intellekt</div>'
@@ -3533,29 +3496,6 @@ window.resetAll=function(){if(!confirm("Davom?"))return;D=JSON.parse(JSON.string
 window.expJ=function(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,2)]));a.download='mb_data.json';a.click()};
 window.impJ=function(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){try{D=JSON.parse(e.target.result);save();go('home');toast("OK",'ok')}catch(e){toast("Xato",'er')}};r.readAsText(f)};
 
-/* ═══ BULUT BOSHQARISH ═══ */
-function saveCloudUrl(){
-  var url=($('cloudUrlInp')||{}).value||'';url=url.trim();
-  if(url&&!url.startsWith('https://')){toast('URL https:// bilan boshlanishi kerak','er');return}
-  localStorage.setItem('cloudUrl',url);CLOUD_URL=url;
-  /* D ga ham saqlash */
-  D._cloudUrl=url;
-  var ind=$('cloudInd');
-  if(ind){ind.textContent=url?'☁ Bulut ulangan':'⚪ Bulut ulanmagan';ind.style.color=url?'#22c55e':'var(--t3)'}
-  toast(url?'☁ Bulut URL saqlandi':'⚪ Bulut o\'chirildi','ok');
-}
-async function testCloud(){
-  var url=_getCloudUrl();if(!url){toast('Avval URL kiriting','er');return}
-  toast('🔍 Test...','nf');
-  try{var r=await fetch(url+'?t='+Date.now());if(r.ok){var d=await r.json();toast('✅ Bulut ishlayapti! '+(d.leaders?d.leaders.length+' rahbar':'Bo\'sh'),'ok')}else{toast('❌ HTTP xato: '+r.status,'er')}}catch(e){toast('❌ Ulanish xatosi: '+e.message,'er')}
-}
-async function pushAllToCloud(){
-  var url=_getCloudUrl();if(!url){toast('Avval URL kiriting','er');return}
-  toast('⬆ Yuklanmoqda...','nf');D._v=(D._v||0)+1;
-  try{var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(D)});
-  if(r.ok){toast('✅ Barcha ma\'lumot bulutga yuklandi (v'+D._v+')','ok');var ind=$('cloudInd');if(ind){ind.textContent='☁ Sinxronlandi ✓';ind.style.color='#22c55e'}}
-  else{toast('❌ Yuklash xatosi: '+r.status,'er')}}catch(e){toast('❌ Xato: '+e.message,'er')}
-}
 
 /* ═══ AI KALIT BOSHQARISH ═══ */
 function saveAiKey(){
@@ -5007,50 +4947,25 @@ document.addEventListener('DOMContentLoaded',async function(){
   }
   
   try{
-    updateLoader(10, 'Bulutga ulanmoqda...', 'npoint.io');
+    updateLoader(10, 'Bulutga ulanmoqda...', SUPABASE_URL ? 'Supabase' : 'npoint.io fallback');
     
     /* ═══════════════════════════════════════════════════════════════════════════
-       1-QADAM: BULUTDAN YUKLASH — ASOSIY VA YAGONA MANBA
+       1-QADAM: BULUTDAN YUKLASH — SUPABASE yoki NPOINT FALLBACK
        ═══════════════════════════════════════════════════════════════════════════ */
-    var cloudUrl = 'https://api.npoint.io/73a6a46079966e775e20';
     var cloudData = null;
     var cloudSuccess = false;
     
     try{
-      updateLoader(20, 'Bulutdan yuklanmoqda...', 'GET ' + cloudUrl.substring(0,40) + '...');
+      updateLoader(20, 'Bulutdan yuklanmoqda...', SUPABASE_URL ? 'Supabase DB' : 'npoint.io');
       
-      var controller = new AbortController();
-      var timeoutId = setTimeout(function(){ controller.abort(); }, 10000);
+      cloudData = await cloudPull();
+      updateLoader(40, 'Ma\'lumot olinmoqda...', '');
       
-      var response = await fetch(cloudUrl + '?nocache=' + Date.now() + '_' + Math.random(), {
-        method: 'GET',
-        cache: 'no-store',
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
-      
-      clearTimeout(timeoutId);
-      updateLoader(40, 'Ma\'lumot olinmoqda...', 'Status: ' + response.status);
-      
-      if(response.ok){
-        var text = await response.text();
-        updateLoader(50, 'Tahlil qilinmoqda...', text.length + ' bytes');
-        
-        if(text && text.trim().length > 50){
-          cloudData = JSON.parse(text);
-          
-          if(cloudData && cloudData.leaders && cloudData.leaders.length > 0){
-            cloudSuccess = true;
-            console.log('☁️ BULUTDAN MUVAFFAQIYATLI OLINDI:');
-            console.log('   📊 Versiya: v' + (cloudData._v || 0));
-            console.log('   👥 Rahbarlar: ' + cloudData.leaders.length);
-            console.log('   📁 Bo\'limlar: ' + cloudData.leaders.reduce(function(s,l){return s+(l.departments?l.departments.length:0)},0));
-          }
-        }
+      if(cloudData && cloudData.leaders && cloudData.leaders.length > 0){
+        cloudSuccess = true;
+        console.log('🟢 BULUTDAN MUVAFFAQIYATLI OLINDI:');
+        console.log('   📊 Versiya: v' + (cloudData._v || 0));
+        console.log('   👥 Rahbarlar: ' + cloudData.leaders.length);
       }
     }catch(e){
       console.warn('☁️ Bulut xatosi:', e.name, e.message);
