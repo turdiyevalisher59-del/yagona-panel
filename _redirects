@@ -1,0 +1,4 @@
+# Netlify redirects
+/dashboard  /index.html  200
+/settings   /admin.html  200
+/sozlamalar /admin.html  200

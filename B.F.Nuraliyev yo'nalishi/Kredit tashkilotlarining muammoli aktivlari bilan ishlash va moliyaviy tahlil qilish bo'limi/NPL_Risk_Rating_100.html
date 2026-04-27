@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPL Risk Reyting - 100 Ballik Tizim</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--primary:#0F4C75;--secondary:#3282B8;--bg-dark:#1B262C;--bg-card:#222E35;--bg-input:#2D3A42;--text:#FFF;--text-sec:#A8C5D6;--text-muted:#6B8A9E;--success:#10B981;--warning:#F59E0B;--danger:#EF4444;--border:#374955}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg-dark);color:var(--text);min-height:100vh}
+        .container{max-width:1400px;margin:0 auto;padding:20px}
+        .header{background:linear-gradient(135deg,var(--primary),#0A3A5A);border-radius:16px;padding:32px;margin-bottom:24px}
+        .header h1{font-size:26px;margin-bottom:8px}
+        .header p{color:#BBE1FA;font-size:14px}
+        .tabs{display:flex;gap:8px;margin-bottom:24px;background:var(--bg-card);padding:8px;border-radius:12px;flex-wrap:wrap}
+        .tab{padding:12px 24px;background:0;border:0;color:var(--text-sec);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;border-radius:8px;transition:.2s}
+        .tab:hover{background:var(--bg-input);color:var(--text)}
+        .tab.active{background:var(--primary);color:var(--text)}
+        .panel{display:none}.panel.active{display:block}
+        .grid{display:grid;grid-template-columns:1fr 380px;gap:24px}
+        @media(max-width:1024px){.grid{grid-template-columns:1fr}}
+        .card{background:var(--bg-card);border-radius:16px;padding:24px;border:1px solid var(--border)}
+        .card-title{font-size:16px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+        .icon{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center}
+        .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+        @media(max-width:768px){.form-grid{grid-template-columns:1fr}}
+        .form-group{display:flex;flex-direction:column;gap:6px}
+        .form-label{font-size:13px;color:var(--text-sec);font-weight:500}
+        .form-input,.form-select{background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:inherit;font-size:14px}
+        .form-input:focus,.form-select:focus{outline:0;border-color:var(--secondary);box-shadow:0 0 0 3px rgba(50,130,184,.2)}
+        .section-title{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:24px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+        .result-score{text-align:center;padding:32px 20px;background:linear-gradient(180deg,var(--bg-input),var(--bg-card));border-radius:12px;margin-bottom:20px}
+        .score-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+        .score-value{font-size:80px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1;transition:color .3s}
+        .score-unit{font-size:18px;color:var(--text-muted);margin-bottom:16px}
+        .score-value.low{color:var(--success)}.score-value.medium{color:var(--warning)}.score-value.high{color:var(--danger)}
+        .badge{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:24px;font-weight:600;font-size:15px;margin-top:16px}
+        .badge.low{background:rgba(16,185,129,.15);color:var(--success)}
+        .badge.medium{background:rgba(245,158,11,.15);color:var(--warning)}
+        .badge.high{background:rgba(239,68,68,.15);color:var(--danger)}
+        .progress{width:100%;height:14px;background:var(--bg-dark);border-radius:7px;margin:20px 0;overflow:hidden}
+        .progress-bar{height:100%;border-radius:7px;transition:width .5s}
+        .progress-bar.low{background:linear-gradient(90deg,#10B981,#34D399)}
+        .progress-bar.medium{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+        .progress-bar.high{background:linear-gradient(90deg,#EF4444,#F87171)}
+        .markers{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)}
+        .breakdown{display:flex;flex-direction:column;gap:10px}
+        .breakdown-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg-input);border-radius:8px;font-size:13px}
+        .breakdown-item .label{color:var(--text-sec)}
+        .breakdown-item .val{font-family:'JetBrains Mono',monospace;font-weight:600;padding:4px 10px;border-radius:4px;font-size:12px}
+        .val.s1{background:rgba(16,185,129,.2);color:var(--success)}
+        .val.s2{background:rgba(245,158,11,.2);color:var(--warning)}
+        .val.s3{background:rgba(239,68,68,.2);color:var(--danger)}
+        .btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--secondary),var(--primary));border:0;border-radius:10px;color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;margin-top:24px}
+        .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(50,130,184,.4)}
+        .btn-sec{background:var(--bg-input);border:1px solid var(--border);margin-top:12px}
+        .btn-sec:hover{background:var(--border);box-shadow:none;transform:none}
+        .rec{margin-top:20px;padding:16px;background:var(--bg-input);border-radius:10px;font-size:13px;border-left:4px solid var(--secondary)}
+        .rec.low{border-left-color:var(--success)}.rec.medium{border-left-color:var(--warning)}.rec.high{border-left-color:var(--danger)}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+        @media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}}
+        .stat{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
+        .stat-val{font-size:32px;font-weight:700;font-family:'JetBrains Mono',monospace}
+        .stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase}
+        table{width:100%;border-collapse:collapse;font-size:13px}
+        th{text-align:left;padding:12px;background:var(--bg-input);color:var(--text-sec);font-size:11px;text-transform:uppercase}
+        td{padding:12px;border-bottom:1px solid var(--border)}
+        .ind{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}
+        .ind.low{background:var(--success)}.ind.medium{background:var(--warning)}.ind.high{background:var(--danger)}
+        .trend{font-size:11px;padding:4px 8px;border-radius:4px}
+        .trend.up{background:rgba(239,68,68,.15);color:var(--danger)}
+        .trend.down{background:rgba(16,185,129,.15);color:var(--success)}
+        .trend.stable{background:rgba(245,158,11,.15);color:var(--warning)}
+        .cat-tabs{display:flex;gap:8px;margin-bottom:20px}
+        .cat-tab{padding:8px 16px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-sec);font-size:13px;cursor:pointer}
+        .cat-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+        .method h3{font-size:18px;margin-bottom:16px;color:#BBE1FA}
+        .scale{display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg-input);border-radius:10px;margin-bottom:12px}
+        .scale-box{width:60px;height:60px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+        .scale-box span{font-size:10px;font-weight:400}
+        .scale-box.low{background:var(--success)}.scale-box.medium{background:var(--warning);color:#000}.scale-box.high{background:var(--danger)}
+        .scale-info h4{font-size:15px;margin-bottom:4px}.scale-info p{font-size:13px;color:var(--text-muted)}
+        
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>🏦 NPL Risk Reyting Tizimi</h1>
+        <p>Toshkent viloyati banklari uchun • 100 ballik professional baholash tizimi</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab active" onclick="showPanel('ind')">👤 Jismoniy shaxslar</button>
+        <button class="tab" onclick="showPanel('corp')">🏢 Yuridik shaxslar</button>
+        <button class="tab" onclick="showPanel('npl')">📈 NPL Tahlili</button>
+        <button class="tab" onclick="showPanel('method')">📋 Metodologiya</button>
+    </div>
+
+    <!-- JISMONIY SHAXSLAR -->
+    <div id="ind" class="panel active">
+        <div class="grid">
+            <div class="card">
+                <div class="card-title"><div class="icon">👤</div><span>Jismoniy shaxs ma'lumotlari</span></div>
+                
+                <div class="section-title">Kredit ma'lumotlari</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Kredit turi</label>
+                        <select id="i_type" class="form-select" onchange="calcInd()">
+                            <option value="ipoteka">Ipoteka krediti</option>
+                            <option value="avto">Avtokredit</option>
+                            <option value="istemol">Iste'mol krediti</option>
+                            <option value="mikro">Mikrokredit</option>
+                            <option value="talim">Ta'lim krediti</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kredit summasi (mln)</label>
+                        <input type="number" id="i_amount" class="form-input" value="100" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Muddati (oy)</label>
+                        <input type="number" id="i_term" class="form-input" value="36" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Foiz stavkasi (%)</label>
+                        <input type="number" id="i_rate" class="form-input" value="24" onchange="calcInd()">
+                    </div>
+                </div>
+
+                <div class="section-title">Garov va ta'minot</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Garov turi</label>
+                        <select id="i_coll" class="form-select" onchange="calcInd()">
+                            <option value="real">Ko'chmas mulk</option>
+                            <option value="auto">Avtotransport</option>
+                            <option value="guar">Kafolat</option>
+                            <option value="none">Garovsiz</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">LTV nisbati (%)</label>
+                        <input type="number" id="i_ltv" class="form-input" value="70" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Garov sug'urtasi</label>
+                        <select id="i_ins" class="form-select" onchange="calcInd()">
+                            <option value="full">To'liq</option>
+                            <option value="part">Qisman</option>
+                            <option value="none">Yo'q</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Garov joylashuvi</label>
+                        <select id="i_loc" class="form-select" onchange="calcInd()">
+                            <option value="city">Toshkent shahri</option>
+                            <option value="reg">Viloyat markazi</option>
+                            <option value="rur">Qishloq</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Daromad va bandlik</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Oylik daromad (mln)</label>
+                        <input type="number" id="i_income" class="form-input" value="5" step="0.1" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">DSTI nisbati (%)</label>
+                        <input type="number" id="i_dsti" class="form-input" value="35" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ish staji (yil)</label>
+                        <input type="number" id="i_emp" class="form-input" value="5" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bandlik turi</label>
+                        <select id="i_emptype" class="form-select" onchange="calcInd()">
+                            <option value="formal">Rasmiy</option>
+                            <option value="self">O'z-o'zini band</option>
+                            <option value="inf">Norasmiy</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Kredit tarixi</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Kredit tarixi (yil)</label>
+                        <input type="number" id="i_hist" class="form-input" value="3" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Joriy kreditlar</label>
+                        <input type="number" id="i_loans" class="form-input" value="1" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To'lov kechikishlari</label>
+                        <select id="i_delay" class="form-select" onchange="calcInd()">
+                            <option value="none">Yo'q</option>
+                            <option value="few">1-2 marta</option>
+                            <option value="many">3+ marta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">NPL tarixi</label>
+                        <select id="i_npl" class="form-select" onchange="calcInd()">
+                            <option value="never">Hech qachon</option>
+                            <option value="once">1 marta</option>
+                            <option value="mult">Ko'p marta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Demografik</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Yosh</label>
+                        <input type="number" id="i_age" class="form-input" value="35" onchange="calcInd()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ta'lim</label>
+                        <select id="i_edu" class="form-select" onchange="calcInd()">
+                            <option value="high">Oliy</option>
+                            <option value="sec">O'rta maxsus</option>
+                            <option value="basic">O'rta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calcInd()">📊 Riskni Hisoblash</button>
+                <button class="btn btn-sec" onclick="resetInd()">🔄 Tozalash</button>
+            </div>
+
+            <div class="result-panel">
+                <div class="card">
+                    <div class="card-title"><div class="icon">📊</div><span>Baholash natijasi</span></div>
+                    <div class="result-score">
+                        <div class="score-label">RISK BALLI</div>
+                        <div id="i_score" class="score-value medium">45</div>
+                        <div class="score-unit">/ 100 ball</div>
+                        <div class="progress"><div id="i_prog" class="progress-bar medium" style="width:45%"></div></div>
+                        <div class="markers"><span>0 (Xavfsiz)</span><span>35</span><span>65</span><span>100 (Xavfli)</span></div>
+                        <div id="i_badge" class="badge medium">⚠️ O'RTA RISK</div>
+                    </div>
+                    <div class="breakdown">
+                        <div class="breakdown-item"><span class="label">LTV nisbati</span><span id="b_ltv" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">DSTI nisbati</span><span id="b_dsti" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">Daromad</span><span id="b_inc" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">Kredit tarixi</span><span id="b_hist" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">Garov sifati</span><span id="b_coll" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">Bandlik</span><span id="b_emp" class="val s2">O'rtacha</span></div>
+                    </div>
+                    <div id="i_rec" class="rec medium"><strong>📋 Tavsiya:</strong> Qo'shimcha ta'minot talab qilinadi.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- YURIDIK SHAXSLAR -->
+    <div id="corp" class="panel">
+        <div class="grid">
+            <div class="card">
+                <div class="card-title"><div class="icon">🏢</div><span>Yuridik shaxs ma'lumotlari</span></div>
+                
+                <div class="section-title">Biznes profili</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Biznes turi</label>
+                        <select id="c_type" class="form-select" onchange="calcCorp()">
+                            <option value="small">Kichik biznes</option>
+                            <option value="med">O'rta biznes</option>
+                            <option value="large">Yirik korporativ</option>
+                            <option value="agro">Qishloq xo'jaligi</option>
+                            <option value="const">Qurilish</option>
+                            <option value="trade">Savdo</option>
+                            <option value="mfg">Ishlab chiqarish</option>
+                            <option value="it">IT/Texnologiya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Faoliyat muddati (yil)</label>
+                        <input type="number" id="c_years" class="form-input" value="5" onchange="calcCorp()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kredit summasi (mln)</label>
+                        <input type="number" id="c_amount" class="form-input" value="500" onchange="calcCorp()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kredit maqsadi</label>
+                        <select id="c_purpose" class="form-select" onchange="calcCorp()">
+                            <option value="inv">Investitsiya</option>
+                            <option value="work">Aylanma mablag'</option>
+                            <option value="ref">Qayta moliyalash</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Moliyaviy ko'rsatkichlar</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Likvidlik koef.</label>
+                        <input type="number" id="c_liq" class="form-input" value="1.5" step="0.1" onchange="calcCorp()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Qarz/Kapital</label>
+                        <input type="number" id="c_lev" class="form-input" value="0.8" step="0.1" onchange="calcCorp()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">DSCR</label>
+                        <input type="number" id="c_dscr" class="form-input" value="1.4" step="0.1" onchange="calcCorp()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ROA (%)</label>
+                        <input type="number" id="c_roa" class="form-input" value="6" step="0.1" onchange="calcCorp()">
+                    </div>
+                </div>
+
+                <div class="section-title">Garov</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Garov turi</label>
+                        <select id="c_coll" class="form-select" onchange="calcCorp()">
+                            <option value="real">Ko'chmas mulk</option>
+                            <option value="equip">Uskunalar</option>
+                            <option value="inv">Tovar zaxirasi</option>
+                            <option value="guar">Kafolat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">LTV (%)</label>
+                        <input type="number" id="c_ltv" class="form-input" value="60" onchange="calcCorp()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Audit holati</label>
+                        <select id="c_audit" class="form-select" onchange="calcCorp()">
+                            <option value="pos">Ijobiy</option>
+                            <option value="qual">Izohli</option>
+                            <option value="neg">Salbiy/Yo'q</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calcCorp()">📊 Riskni Hisoblash</button>
+                <button class="btn btn-sec" onclick="resetCorp()">🔄 Tozalash</button>
+            </div>
+
+            <div class="result-panel">
+                <div class="card">
+                    <div class="card-title"><div class="icon">📊</div><span>Baholash natijasi</span></div>
+                    <div class="result-score">
+                        <div class="score-label">RISK BALLI</div>
+                        <div id="c_score" class="score-value medium">45</div>
+                        <div class="score-unit">/ 100 ball</div>
+                        <div class="progress"><div id="c_prog" class="progress-bar medium" style="width:45%"></div></div>
+                        <div class="markers"><span>0</span><span>35</span><span>65</span><span>100</span></div>
+                        <div id="c_badge" class="badge medium">⚠️ O'RTA RISK</div>
+                    </div>
+                    <div class="breakdown">
+                        <div class="breakdown-item"><span class="label">Likvidlik</span><span id="bc_liq" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">Leverage</span><span id="bc_lev" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">DSCR</span><span id="bc_dscr" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">ROA</span><span id="bc_roa" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">Garov</span><span id="bc_coll" class="val s2">O'rtacha</span></div>
+                        <div class="breakdown-item"><span class="label">Sektor</span><span id="bc_sec" class="val s2">O'rtacha</span></div>
+                    </div>
+                    <div id="c_rec" class="rec medium"><strong>📋 Tavsiya:</strong> Qo'shimcha tahlil talab qilinadi.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NPL TAHLILI -->
+    <div id="npl" class="panel">
+        <div class="stats">
+            <div class="stat"><div class="stat-val" style="color:var(--secondary)">3.7%</div><div class="stat-label">O'rtacha NPL</div></div>
+            <div class="stat"><div class="stat-val" style="color:var(--danger)">9.2%</div><div class="stat-label">Eng yuqori</div></div>
+            <div class="stat"><div class="stat-val" style="color:var(--success)">2.5%</div><div class="stat-label">Eng past</div></div>
+            <div class="stat"><div class="stat-val" style="color:var(--warning)">21.26</div><div class="stat-label">NPL (trln)</div></div>
+        </div>
+        <div class="card">
+            <div class="card-title"><div class="icon">📈</div><span>Kredit turlari bo'yicha NPL</span></div>
+            <div class="cat-tabs">
+                <button class="cat-tab active" onclick="filterNPL('all',this)">Barchasi</button>
+                <button class="cat-tab" onclick="filterNPL('ind',this)">Jismoniy</button>
+                <button class="cat-tab" onclick="filterNPL('corp',this)">Yuridik</button>
+            </div>
+            <table>
+                <thead><tr><th>Kredit turi</th><th>NPL %</th><th>Trend</th><th>Risk ball</th><th>Toifa</th></tr></thead>
+                <tbody id="npl-body">
+                    <tr data-cat="ind"><td><span class="ind low"></span>Ipoteka (birlamchi)</td><td>2.5%</td><td><span class="trend stable">→</span></td><td>25</td><td><span class="badge low" style="padding:4px 12px;font-size:11px">Past</span></td></tr>
+                    <tr data-cat="ind"><td><span class="ind medium"></span>Ipoteka (ikkilamchi)</td><td>4.2%</td><td><span class="trend up">↑</span></td><td>42</td><td><span class="badge medium" style="padding:4px 12px;font-size:11px">O'rta</span></td></tr>
+                    <tr data-cat="ind"><td><span class="ind medium"></span>Avtokredit (yangi)</td><td>3.8%</td><td><span class="trend up">↑</span></td><td>38</td><td><span class="badge medium" style="padding:4px 12px;font-size:11px">O'rta</span></td></tr>
+                    <tr data-cat="ind"><td><span class="ind high"></span>Avtokredit (ishlatilgan)</td><td>6.5%</td><td><span class="trend up">↑</span></td><td>65</td><td><span class="badge high" style="padding:4px 12px;font-size:11px">Yuqori</span></td></tr>
+                    <tr data-cat="ind"><td><span class="ind high"></span>Iste'mol (garovsiz)</td><td>8.5%</td><td><span class="trend up">↑</span></td><td>85</td><td><span class="badge high" style="padding:4px 12px;font-size:11px">Yuqori</span></td></tr>
+                    <tr data-cat="ind"><td><span class="ind high"></span>Mikrokredit</td><td>9.2%</td><td><span class="trend up">↑</span></td><td>92</td><td><span class="badge high" style="padding:4px 12px;font-size:11px">Yuqori</span></td></tr>
+                    <tr data-cat="ind"><td><span class="ind low"></span>Ta'lim krediti</td><td>2.8%</td><td><span class="trend down">↓</span></td><td>28</td><td><span class="badge low" style="padding:4px 12px;font-size:11px">Past</span></td></tr>
+                    <tr data-cat="corp"><td><span class="ind medium"></span>Kichik biznes</td><td>5.8%</td><td><span class="trend up">↑</span></td><td>58</td><td><span class="badge medium" style="padding:4px 12px;font-size:11px">O'rta</span></td></tr>
+                    <tr data-cat="corp"><td><span class="ind low"></span>Yirik korporativ</td><td>3.5%</td><td><span class="trend down">↓</span></td><td>35</td><td><span class="badge low" style="padding:4px 12px;font-size:11px">Past</span></td></tr>
+                    <tr data-cat="corp"><td><span class="ind high"></span>Qishloq xo'jaligi</td><td>7.2%</td><td><span class="trend up">↑</span></td><td>72</td><td><span class="badge high" style="padding:4px 12px;font-size:11px">Yuqori</span></td></tr>
+                    <tr data-cat="corp"><td><span class="ind high"></span>Qurilish</td><td>6.8%</td><td><span class="trend up">↑</span></td><td>68</td><td><span class="badge high" style="padding:4px 12px;font-size:11px">Yuqori</span></td></tr>
+                    <tr data-cat="corp"><td><span class="ind low"></span>IT/Texnologiya</td><td>3.5%</td><td><span class="trend down">↓</span></td><td>35</td><td><span class="badge low" style="padding:4px 12px;font-size:11px">Past</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- METODOLOGIYA -->
+    <div id="method" class="panel">
+        <div class="card">
+            <div class="card-title"><div class="icon">📋</div><span>Metodologiya (100 ballik tizim)</span></div>
+            <div class="method">
+                <h3>Baholash shkalasi</h3>
+                <div class="scale">
+                    <div class="scale-box low">0-35<span>ball</span></div>
+                    <div class="scale-info"><h4>✅ PAST RISK</h4><p>Kredit tavsiya etiladi. Standart shartlar.</p></div>
+                </div>
+                <div class="scale">
+                    <div class="scale-box medium">36-65<span>ball</span></div>
+                    <div class="scale-info"><h4>⚠️ O'RTA RISK</h4><p>Qo'shimcha ta'minot va monitoring talab qilinadi.</p></div>
+                </div>
+                <div class="scale">
+                    <div class="scale-box high">66-100<span>ball</span></div>
+                    <div class="scale-info"><h4>🔴 YUQORI RISK</h4><p>Kredit tavsiya etilmaydi yoki maxsus shartlar bilan.</p></div>
+                </div>
+                <h3 style="margin-top:32px">Formula</h3>
+                <div style="background:var(--bg-input);padding:20px;border-radius:10px;font-family:'JetBrains Mono',monospace">
+                    Risk_ball = ((Vaznli_o'rtacha - 1) / 2) × 100
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<script>
+function showPanel(id){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+}
+
+function filterNPL(cat,btn){
+    document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#npl-body tr').forEach(r=>{
+        r.style.display=(cat==='all'||r.dataset.cat===cat)?'':'none';
+    });
+}
+
+function sLTV(v){return v<=0?3:v<60?1:v<80?2:3}
+function sDSTI(v){return v<30?1:v<50?2:3}
+function sInc(v){return v>5?1:v>2?2:3}
+function sEmp(v){return v>5?1:v>2?2:3}
+function sHist(v){return v>3?1:v>1?2:3}
+function sColl(t){return t==='real'?1:(t==='auto'||t==='equip')?2:3}
+function sType(t){return(t==='ipoteka'||t==='talim')?1:(t==='avto'||t==='inv')?2:3}
+function sLoans(n){return n<=1?1:n<=3?2:3}
+function sDelay(d){return d==='none'?1:d==='few'?2:3}
+function sAge(a){return(a>=30&&a<=50)?1:(a>=25&&a<=60)?2:3}
+function sLiq(v){return v>2?1:v>1?2:3}
+function sLev(v){return v<0.5?1:v<1.5?2:3}
+function sDSCR(v){return v>1.5?1:v>1.2?2:3}
+function sROA(v){return v>8?1:v>3?2:3}
+function sSec(t){return(t==='large'||t==='it')?1:(t==='agro'||t==='const')?3:2}
+function sYrs(v){return v>5?1:v>2?2:3}
+function sAudit(s){return s==='pos'?1:s==='qual'?2:3}
+function getLbl(s){return s===1?'Yaxshi':s===2?"O'rtacha":'Xavfli'}
+function getCls(s){return s===1?'s1':s===2?'s2':'s3'}
+function to100(w){return Math.round(((w-1)/2)*100)}
+
+function calcInd(){
+    const s={
+        ltv:sLTV(+document.getElementById('i_ltv').value||0),
+        dsti:sDSTI(+document.getElementById('i_dsti').value||0),
+        inc:sInc(+document.getElementById('i_income').value||0),
+        emp:sEmp(+document.getElementById('i_emp').value||0),
+        hist:sHist(+document.getElementById('i_hist').value||0),
+        coll:sColl(document.getElementById('i_coll').value),
+        type:sType(document.getElementById('i_type').value),
+        loans:sLoans(+document.getElementById('i_loans').value||0),
+        delay:sDelay(document.getElementById('i_delay').value),
+        age:sAge(+document.getElementById('i_age').value||35)
+    };
+    const w={ltv:.15,dsti:.15,inc:.12,hist:.12,coll:.12,emp:.10,type:.08,loans:.08,delay:.04,age:.04};
+    let sum=0;for(let k in w)sum+=s[k]*w[k];
+    const score=to100(sum);
+    updInd(score,s);
+}
+
+function updInd(score,s){
+    const el=document.getElementById('i_score'),prog=document.getElementById('i_prog'),badge=document.getElementById('i_badge'),rec=document.getElementById('i_rec');
+    el.textContent=score;prog.style.width=score+'%';
+    el.className='score-value';prog.className='progress-bar';badge.className='badge';rec.className='rec';
+    let cls,txt,msg,em;
+    if(score<=35){cls='low';txt='PAST RISK';em='✅';msg='Kredit tavsiya etiladi. Standart shartlar.';}
+    else if(score<=65){cls='medium';txt="O'RTA RISK";em='⚠️';msg="Qo'shimcha ta'minot va monitoring talab qilinadi.";}
+    else{cls='high';txt='YUQORI RISK';em='🔴';msg='Kredit tavsiya etilmaydi. Kuchli ta\'minot kerak.';}
+    el.classList.add(cls);prog.classList.add(cls);badge.classList.add(cls);rec.classList.add(cls);
+    badge.innerHTML=em+' '+txt;rec.innerHTML='<strong>📋 Tavsiya:</strong> '+msg;
+    ['ltv','dsti','inc','hist','coll','emp'].forEach(k=>{
+        const e=document.getElementById('b_'+k);
+        e.textContent=getLbl(s[k]);e.className='val '+getCls(s[k]);
+    });
+}
+
+function resetInd(){
+    ['i_type','i_coll','i_ins','i_loc','i_emptype','i_delay','i_npl','i_edu'].forEach(id=>document.getElementById(id).selectedIndex=0);
+    document.getElementById('i_amount').value='100';document.getElementById('i_term').value='36';document.getElementById('i_rate').value='24';
+    document.getElementById('i_ltv').value='70';document.getElementById('i_income').value='5';document.getElementById('i_dsti').value='35';
+    document.getElementById('i_emp').value='5';document.getElementById('i_hist').value='3';document.getElementById('i_loans').value='1';
+    document.getElementById('i_age').value='35';calcInd();
+}
+
+function calcCorp(){
+    const s={
+        liq:sLiq(+document.getElementById('c_liq').value||1.5),
+        lev:sLev(+document.getElementById('c_lev').value||0.8),
+        dscr:sDSCR(+document.getElementById('c_dscr').value||1.4),
+        roa:sROA(+document.getElementById('c_roa').value||6),
+        ltv:sLTV(+document.getElementById('c_ltv').value||60),
+        coll:sColl(document.getElementById('c_coll').value),
+        sec:sSec(document.getElementById('c_type').value),
+        yrs:sYrs(+document.getElementById('c_years').value||5),
+        audit:sAudit(document.getElementById('c_audit').value),
+        purp:sType(document.getElementById('c_purpose').value)
+    };
+    const w={dscr:.15,ltv:.12,lev:.12,liq:.10,roa:.10,coll:.12,sec:.10,yrs:.08,audit:.06,purp:.05};
+    let sum=0;for(let k in w)sum+=s[k]*w[k];
+    const score=to100(sum);
+    updCorp(score,s);
+}
+
+function updCorp(score,s){
+    const el=document.getElementById('c_score'),prog=document.getElementById('c_prog'),badge=document.getElementById('c_badge'),rec=document.getElementById('c_rec');
+    el.textContent=score;prog.style.width=score+'%';
+    el.className='score-value';prog.className='progress-bar';badge.className='badge';rec.className='rec';
+    let cls,txt,msg,em;
+    if(score<=35){cls='low';txt='PAST RISK';em='✅';msg='Kredit tavsiya etiladi.';}
+    else if(score<=65){cls='medium';txt="O'RTA RISK";em='⚠️';msg="Qo'shimcha tahlil talab qilinadi.";}
+    else{cls='high';txt='YUQORI RISK';em='🔴';msg='Kredit tavsiya etilmaydi.';}
+    el.classList.add(cls);prog.classList.add(cls);badge.classList.add(cls);rec.classList.add(cls);
+    badge.innerHTML=em+' '+txt;rec.innerHTML='<strong>📋 Tavsiya:</strong> '+msg;
+    const map={liq:'bc_liq',lev:'bc_lev',dscr:'bc_dscr',roa:'bc_roa',coll:'bc_coll',sec:'bc_sec'};
+    for(let k in map){const e=document.getElementById(map[k]);e.textContent=getLbl(s[k]);e.className='val '+getCls(s[k]);}
+}
+
+function resetCorp(){
+    ['c_type','c_purpose','c_coll','c_audit'].forEach(id=>document.getElementById(id).selectedIndex=0);
+    document.getElementById('c_years').value='5';document.getElementById('c_amount').value='500';
+    document.getElementById('c_liq').value='1.5';document.getElementById('c_lev').value='0.8';
+    document.getElementById('c_dscr').value='1.4';document.getElementById('c_roa').value='6';
+    document.getElementById('c_ltv').value='60';calcCorp();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{calcInd();calcCorp();});
+</script>
+</body>
+</html>

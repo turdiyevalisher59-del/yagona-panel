@@ -1,0 +1,1229 @@
+/* Responsive Design - Mobile & Tablet */
+/* Parkentsoy Voice - Responsive Styles */
+/* To'liq qurilmalar uchun moslashtirish */
+
+/* ========== GLOBAL RESPONSIVE FIXES ========== */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== BASE IMAGE FIXES (All Devices) ========== */
+.bank-card-image {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.bank-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.bank-card-image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    pointer-events: none;
+}
+
+.bank-card-info {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    color: #fff;
+}
+
+/* ========== TABLET (768px - 1024px) ========== */
+@media screen and (max-width: 1024px) {
+
+    /* Hero Section */
+    .hero-content {
+        padding: 1.5rem;
+        max-width: 100%;
+    }
+
+    .hero-title {
+        font-size: 2.5rem !important;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem !important;
+        padding: 0 20px;
+    }
+
+    .hero-stats {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .hero-stat-value {
+        font-size: 2rem;
+    }
+
+    .hero-blob {
+        display: none;
+    }
+
+    /* Dashboard */
+    .dashboard-header {
+        padding: 30px 20px 60px;
+    }
+
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+
+    .header-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .header-stat-card {
+        padding: 20px;
+    }
+
+    .header-stat-value {
+        font-size: 2rem;
+    }
+
+    .stats-section {
+        padding: 0 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-card-value {
+        font-size: 1.75rem;
+    }
+
+    .banks-section {
+        padding: 32px 16px;
+    }
+
+    .banks-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px;
+    }
+
+    .bank-card {
+        padding: 20px;
+    }
+
+    /* Bank Card Images - Fix for tablet */
+    .bank-card-image {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .bank-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .bank-card-image-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    }
+
+    /* Bank Details */
+    .bank-detail-hero {
+        height: 350px;
+    }
+
+    .bank-detail-content {
+        padding: 20px;
+    }
+
+    .detail-card {
+        padding: 20px;
+    }
+
+    .progress-ring {
+        width: 100px;
+        height: 100px;
+    }
+
+    .progress-ring-text {
+        font-size: 1.25rem;
+    }
+
+    /* Modals */
+    .modal-content {
+        width: 90%;
+        max-width: 600px;
+        margin: 5% auto;
+    }
+
+    /* PDF Button */
+    .pdf-download-btn {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* ========== MOBILE LANDSCAPE (480px - 768px) ========== */
+@media screen and (max-width: 768px) {
+
+    /* Hero Section */
+    .hero {
+        padding: 40px 15px !important;
+        min-height: 100vh;
+    }
+
+    .hero-content {
+        padding: 1rem;
+    }
+
+    .hero-badge {
+        padding: 8px 14px;
+        font-size: 12px;
+        margin-bottom: 16px;
+    }
+
+    .hero-title {
+        font-size: 2rem !important;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem !important;
+        margin-bottom: 24px;
+    }
+
+    .hero-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+
+    .hero-stat {
+        min-width: auto;
+    }
+
+    .hero-stat-value {
+        font-size: 1.75rem;
+    }
+
+    .hero-stat-label {
+        font-size: 0.75rem;
+    }
+
+    .hero-stat-divider {
+        height: 40px;
+        width: 1px;
+    }
+
+    .hero-btn {
+        padding: 14px 28px;
+        font-size: 0.95rem;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .hero-scroll {
+        bottom: 20px;
+    }
+
+    /* Dashboard */
+    .dashboard-header {
+        padding: 24px 16px 50px;
+    }
+
+    .dashboard-title-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .dashboard-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .dashboard-title {
+        font-size: 1.35rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .header-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .header-stat-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .header-stat-value {
+        font-size: 1.75rem;
+    }
+
+    .header-stat-label {
+        font-size: 0.75rem;
+    }
+
+    .stats-section {
+        padding: 0 12px;
+        margin-top: -30px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .stat-card-label {
+        font-size: 0.65rem;
+    }
+
+    .stat-card-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-card-sub {
+        font-size: 0.65rem;
+    }
+
+    .stat-card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+
+    .stat-card-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .banks-section {
+        padding: 32px 12px;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        margin-bottom: 16px;
+    }
+
+    .banks-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    .bank-card {
+        padding: 16px;
+        border-radius: 20px;
+    }
+
+    /* Bank Card Images - Mobile */
+    .bank-card-image {
+        position: relative;
+        width: 100%;
+        height: 160px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 12px;
+    }
+
+    .bank-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .bank-card-image-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    }
+
+    .bank-card-info {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+    }
+
+    .bank-card-name {
+        font-size: 1.25rem;
+    }
+
+    .bank-card-meta {
+        font-size: 0.8rem;
+    }
+
+    .bank-card-badge {
+        padding: 6px 10px;
+        font-size: 0.7rem;
+    }
+
+    .bank-card-stats {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .bank-stat {
+        padding: 10px 6px;
+        border-radius: 10px;
+    }
+
+    .bank-stat-value {
+        font-size: 1.1rem;
+    }
+
+    .bank-stat-label {
+        font-size: 0.6rem;
+    }
+
+    .bank-progress {
+        margin-bottom: 12px;
+    }
+
+    .bank-card-btn {
+        padding: 12px;
+        font-size: 0.8rem;
+        border-radius: 12px;
+    }
+
+    /* Bank Detail Section */
+    .bank-detail-hero {
+        height: 320px;
+    }
+
+    .bank-detail-back {
+        top: 16px;
+        left: 16px;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    .bank-detail-hero-content {
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+    }
+
+    .bank-detail-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    .bank-detail-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .bank-detail-title {
+        font-size: 1.5rem !important;
+    }
+
+    .bank-detail-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .bank-detail-quick-stats {
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .bank-detail-quick-stat {
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+    }
+
+    .bank-detail-content {
+        padding: 16px;
+        padding-bottom: 100px;
+    }
+
+    .detail-card {
+        padding: 16px;
+        border-radius: 20px;
+        margin-bottom: 16px;
+    }
+
+    .detail-card-title {
+        font-size: 1rem;
+        margin-bottom: 16px;
+    }
+
+    .progress-rings {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .progress-ring {
+        width: 100px;
+        height: 100px;
+    }
+
+    .progress-ring-text {
+        font-size: 1.25rem;
+    }
+
+    .progress-ring-label {
+        font-size: 0.8rem;
+    }
+
+    .stats-summary {
+        gap: 8px;
+    }
+
+    .stats-summary-item {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .stats-summary-value {
+        font-size: 1.25rem;
+    }
+
+    .stats-summary-label {
+        font-size: 0.7rem;
+    }
+
+    .apartment-list {
+        gap: 10px;
+    }
+
+    .apartment-item {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .apartment-item-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .apartment-item-info p {
+        font-size: 0.8rem;
+    }
+
+    .apartment-item-price-value {
+        font-size: 1.1rem;
+    }
+
+    .credit-grid {
+        gap: 10px;
+    }
+
+    .credit-item {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .credit-item-value {
+        font-size: 1.25rem;
+    }
+
+    .credit-highlight {
+        padding: 16px;
+    }
+
+    .credit-highlight-value {
+        font-size: 1.5rem;
+    }
+
+    .company-card {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .company-card-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .company-stat {
+        padding: 8px;
+    }
+
+    .company-stat-value {
+        font-size: 1rem;
+    }
+
+    .contact-row {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contact-avatar {
+        width: 56px;
+        height: 56px;
+        font-size: 1.25rem;
+    }
+
+    .contact-btn {
+        padding: 14px;
+        font-size: 0.9rem;
+    }
+
+    .map-container iframe {
+        height: 220px;
+    }
+
+    .map-footer {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    /* Modals */
+    .modal-content {
+        width: 95%;
+        margin: 3% auto;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 20px;
+    }
+
+    .modal-header {
+        padding: 16px;
+    }
+
+    .modal-title {
+        font-size: 1.1rem;
+    }
+
+    .modal-title-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .modal-close {
+        width: 36px;
+        height: 36px;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-stat-grid {
+        gap: 12px;
+    }
+
+    .modal-stat-item {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .modal-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .modal-stat-label {
+        font-size: 0.75rem;
+    }
+
+    .modal-bank-item {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+        border-radius: 12px;
+    }
+
+    /* Voice Assistant Button */
+    .voice-assistant-btn {
+        width: 50px !important;
+        height: 50px !important;
+        right: 16px !important;
+        bottom: 80px !important;
+    }
+
+    .voice-assistant-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    /* Voice Status */
+    .voice-status {
+        left: 12px !important;
+        right: 12px !important;
+        bottom: 140px !important;
+        max-width: none;
+        min-width: auto;
+    }
+
+    /* PDF Download Button */
+    .pdf-download-btn {
+        padding: 12px 18px;
+        font-size: 0.85rem;
+        bottom: 16px;
+        right: 16px;
+        border-radius: 14px;
+    }
+
+    /* TTS Button */
+    .tts-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .tts-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* ========== MOBILE PORTRAIT (max 480px) ========== */
+@media screen and (max-width: 480px) {
+
+    /* Global */
+    body {
+        font-size: 14px;
+    }
+
+    /* Hero Section */
+    .hero {
+        padding: 30px 10px !important;
+    }
+
+    .hero-badge {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .hero-title {
+        font-size: 1.6rem !important;
+        margin-bottom: 10px;
+    }
+
+    .hero-subtitle {
+        font-size: 0.8rem !important;
+        line-height: 1.4;
+    }
+
+    .hero-stats {
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .hero-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .hero-stat-label {
+        font-size: 0.65rem;
+    }
+
+    .hero-stat-divider {
+        height: 30px;
+    }
+
+    .hero-btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        border-radius: 12px;
+    }
+
+    /* Dashboard */
+    .dashboard-header {
+        padding: 20px 12px 40px;
+    }
+
+    .dashboard-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .dashboard-title {
+        font-size: 1.2rem;
+    }
+
+    .header-stats {
+        gap: 8px;
+    }
+
+    .header-stat-card {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .header-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .header-stat-label {
+        font-size: 0.7rem;
+    }
+
+    .stats-section {
+        padding: 0 10px;
+        margin-top: -25px;
+    }
+
+    .stats-grid {
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .stat-card-label {
+        font-size: 0.6rem;
+    }
+
+    .stat-card-value {
+        font-size: 1.35rem;
+    }
+
+    .stat-card-sub {
+        font-size: 0.6rem;
+    }
+
+    .stat-card-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    .stat-card-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .banks-section {
+        padding: 24px 10px;
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+    }
+
+    .bank-card {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .bank-card-image {
+        height: 140px;
+        border-radius: 10px;
+    }
+
+    .bank-card-name {
+        font-size: 1.15rem;
+    }
+
+    .bank-card-meta {
+        font-size: 0.75rem;
+    }
+
+    .bank-stat-value {
+        font-size: 1rem;
+    }
+
+    .bank-card-btn {
+        padding: 10px;
+        font-size: 0.75rem;
+    }
+
+    /* Bank Detail */
+    .bank-detail-hero {
+        height: 280px;
+    }
+
+    .bank-detail-back {
+        top: 12px;
+        left: 12px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .bank-detail-title {
+        font-size: 1.3rem !important;
+    }
+
+    .bank-detail-quick-stat {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    .bank-detail-content {
+        padding: 12px;
+        padding-bottom: 90px;
+    }
+
+    .detail-card {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .detail-card-title {
+        font-size: 0.95rem;
+    }
+
+    .progress-ring {
+        width: 80px;
+        height: 80px;
+    }
+
+    .progress-ring-text {
+        font-size: 1rem;
+    }
+
+    .progress-ring-label {
+        font-size: 0.7rem;
+    }
+
+    .stats-summary-value {
+        font-size: 1.1rem;
+    }
+
+    .apartment-item-price-value {
+        font-size: 1rem;
+    }
+
+    .credit-item-value {
+        font-size: 1.1rem;
+    }
+
+    .credit-highlight-value {
+        font-size: 1.35rem;
+    }
+
+    .company-card-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .company-stat-value {
+        font-size: 0.9rem;
+    }
+
+    .company-stat-label {
+        font-size: 0.55rem;
+    }
+
+    /* Modals */
+    .modal-content {
+        width: 98%;
+        margin: 2% auto;
+        border-radius: 16px;
+    }
+
+    .modal-header {
+        padding: 14px;
+    }
+
+    .modal-title {
+        font-size: 1rem;
+    }
+
+    .modal-body {
+        padding: 14px;
+    }
+
+    .modal-stat-value {
+        font-size: 1.35rem;
+    }
+
+    .modal-bank-item {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        border-radius: 10px;
+    }
+
+    /* Voice Assistant */
+    .voice-assistant-btn {
+        width: 45px !important;
+        height: 45px !important;
+        right: 12px !important;
+        bottom: 70px !important;
+    }
+
+    .voice-assistant-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .voice-status {
+        bottom: 125px !important;
+        padding: 12px 16px;
+        font-size: 0.85rem;
+    }
+
+    /* PDF Download Button */
+    .pdf-download-btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        bottom: 12px;
+        right: 12px;
+        border-radius: 12px;
+    }
+
+    .pdf-download-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* TTS Button */
+    .tts-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .tts-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Map */
+    .map-container iframe {
+        height: 180px;
+    }
+}
+
+/* ========== VERY SMALL SCREENS (max 360px) ========== */
+@media screen and (max-width: 360px) {
+    .hero-title {
+        font-size: 1.4rem !important;
+    }
+
+    .hero-stat-value {
+        font-size: 1.3rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .stat-card-value {
+        font-size: 1.5rem;
+    }
+
+    .header-stat-value {
+        font-size: 1.3rem;
+    }
+
+    .bank-card-image {
+        height: 120px;
+    }
+
+    .progress-ring {
+        width: 70px;
+        height: 70px;
+    }
+
+    .progress-ring-text {
+        font-size: 0.9rem;
+    }
+
+    .company-card-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========== LANDSCAPE ORIENTATION FIX ========== */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        padding: 20px 15px !important;
+        min-height: auto;
+    }
+
+    .hero-title {
+        font-size: 1.5rem !important;
+    }
+
+    .hero-stats {
+        margin: 15px 0;
+    }
+
+    .hero-stat-value {
+        font-size: 1.3rem;
+    }
+
+    .hero-btn {
+        padding: 10px 20px;
+    }
+
+    .voice-assistant-btn {
+        bottom: 10px !important;
+    }
+
+    .bank-detail-hero {
+        height: 200px;
+    }
+
+    .progress-rings {
+        flex-direction: row;
+    }
+
+    .progress-ring {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+/* ========== TOUCH DEVICE OPTIMIZATIONS ========== */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Larger touch targets */
+    .bank-card {
+        min-height: 120px;
+    }
+
+    .stat-card {
+        min-height: 80px;
+    }
+
+    .detail-card {
+        min-height: 60px;
+    }
+
+    .tts-btn {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .bank-detail-back,
+    .hero-btn,
+    .bank-card-btn,
+    .contact-btn,
+    .pdf-download-btn {
+        min-height: 44px;
+    }
+
+    .modal-bank-item {
+        min-height: 50px;
+    }
+
+    /* Remove hover effects for touch devices */
+    .bank-card:hover,
+    .stat-card:hover,
+    .detail-card:hover {
+        transform: none;
+    }
+
+    /* Active state for touch */
+    .bank-card:active,
+    .stat-card:active,
+    .detail-card:active,
+    .tts-btn:active,
+    .hero-btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* ========== PRINT STYLES ========== */
+@media print {
+
+    .voice-assistant-btn,
+    .voice-status,
+    .bank-detail-back,
+    .pdf-download-btn,
+    .tts-btn,
+    .hero-scroll {
+        display: none !important;
+    }
+
+    .bank-detail-content {
+        padding: 20px;
+        padding-bottom: 20px;
+    }
+
+    .detail-card {
+        break-inside: avoid;
+    }
+
+    .progress-rings {
+        flex-direction: row;
+    }
+}
+
+/* ========== ACCESSIBILITY ========== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+
+    .bank-card,
+    .stat-card,
+    .detail-card,
+    .modal-content {
+        border: 2px solid currentColor;
+    }
+}
+
+/* ========== SAFE AREA FOR NOTCHED DEVICES ========== */
+@supports (padding: max(0px)) {
+    .hero {
+        padding-top: max(20px, env(safe-area-inset-top)) !important;
+        padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+    }
+
+    .bank-detail-content {
+        padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
+    }
+
+    .voice-assistant-btn {
+        bottom: max(80px, calc(80px + env(safe-area-inset-bottom))) !important;
+    }
+
+    .pdf-download-btn {
+        bottom: max(16px, calc(16px + env(safe-area-inset-bottom)));
+    }
+}

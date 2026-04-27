@@ -1,0 +1,4291 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тошкент вилояти банклари — дастурлар таҳлили</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   Modern Fintech / Canva-style Design System
+   Reference: Stripe Dashboard, Wise, Revolut, Linear, Notion analytics
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+:root {
+  /* ─ Surfaces — soft pastel base, white cards on top ─ */
+  --bg: #f6f7fb;
+  --bg-tint: #fafbff;
+  --surface: #ffffff;
+  --surface-alt: #f8f9ff;
+  --surface-hover: #f1f3fa;
+
+  /* ─ Brand gradients — used for hero, modal headers, accent bars ─ */
+  --grad-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --grad-secondary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --grad-warm: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --grad-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --grad-cool: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%);
+  --grad-rose: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+  /* ─ Solid colours — vibrant Tailwind 500-tier palette ─ */
+  --primary: #6366f1;        /* indigo */
+  --primary-dark: #4f46e5;
+  --primary-light: #eef2ff;
+  --secondary: #06b6d4;      /* cyan */
+  --secondary-light: #ecfeff;
+  --accent: #f43f5e;         /* rose */
+  --accent-light: #fff1f2;
+  --warm: #f59e0b;           /* amber */
+  --warm-light: #fffbeb;
+  --cool: #10b981;           /* emerald */
+  --cool-light: #ecfdf5;
+  --purple: #8b5cf6;         /* violet */
+  --purple-light: #f5f3ff;
+  --pink: #ec4899;           /* pink */
+  --pink-light: #fdf2f8;
+
+  /* ─ Text — high contrast for readability ─ */
+  --text: #0f172a;           /* near-black with hint of blue */
+  --text-2: #475569;         /* slate */
+  --text-3: #94a3b8;         /* light slate */
+  --text-on-grad: #ffffff;
+  --text-on-grad-dim: rgba(255,255,255,0.85);
+
+  /* ─ Lines (rarely used; we prefer shadows) ─ */
+  --line: #e2e8f0;
+  --line-2: #f1f5f9;
+
+  /* ─ Status — vibrant, used in pills and indicators ─ */
+  --pos: #10b981;
+  --pos-bg: #d1fae5;
+  --warn: #f59e0b;
+  --warn-bg: #fef3c7;
+  --neg: #f43f5e;
+  --neg-bg: #fee2e2;
+
+  /* ─ Shadows — soft, indigo-tinted, multi-layer ─ */
+  --shadow-sm: 0 1px 3px rgba(99,102,241,0.06), 0 1px 2px rgba(99,102,241,0.04);
+  --shadow-md: 0 4px 12px rgba(99,102,241,0.08), 0 2px 4px rgba(99,102,241,0.04);
+  --shadow-lg: 0 12px 32px rgba(99,102,241,0.1), 0 4px 8px rgba(99,102,241,0.05);
+  --shadow-xl: 0 24px 48px rgba(99,102,241,0.14), 0 12px 24px rgba(99,102,241,0.06);
+  --shadow-hero: 0 20px 60px rgba(102,126,234,0.35), 0 8px 16px rgba(118,75,162,0.2);
+
+  /* ─ Type ─ */
+  --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ─ Geometry — generous rounding for friendly Canva feel ─ */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-2xl: 24px;
+  --r-pill: 999px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern', 'liga', 'cv01';
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Decorative gradient blobs in fixed background — gives the page life
+   without distracting. These three radial gradients in different positions
+   create soft colour wash effect typical of Canva designs. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(at 5% 8%, rgba(99,102,241,0.08) 0%, transparent 35%),
+    radial-gradient(at 95% 0%, rgba(6,182,212,0.06) 0%, transparent 40%),
+    radial-gradient(at 85% 95%, rgba(244,63,94,0.05) 0%, transparent 35%),
+    radial-gradient(at 15% 90%, rgba(139,92,246,0.05) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 1640px;
+  margin: 0 auto;
+  padding: 32px 40px;
+  position: relative;
+  z-index: 1;
+}
+.hidden { display: none !important; }
+
+/* ─── Header — gradient title + pill buttons ───────────────────── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line-2);
+}
+.header-left { display: flex; flex-direction: column; gap: 10px; min-width: 0; flex: 1; }
+
+/* The eyebrow is a small coloured pill — gives the header structure */
+.header-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border-radius: var(--r-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+.header-eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Title with gradient text — the most "Canva" element of the header.
+   We clip the gradient to text using -webkit-background-clip. */
+.header h1 {
+  font-family: var(--font);
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  background: linear-gradient(135deg, #1e1b4b 0%, #6366f1 60%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-2);
+  font-weight: 500;
+  margin-top: 2px;
+  letter-spacing: 0.005em;
+}
+.header-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ─── Buttons — pill-shaped with shadows ─────────────────────────── */
+.btn {
+  font-family: var(--font);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  padding: 10px 20px;
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover {
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.btn:active { transform: translateY(0); }
+.btn:disabled {
+  opacity: 0.5; cursor: not-allowed;
+  background: var(--surface);
+  box-shadow: none;
+  transform: none;
+}
+.btn-primary {
+  background: var(--grad-primary);
+  color: white;
+  box-shadow: 0 4px 14px rgba(102,126,234,0.4);
+}
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+  filter: brightness(1.05);
+}
+.btn-primary:disabled {
+  background: var(--text-3);
+  box-shadow: none;
+}
+.btn-icon { display: none; }
+
+/* ─── Upload area ────────────────────────────────────────────────── */
+.upload-section {
+  background: var(--surface);
+  border: 2px dashed var(--line);
+  border-radius: var(--r-lg);
+  padding: 64px 32px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 32px;
+  transition: all 0.18s ease;
+  box-shadow: var(--shadow-sm);
+}
+.upload-section:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.upload-section.dragover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: var(--shadow-lg);
+}
+.upload-section.file-loaded {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-style: solid;
+  border-color: var(--line);
+  border-width: 1px;
+  text-align: left;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.upload-icon { display: none; }
+.upload-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.upload-hint {
+  font-size: 0.88rem;
+  color: var(--text-2);
+  margin-bottom: 24px;
+  letter-spacing: 0.005em;
+}
+.upload-btn {
+  font-family: var(--font);
+  padding: 11px 24px;
+  background: var(--grad-primary);
+  color: white;
+  border: none;
+  border-radius: var(--r-pill);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.005em;
+  box-shadow: 0 4px 14px rgba(102,126,234,0.4);
+  transition: all 0.18s ease;
+}
+.upload-btn:hover {
+  box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+.upload-input { display: none; }
+.upload-info { display: flex; flex-direction: column; gap: 2px; }
+.upload-info-name { font-weight: 700; color: var(--text); font-size: 0.9rem; }
+.upload-info-meta { font-size: 0.78rem; color: var(--text-2); letter-spacing: 0.005em; }
+
+/* ─── Info banner — light primary tint with coloured left bar ─── */
+.info-banner {
+  background: var(--primary-light);
+  border-left: 4px solid var(--primary);
+  padding: 18px 24px;
+  margin-bottom: 28px;
+  border-radius: var(--r);
+  font-size: 0.88rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.info-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.info-banner.warn { background: var(--warm-light); border-left-color: var(--warm); }
+.info-banner.warn::before { background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%); }
+.info-banner-icon { display: none; }
+.info-banner-content { flex: 1; position: relative; z-index: 1; }
+.info-banner-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -0.005em;
+}
+.info-banner-text { color: var(--text-2); line-height: 1.6; }
+.info-banner-text strong { color: var(--text); font-weight: 700; }
+.info-banner-meta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(99,102,241,0.15);
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+.info-banner-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.7);
+  border-radius: var(--r-pill);
+  font-weight: 500;
+}
+.info-banner-meta strong { color: var(--primary-dark); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ─── Section title — eyebrow style ─────────────────────────────── */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.section-title-icon { display: none; }
+.section-title .num {
+  font-family: var(--mono);
+  color: var(--text-3);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  background: var(--surface);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── Filters panel — white card with shadow ─────────────────────── */
+.filters-panel {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  margin-bottom: 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  box-shadow: var(--shadow-md);
+}
+.filter-group { display: flex; flex-direction: column; }
+.filter-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-2);
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+.filter-select, .multi-select-trigger {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  font-size: 0.86rem;
+  background: var(--surface);
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 500;
+  color: var(--text);
+  transition: all 0.15s ease;
+}
+.filter-select:hover, .multi-select-trigger:hover { border-color: var(--primary); }
+.filter-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,0.12); }
+
+/* ─── Multi-select ───────────────────────────────────────────────── */
+.multi-select { position: relative; }
+.multi-select-trigger { display: flex; justify-content: space-between; align-items: center; }
+.multi-select-trigger.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+}
+.ms-trigger-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: left; }
+.multi-select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r);
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+  box-shadow: var(--shadow-xl);
+}
+.multi-select-dropdown.open { display: block; }
+.ms-search { padding: 10px; border-bottom: 1px solid var(--line-2); position: sticky; top: 0; background: var(--surface); z-index: 2; }
+.ms-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--text);
+}
+.ms-search input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+.ms-actions {
+  display: flex; gap: 6px; padding: 8px 10px;
+  border-bottom: 1px solid var(--line-2);
+  position: sticky; top: 53px; background: var(--surface); z-index: 1;
+}
+.ms-actions button {
+  flex: 1; padding: 6px 8px; border: none;
+  background: var(--primary-light); color: var(--primary-dark);
+  border-radius: var(--r-pill); font-size: 0.74rem;
+  cursor: pointer; font-family: inherit; font-weight: 600;
+  transition: all 0.15s ease;
+}
+.ms-actions button:hover { background: var(--primary); color: white; }
+.ms-option {
+  padding: 8px 14px; cursor: pointer; display: flex; align-items: center;
+  gap: 10px; font-size: 0.84rem; color: var(--text);
+  transition: background 0.1s ease;
+}
+.ms-option:hover { background: var(--primary-light); }
+.ms-option.selected { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+.ms-option input[type=checkbox] { cursor: pointer; accent-color: var(--primary); }
+
+/* ═══════════════════════════════════════════════════════════════
+   KPI HERO — the centerpiece. Big purple gradient card with
+   decorative blobs, dramatic typography, and a vibrant rail beside it.
+   This is the visual anchor of the dashboard.
+   ═══════════════════════════════════════════════════════════════ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 0;
+  margin-bottom: 36px;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-hero);
+}
+
+/* Hero — bold purple gradient with decorative shapes */
+.kpi-hero-primary {
+  background: var(--grad-primary);
+  color: white;
+  padding: 44px 48px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 320px;
+  transition: filter 0.2s ease;
+}
+.kpi-hero-primary:hover { filter: brightness(1.05); }
+
+/* Two decorative gradient blobs — top-right and bottom-left.
+   These give the gradient depth without being distracting. */
+.kpi-hero-primary::before {
+  content: '';
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.kpi-hero-primary::after {
+  content: '';
+  position: absolute;
+  bottom: -150px; left: -50px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(244,63,94,0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Eyebrow pill — semi-transparent white inside the gradient */
+.kpi-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.18);
+  border-radius: var(--r-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  align-self: flex-start;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+.kpi-hero-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: white;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 10px rgba(255,255,255,0.6);
+}
+
+/* The big number — sans-serif now, modern and bold */
+.kpi-hero-number {
+  font-family: var(--font);
+  font-size: 5.2rem;
+  font-weight: 800;
+  color: white;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-bottom: 22px;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.kpi-hero-number .pct-mark {
+  font-size: 0.5em;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  margin-left: 6px;
+  letter-spacing: -0.02em;
+  vertical-align: 0.08em;
+}
+
+/* Status badge — vibrant pill */
+.kpi-hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: var(--r-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  backdrop-filter: blur(10px);
+}
+.kpi-hero-status::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.kpi-hero-status.up {
+  background: rgba(16,185,129,0.25);
+  color: #d1fae5;
+}
+.kpi-hero-status.up::before { background: #34d399; box-shadow: 0 0 8px #34d399; }
+.kpi-hero-status.down {
+  background: rgba(244,63,94,0.25);
+  color: #fecaca;
+}
+.kpi-hero-status.down::before { background: #fb7185; box-shadow: 0 0 8px #fb7185; }
+.kpi-hero-status.neutral {
+  background: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.92);
+}
+.kpi-hero-status.neutral::before { background: rgba(255,255,255,0.85); }
+
+.kpi-hero-detail {
+  font-family: var(--font);
+  font-size: 1rem;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.5;
+  letter-spacing: 0;
+  max-width: 540px;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+.kpi-hero-detail strong {
+  color: white;
+  font-weight: 700;
+}
+
+/* Rail — supporting metrics, white background with coloured left bars */
+.kpi-hero-rail {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+.kpi-rail-item {
+  flex: 1;
+  padding: 20px 26px 20px 32px;
+  border-bottom: 1px solid var(--line-2);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  min-height: 80px;
+}
+.kpi-rail-item:last-child { border-bottom: none; }
+.kpi-rail-item:hover { background: var(--surface-alt); }
+
+/* Each rail item gets its own coloured accent bar on the left.
+   Uses :nth-child to cycle through indigo, cyan, amber, emerald. */
+.kpi-rail-item::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 22px;
+  bottom: 22px;
+  width: 4px;
+  border-radius: var(--r-pill);
+  transition: width 0.2s ease;
+}
+.kpi-rail-item:nth-child(1)::before { background: var(--grad-primary); }
+.kpi-rail-item:nth-child(2)::before { background: var(--grad-secondary); }
+.kpi-rail-item:nth-child(3)::before { background: var(--grad-warm); }
+.kpi-rail-item:nth-child(4)::before { background: var(--grad-success); }
+.kpi-rail-item:hover::before { width: 6px; }
+
+.kpi-rail-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-2);
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.kpi-rail-value {
+  font-family: var(--font);
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.kpi-rail-unit {
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-left: 6px;
+  letter-spacing: 0.005em;
+}
+.kpi-rail-sub {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  margin-top: 5px;
+  letter-spacing: 0.005em;
+  font-weight: 500;
+}
+.kpi-rail-sub strong { color: var(--primary-dark); font-weight: 700; }
+
+/* ─── Program cards — colour-banded, soft shadows ─────────────── */
+.program-section { margin-bottom: 36px; }
+.program-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 16px;
+}
+.program-card {
+  background: var(--surface);
+  padding: 22px 24px;
+  position: relative;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+.program-card.has-detail { cursor: pointer; }
+.program-card.has-detail:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+.program-card.placeholder { opacity: 0.65; }
+
+/* Coloured top accent bar — uses --prog-color from inline style */
+.program-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--prog-color, var(--primary));
+}
+
+.program-card.placeholder::after {
+  content: 'placeholder';
+  position: absolute;
+  top: 14px; right: 18px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--warm);
+  background: var(--warm-bg);
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 6px 0 16px 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-2);
+}
+.pc-name {
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.pc-shape {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--surface-alt);
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pc-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pc-stat {
+  background: var(--surface-alt);
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+}
+.pc-stat-label {
+  font-size: 0.66rem;
+  color: var(--text-2);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.pc-stat-value {
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+.pc-progress { padding-top: 4px; }
+.pc-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: var(--text-2);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.pc-progress-label .pct {
+  font-family: var(--font);
+  color: var(--prog-color, var(--primary));
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.pc-progress-bar {
+  height: 6px;
+  background: var(--line-2);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.pc-progress-fill {
+  height: 100%;
+  background: var(--prog-color, var(--primary));
+  border-radius: var(--r-pill);
+  transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.detail-hint {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  margin-top: 10px;
+  letter-spacing: 0.02em;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ─── Tab nav — pill-shaped active state ────────────────────────── */
+.tab-nav {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: var(--surface);
+  padding: 6px;
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 9px 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-2);
+  border-radius: var(--r-pill);
+  font-family: var(--font);
+  letter-spacing: 0.005em;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn:hover { color: var(--text); background: var(--surface-alt); }
+.tab-btn.active {
+  color: white;
+  background: var(--grad-primary);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.35);
+}
+.tab-icon { display: none; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── Charts ─────────────────────────────────────────────────────── */
+.chart-grid { display: grid; gap: 18px; margin-bottom: 24px; }
+.chart-grid.two { grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); }
+.chart-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 24px 26px;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.2s ease;
+}
+.chart-card:hover { box-shadow: var(--shadow-lg); }
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-2);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.chart-title {
+  font-family: var(--font);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.012em;
+  line-height: 1.3;
+}
+.chart-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  margin-top: 4px;
+  letter-spacing: 0.005em;
+  font-weight: 500;
+}
+.chart-container { position: relative; height: 340px; }
+.chart-container.tall { height: 480px; }
+.chart-container.short { height: 240px; }
+
+/* ─── Weekly cards — colourful ─────────────────────────────────── */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.week-card {
+  background: var(--surface);
+  padding: 18px 20px;
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.week-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.week-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.week-card:nth-child(1)::before { background: var(--grad-primary); }
+.week-card:nth-child(2)::before { background: var(--grad-secondary); }
+.week-card:nth-child(3)::before { background: var(--grad-warm); }
+.week-card:nth-child(4)::before { background: var(--grad-success); }
+.week-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-2);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.week-value {
+  font-family: var(--font);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.week-pct {
+  font-size: 0.76rem;
+  color: var(--text-2);
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+/* ─── Tables ─────────────────────────────────────────────────────── */
+.table-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+}
+.table-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--primary-light) 0%, transparent 100%);
+}
+.table-header-title {
+  font-family: var(--font);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.table-header-meta { font-size: 0.78rem; color: var(--text-2); font-weight: 500; }
+.table-wrap { overflow-x: auto; max-height: 720px; overflow-y: auto; }
+.table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+.table-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+.table-wrap::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+.dt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  font-feature-settings: 'tnum';
+}
+.dt th {
+  padding: 12px 14px;
+  text-align: left;
+  background: var(--surface-alt);
+  border-bottom: 1.5px solid var(--line);
+  color: var(--text-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  position: sticky; top: 0; z-index: 10;
+}
+.dt th.num, .dt td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.dt th.center, .dt td.center { text-align: center; }
+.dt td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line-2);
+  color: var(--text);
+  vertical-align: middle;
+}
+.dt tbody tr { transition: background 0.12s ease; }
+.dt tbody tr:hover { background: var(--primary-light); }
+.dt tbody tr.bank-row {
+  background: linear-gradient(90deg, rgba(99,102,241,0.04) 0%, transparent 100%);
+  font-weight: 700;
+}
+.dt tbody tr.bank-row:hover { background: var(--primary-light); }
+.dt tbody tr.total-row {
+  background: var(--grad-primary);
+  color: white;
+  font-weight: 800;
+  position: sticky; bottom: 0; z-index: 5;
+}
+.dt tbody tr.total-row td { border-bottom: none; color: white; }
+.dt tbody tr.total-row:hover { filter: brightness(1.05); }
+.dt th.sortable { cursor: pointer; user-select: none; transition: color 0.15s ease; }
+.dt th.sortable:hover { color: var(--primary); }
+.dt th.sortable::after { content: ' ↕'; opacity: 0.3; font-size: 0.7rem; }
+.dt th.sortable.asc::after { content: ' ↑'; opacity: 1; color: var(--primary); }
+.dt th.sortable.desc::after { content: ' ↓'; opacity: 1; color: var(--primary); }
+.dt .name-cell { max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dt .branch-name { padding-left: 24px; color: var(--text-2); font-weight: 500; font-size: 0.8rem; }
+
+/* Pct cells — vibrant pills */
+.pct-cell {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.005em;
+}
+.pct-cell.high { color: var(--pos); background: var(--pos-bg); }
+.pct-cell.med { color: var(--warm); background: var(--warm-bg); }
+.pct-cell.low { color: var(--neg); background: var(--neg-bg); }
+.pct-cell.zero { color: var(--text-3); background: var(--line-2); }
+
+/* ─── Hudud cards — colour-banded ─────────────────────────────── */
+.hudud-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+.hudud-card {
+  background: var(--surface);
+  padding: 20px 22px;
+  cursor: pointer;
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.hudud-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+.hudud-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--grad-primary);
+}
+.hudud-card:nth-child(4n+2)::before { background: var(--grad-secondary); }
+.hudud-card:nth-child(4n+3)::before { background: var(--grad-warm); }
+.hudud-card:nth-child(4n+4)::before { background: var(--grad-success); }
+
+.hudud-name {
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.hudud-meta {
+  font-size: 0.76rem;
+  color: var(--text-2);
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.hudud-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.hudud-stat-label {
+  font-size: 0.66rem;
+  color: var(--text-2);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+.hudud-stat-value {
+  font-family: var(--font);
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.hudud-bar {
+  height: 4px;
+  background: var(--line-2);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.hudud-bar-fill {
+  height: 100%;
+  background: var(--grad-primary);
+  border-radius: var(--r-pill);
+}
+
+/* ─── Modal — gradient header ──────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  animation: fadeIn 0.25s ease;
+}
+.modal-window {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(15,23,42,0.4), 0 8px 24px rgba(15,23,42,0.15);
+  animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-header {
+  padding: 22px 28px;
+  background: var(--grad-primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.modal-header::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.modal-title {
+  font-family: var(--font);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+}
+.modal-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.85);
+  margin-top: 4px;
+  letter-spacing: 0.005em;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+.modal-close {
+  background: rgba(255,255,255,0.18);
+  border: none;
+  color: white;
+  width: 34px; height: 34px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+}
+.modal-close:hover { background: rgba(244,63,94,0.85); transform: rotate(90deg); }
+.modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  flex: 1;
+  background: var(--bg);
+}
+.modal-body::-webkit-scrollbar { width: 8px; }
+.modal-body::-webkit-scrollbar-track { background: transparent; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+.modal-section {
+  background: var(--surface);
+  border-radius: var(--r);
+  padding: 22px 26px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.modal-section-title {
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-2);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  letter-spacing: -0.005em;
+}
+.modal-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.modal-stat {
+  background: var(--surface-alt);
+  padding: 14px 18px;
+  border-radius: var(--r);
+  position: relative;
+  overflow: hidden;
+}
+.modal-stat::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 3px; height: 100%;
+  background: var(--primary);
+}
+.modal-stat.success::before { background: var(--cool); }
+.modal-stat.warning::before { background: var(--warm); }
+.modal-stat.danger::before { background: var(--accent); }
+.modal-stat.dark::before { background: var(--grad-primary); }
+.modal-stat-label {
+  font-size: 0.66rem;
+  color: var(--text-2);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+.modal-stat-value {
+  font-family: var(--font);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.022em;
+  line-height: 1.15;
+}
+.modal-stat.success .modal-stat-value { color: var(--cool); }
+.modal-stat.warning .modal-stat-value { color: var(--warm); }
+.modal-stat.danger .modal-stat-value { color: var(--accent); }
+.modal-stat.dark .modal-stat-value { color: var(--primary-dark); }
+.modal-stat-sub { font-size: 0.74rem; color: var(--text-2); margin-top: 4px; font-weight: 500; }
+.modal-stat-sub strong { color: var(--text); font-weight: 700; }
+.modal-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.modal-chart-container { position: relative; height: 280px; }
+.modal-chart-container.tall { height: 380px; }
+
+/* ─── Loading ────────────────────────────────────────────────────── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(246,247,251,0.85);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--line);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: var(--text-2); font-size: 0.86rem; font-weight: 600; }
+
+/* ─── Footer ─────────────────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 32px 0 20px;
+  font-size: 0.78rem;
+  color: var(--text-3);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-top: 36px;
+  border-top: 1px solid var(--line-2);
+}
+
+/* ─── KPI badge legacy support ────────────────────────────────── */
+.kpi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-badge.up { background: var(--pos-bg); color: var(--pos); }
+.kpi-badge.down { background: var(--neg-bg); color: var(--neg); }
+.kpi-badge.neutral { background: var(--surface-alt); color: var(--text-2); }
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 968px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .kpi-hero-primary {
+    padding: 32px 28px;
+    min-height: auto;
+  }
+  .kpi-hero-number { font-size: 4rem; }
+}
+
+@media (max-width: 768px) {
+  .container { padding: 20px 16px; }
+  .header { flex-direction: column; align-items: flex-start; }
+  .header h1 { font-size: 1.65rem; }
+  .filters-panel { grid-template-columns: 1fr; }
+  .chart-grid.two { grid-template-columns: 1fr; }
+  .chart-container { height: 280px; }
+  .pc-stats { grid-template-columns: 1fr; }
+  .modal-grid-2 { grid-template-columns: 1fr; }
+  .modal-window { max-height: 96vh; border-radius: var(--r); }
+  .modal-header, .modal-body, .modal-section { padding: 18px 20px; }
+  .kpi-hero-primary { padding: 28px 22px; }
+  .kpi-hero-number { font-size: 3.4rem; }
+  .kpi-hero-detail { font-size: 0.92rem; }
+  .kpi-rail-item { padding: 16px 22px 16px 28px; min-height: 70px; }
+  .kpi-rail-value { font-size: 1.5rem; }
+  body::before { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-eyebrow">Тошкент вилояти · 2026 йил</div>
+      <h1 id="headerTitle">Тижорат банклар томонидан дастурлар доирасида ажратилган кредитлар</h1>
+      <p class="header-subtitle" id="headerSubtitle">Excel файлни юкланг — ҳисобот ойи автоматик аниқланади</p>
+    </div>
+    <div class="header-buttons">
+      <button class="btn" onclick="document.getElementById('fileInput').click()">Файл юклаш</button>
+      <button class="btn btn-primary" id="exportBtn" onclick="exportToExcel()" disabled>Excel экспорт</button>
+      <button class="btn" id="resetBtn" onclick="resetFilters()" disabled>Фильтрни тиклаш</button>
+    </div>
+  </div>
+
+  <!-- UPLOAD ZONE -->
+  <div class="upload-section" id="uploadSection" onclick="document.getElementById('fileInput').click()">
+    <div class="upload-title">Excel ҳисоботни юкланг</div>
+    <div class="upload-hint">Ҳар ойлик "режа_Банк_ва_филиаллари.xlsx" файли — ҳисобот ойи автоматик аниқланади</div>
+    <button class="upload-btn" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+      Файлни танлаш
+    </button>
+    <input type="file" id="fileInput" class="upload-input" accept=".xlsx,.xls">
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent" class="hidden">
+
+    <!-- INFO BANNER -->
+    <div class="info-banner" id="infoBanner">
+      <div class="info-banner-content">
+        <div class="info-banner-title" id="bannerTitle">Ҳисобот маълумотлари</div>
+        <div class="info-banner-text" id="bannerText"></div>
+        <div class="info-banner-meta" id="bannerMeta"></div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-panel">
+      <div class="filter-group">
+        <label class="filter-label">Банклар</label>
+        <div class="multi-select" id="bankFilter">
+          <div class="multi-select-trigger" onclick="toggleMultiSelect('bankFilter')">
+            <span class="ms-trigger-text" id="bankFilterLabel">Барча банклар</span>
+            <span>▾</span>
+          </div>
+          <div class="multi-select-dropdown" id="bankFilterDropdown"></div>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Ҳудудлар</label>
+        <div class="multi-select" id="hududFilter">
+          <div class="multi-select-trigger" onclick="toggleMultiSelect('hududFilter')">
+            <span class="ms-trigger-text" id="hududFilterLabel">Барча ҳудудлар</span>
+            <span>▾</span>
+          </div>
+          <div class="multi-select-dropdown" id="hududFilterDropdown"></div>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Дастур</label>
+        <select class="filter-select" id="programFilter" onchange="onFiltersChange()">
+          <option value="all">Барча дастурлар</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Кўриниш</label>
+        <select class="filter-select" id="viewFilter" onchange="onFiltersChange()">
+          <option value="ytd">Январ-[ой]</option>
+          <option value="month">Фақат [ой] ойи</option>
+          <option value="year">Йиллик режа</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- KPI HERO CARDS -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- PROGRAM CARDS -->
+    <div class="program-section">
+      <div class="section-title">
+        <span id="programsTitle">Дастурлар бўйича натижалар</span>
+        <span class="num" id="programsCounter"></span>
+      </div>
+      <div class="program-grid" id="programGrid"></div>
+    </div>
+
+    <!-- TAB NAV -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('overview')">Умумий кўриниш</button>
+      <button class="tab-btn" onclick="switchTab('banks')">Банклар рейтинги</button>
+      <button class="tab-btn" onclick="switchTab('hududs')">Ҳудудлар</button>
+      <button class="tab-btn" id="weeklyTabBtn" onclick="switchTab('weekly')"><span id="weeklyTabLabel">Ҳафталик динамика</span></button>
+      <button class="tab-btn" onclick="switchTab('details')">Батафсил жадвал</button>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="chart-grid two">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Дастурлар бўйича режа vs амалда</div>
+              <div class="chart-subtitle">Жами вилоят бўйича · Январ-<span class="month-name"></span> · млн сўм</div>
+            </div>
+          </div>
+          <div class="chart-container"><canvas id="planActualChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Дастурлар режа бажарилиши</div>
+              <div class="chart-subtitle">Январ-<span class="month-name"></span> режасига нисбатан, фоиз</div>
+            </div>
+          </div>
+          <div class="chart-container"><canvas id="completionChart"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-grid two">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Жами ажратилган кредитлар тақсимоти</div>
+              <div class="chart-subtitle">Дастурлар бўйича улуш</div>
+            </div>
+          </div>
+          <div class="chart-container"><canvas id="distributionChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Топ-10 банклар</div>
+              <div class="chart-subtitle">Жами ажратилган бўйича · Январ-<span class="month-name"></span></div>
+            </div>
+          </div>
+          <div class="chart-container"><canvas id="topBanksChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: BANKS -->
+    <div class="tab-content" id="tab-banks">
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Барча банклар — режа vs амалда</div>
+              <div class="chart-subtitle">Танланган дастур бўйича · млн сўм</div>
+            </div>
+          </div>
+          <div class="chart-container tall"><canvas id="banksRankingChart"></canvas></div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="table-header-title">Банклар бўйича батафсил рейтинг</div>
+            <div class="table-header-meta" id="banksTableMeta"></div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="dt" id="banksTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: HUDUDS -->
+    <div class="tab-content" id="tab-hududs">
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Ҳудудлар бўйича жами ажратилган кредитлар</div>
+              <div class="chart-subtitle">Январ-<span class="month-name"></span> · млн сўм</div>
+            </div>
+          </div>
+          <div class="chart-container tall"><canvas id="hududsChart"></canvas></div>
+        </div>
+      </div>
+      <div class="section-title" style="margin-top:24px">
+        <span>Ҳар бир ҳудуд бўйича натижалар</span>
+        <span class="num" id="hududsCounter"></span>
+      </div>
+      <div class="hudud-grid" id="hududGrid"></div>
+    </div>
+
+    <!-- TAB: WEEKLY -->
+    <div class="tab-content" id="tab-weekly">
+      <div class="info-banner" id="weeklyInfo">
+        <div class="info-banner-content">
+          <div class="info-banner-title"><span class="month-name"></span> ойи бўйича ҳафталик режа</div>
+          <div class="info-banner-text">Танланган дастур учун <span class="month-name"></span> ойи режасининг ҳар бир ҳафтада қандай тақсимланганини кўрсатади. Ушбу маълумот фақат <strong>каттароқ дастурлар</strong> учун мавжуд.</div>
+        </div>
+      </div>
+      <div class="week-grid" id="weekGrid"></div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Ҳафталик режа кумулятив</div>
+              <div class="chart-subtitle"><span class="month-name"></span> ойи давомида тўпланиш</div>
+            </div>
+          </div>
+          <div class="chart-container"><canvas id="weeklyChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: DETAILS -->
+    <div class="tab-content" id="tab-details">
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="table-header-title">Барча банклар ва филиаллар бўйича батафсил маълумот</div>
+            <div class="table-header-meta" id="detailsTableMeta"></div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="dt" id="detailsTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Тошкент вилояти Марказий банк бошқармаси · Ҳисобот ойи автоматик аниқланади
+  </div>
+
+</div>
+
+<!-- MODAL FOR CARD DETAILS -->
+<div id="modal" class="modal-backdrop hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal-window">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">—</div>
+        <div class="modal-subtitle" id="modalSubtitle">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" title="Ёпиш">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">Юкланмоқда...</div>
+</div>
+
+<script>
+// ============================================================================
+// CONSTANTS & GLOBAL STATE
+// ============================================================================
+
+const PROG_COLORS = [
+  // Vibrant Tailwind 500-tier palette — matches Canva-style modern fintech.
+  // Placeholders use light slate so they recede; real programs get bold colours
+  // each from a different hue family for clear visual differentiation.
+  '#cbd5e1', // 1: slate (placeholder — Доимий иш)
+  '#cbd5e1', // 2: slate (placeholder — Аҳоли даромадлари)
+  '#cbd5e1', // 3: slate (placeholder — Микролойиҳалар)
+  '#6366f1', // 4: indigo (aggregate — Дастурлар доирасида)
+  '#f43f5e', // 5: rose (Қичик бизнес)
+  '#06b6d4', // 6: cyan (Биринчи қадам)
+  '#10b981', // 7: emerald (Маҳалла лойиҳаси)
+  '#8b5cf6', // 8: violet (Оилавий тадбиркорлик)
+  '#f59e0b', // 9: amber (extra)
+  '#ec4899', // 10: pink (extra)
+];
+
+// ============================================================================
+// CHART.JS EDITORIAL THEME
+// ----------------------------------------------------------------------------
+// Default Chart.js styling looks like a 2015 admin template — bright blues,
+// thick gridlines, system fonts. We override the global defaults once here
+// so every chart in the dashboard inherits Inter typography, soft hairline
+// gridlines, dark serif tooltips, and discreet legends — the same visual
+// language used by FT Markets, Bloomberg Pro, and Stripe Dashboard.
+// ============================================================================
+if (typeof Chart !== 'undefined' && Chart.defaults && Chart.defaults.font) {
+  // Base font + colour — applies to all text rendered by Chart.js.
+  // We use Plus Jakarta Sans now (the dashboard's primary face) so charts
+  // visually integrate with the rest of the page typography.
+  Chart.defaults.font.family = "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif";
+  Chart.defaults.font.size = 11.5;
+  Chart.defaults.font.weight = '600';
+  Chart.defaults.color = '#475569';                    // slate-600
+  Chart.defaults.borderColor = 'rgba(226, 232, 240, 0.6)';
+
+  // Tooltip — dark slate body with vibrant title font.
+  // The dark tooltip on a light page creates strong contrast without
+  // being aggressive — same approach as Linear, Stripe, Notion.
+  Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';  // slate-900
+  Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+  Chart.defaults.plugins.tooltip.bodyColor = '#cbd5e1';        // slate-300
+  Chart.defaults.plugins.tooltip.titleFont = {
+    family: "'Plus Jakarta Sans', sans-serif",
+    size: 13,
+    weight: '700'
+  };
+  Chart.defaults.plugins.tooltip.bodyFont = {
+    family: "'Plus Jakarta Sans', sans-serif",
+    size: 11.5,
+    weight: '500'
+  };
+  Chart.defaults.plugins.tooltip.padding = 14;
+  Chart.defaults.plugins.tooltip.cornerRadius = 10;            // matches our --r
+  Chart.defaults.plugins.tooltip.boxPadding = 6;
+  Chart.defaults.plugins.tooltip.usePointStyle = true;
+  Chart.defaults.plugins.tooltip.titleSpacing = 6;
+  Chart.defaults.plugins.tooltip.bodySpacing = 4;
+  Chart.defaults.plugins.tooltip.borderColor = 'transparent';
+  Chart.defaults.plugins.tooltip.titleMarginBottom = 8;
+
+  // Legend — pill-style point markers, refined typography
+  Chart.defaults.plugins.legend.labels.padding = 16;
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+  Chart.defaults.plugins.legend.labels.boxWidth = 8;
+  Chart.defaults.plugins.legend.labels.boxHeight = 8;
+  Chart.defaults.plugins.legend.labels.font = {
+    family: "'Plus Jakarta Sans', sans-serif",
+    size: 12,
+    weight: '600'
+  };
+  Chart.defaults.plugins.legend.labels.color = '#475569';
+
+  // Axis grid + ticks — soft hairlines so data dominates
+  if (Chart.defaults.scale) {
+    Chart.defaults.scale.grid = Chart.defaults.scale.grid || {};
+    Chart.defaults.scale.grid.color = 'rgba(226, 232, 240, 0.6)';
+    Chart.defaults.scale.grid.lineWidth = 1;
+    Chart.defaults.scale.grid.drawBorder = false;
+    Chart.defaults.scale.grid.tickColor = 'transparent';
+    Chart.defaults.scale.ticks = Chart.defaults.scale.ticks || {};
+    Chart.defaults.scale.ticks.color = '#94a3b8';
+    Chart.defaults.scale.ticks.padding = 8;
+    Chart.defaults.scale.ticks.font = {
+      family: "'Plus Jakarta Sans', sans-serif",
+      size: 11,
+      weight: '500'
+    };
+    Chart.defaults.scale.border = Chart.defaults.scale.border || {};
+    Chart.defaults.scale.border.color = 'rgba(226, 232, 240, 0.7)';
+    Chart.defaults.scale.border.display = false;
+  }
+
+  // Bar/element styling — more rounded corners for friendly Canva feel
+  Chart.defaults.elements.bar.borderRadius = 6;
+  Chart.defaults.elements.bar.borderSkipped = false;
+  Chart.defaults.elements.line.borderWidth = 3;
+  Chart.defaults.elements.line.tension = 0.35;
+  Chart.defaults.elements.point.radius = 4;
+  Chart.defaults.elements.point.hoverRadius = 7;
+  Chart.defaults.elements.point.borderWidth = 2;
+  Chart.defaults.elements.point.backgroundColor = '#ffffff';
+  Chart.defaults.elements.arc.borderWidth = 3;
+  Chart.defaults.elements.arc.borderColor = '#ffffff';
+}
+
+const MONTH_GENITIVE = {
+  'январ':'январ','феврал':'феврал','март':'март','апрел':'апрел',
+  'май':'май','июн':'июн','июл':'июл','август':'август',
+  'сентябр':'сентябр','октябр':'октябр','ноябр':'ноябр','декабр':'декабр'
+};
+
+// state
+let bankData = null;       // {mainBanks, programs, meta}
+let charts = {};           // chart.js instances
+let selectedBanks = [];    // bank names
+let selectedHududs = [];   // hudud names
+let selectedProgram = 'all';
+let viewMode = 'ytd';      // 'ytd' | 'month' | 'year'
+let banksSortKey = 'totalAllocated';
+let banksSortDir = 'desc';
+
+// ============================================================================
+// FILE HANDLING
+// ============================================================================
+
+const fileInput = document.getElementById('fileInput');
+const uploadSection = document.getElementById('uploadSection');
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+uploadSection.addEventListener('dragover', e => { e.preventDefault(); uploadSection.classList.add('dragover'); });
+uploadSection.addEventListener('dragleave', () => uploadSection.classList.remove('dragover'));
+uploadSection.addEventListener('drop', e => {
+  e.preventDefault(); uploadSection.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file) {
+  if (!file.name.match(/\.(xlsx|xls)$/i)) { alert('Илтимос, .xlsx ёки .xls файл юкланг'); return; }
+  showLoading('Файл ўқилмоқда...');
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+      const sheetName = wb.SheetNames[0];
+      const data = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: null });
+      parseData(data, file.name);
+      renderUploadInfo(file);
+      document.getElementById('mainContent').classList.remove('hidden');
+      document.getElementById('exportBtn').disabled = false;
+      document.getElementById('resetBtn').disabled = false;
+      initApp();
+    } catch (err) {
+      console.error(err);
+      alert('Хато: ' + err.message);
+    }
+    hideLoading();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function renderUploadInfo(file) {
+  uploadSection.classList.add('file-loaded');
+  const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+  uploadSection.innerHTML = `
+    <div class="upload-info" style="flex:1">
+      <div class="upload-info-name">${file.name}</div>
+      <div class="upload-info-meta">
+        ${sizeMB} MB · Ҳисобот ойи: <strong>${bankData.meta.month}</strong>
+        ${bankData.meta.reportDate ? ' · Сана: <strong>' + bankData.meta.reportDate.full + '</strong>' : ''}
+      </div>
+    </div>
+    <button class="upload-btn" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+      Бошқа файл юклаш
+    </button>
+  `;
+}
+
+function showLoading(text) {
+  document.getElementById('loadingText').textContent = text || 'Юкланмоқда...';
+  document.getElementById('loadingOverlay').classList.remove('hidden');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.add('hidden');
+}
+
+// ============================================================================
+// PARSING — adaptive engine that auto-detects month and program shapes
+// ============================================================================
+
+function parseData(data, fileName) {
+  // Step 1: detect report month from headers (rows 4 and 5 have "Январ-XXX" patterns)
+  const reportMonth = detectReportMonth(data);
+  if (!reportMonth) throw new Error('Ҳисобот ойи аниқланмади. Сарлавҳаларни текширинг.');
+
+  // Step 2: detect report date from row 2 (e.g., "01.04.2026 ҳолатига")
+  const reportDate = detectReportDate(data);
+
+  // Step 3: detect file date from filename (e.g., "01_04" or "06_04")
+  const fileDate = detectFileNameDate(fileName);
+
+  // Step 4: detect title from row 1
+  const titleRaw = String(data[0]?.[2] || data[0]?.[40] || '').replace(/\s+/g,' ').trim();
+
+  // Step 5: detect programs from row 3
+  const programs = detectPrograms(data);
+  if (programs.length === 0) throw new Error('Дастурлар топилмади. Excel формати нотўғри.');
+
+  // Step 6: map column types per program based on width
+  programs.forEach(p => { p.cols = mapProgramColumns(p, data); });
+
+  // Step 7: parse bank/branch rows
+  const mainBanks = parseBankRows(data, programs);
+
+  // Step 8: build hudud index
+  const hududSet = new Set();
+  mainBanks.forEach(mb => mb.branches.forEach(br => { if (br.hudud) hududSet.add(br.hudud); }));
+
+  // Step 9: detect placeholder programs (programs whose data is identical to another's)
+  detectPlaceholders(programs, mainBanks);
+
+  bankData = {
+    mainBanks,
+    programs,
+    hududs: [...hududSet].sort(),
+    meta: {
+      month: reportMonth,
+      monthLower: reportMonth.toLowerCase(),
+      reportDate,
+      fileDate,
+      title: titleRaw,
+      fileName
+    }
+  };
+
+  console.log('Parsed:', mainBanks.length, 'banks,', programs.length, 'programs, month:', reportMonth);
+}
+
+// --- detect report month from header rows
+function detectReportMonth(data) {
+  const tally = {};
+  for (let r = 2; r <= 5; r++) {
+    const row = data[r] || [];
+    for (const cell of row) {
+      const s = String(cell || '').replace(/\s+/g,' ').trim();
+      if (!s) continue;
+      // Pattern A: "Январ-XXX ойлари..."
+      const m1 = s.match(/Январ\s*-\s*([А-Яа-яёЁ]+?)\s*ойлари/i);
+      if (m1) {
+        const k = capitalize(m1[1].trim());
+        tally[k] = (tally[k] || 0) + 5; // weighted higher
+      }
+      // Pattern B: standalone "XXX ойи"
+      const m2 = s.match(/^([А-Яа-яёЁ]+?)\s*ойи\s*$/);
+      if (m2) {
+        const k = capitalize(m2[1].trim());
+        tally[k] = (tally[k] || 0) + 1;
+      }
+    }
+  }
+  let best = null, bestCount = 0;
+  for (const k in tally) if (tally[k] > bestCount) { best = k; bestCount = tally[k]; }
+  return best;
+}
+
+function capitalize(s) {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+// --- detect report date from row 2
+function detectReportDate(data) {
+  const row = data[1] || [];
+  for (const cell of row) {
+    const s = String(cell || '');
+    const m = s.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+    if (m) return { day: m[1], month: m[2], year: m[3], full: m[0] };
+  }
+  return null;
+}
+
+// --- detect file date from filename like "01_04_..." or "06_04_..."
+function detectFileNameDate(fileName) {
+  if (!fileName) return null;
+  const m = fileName.match(/(\d{2})[_.-](\d{2})/);
+  if (m) return { day: m[1], month: m[2], full: m[1] + '.' + m[2] };
+  return null;
+}
+
+// --- detect program boundaries from row 3
+function detectPrograms(data) {
+  const r3 = data[2] || [];
+  const r6 = data[5] || [];
+  const programs = [];
+  // Skip first 4 columns (hudud, MFO, №, bank name)
+  for (let c = 4; c < r3.length; c++) {
+    if (r3[c] && String(r3[c]).trim()) {
+      const name = String(r3[c]).replace(/[\r\n]+/g, ' ').replace(/\s+/g,' ').trim();
+      programs.push({ startCol: c, name });
+    }
+  }
+  // Find real "last data column" = max c where row 6 (units) has content
+  let lastDataCol = 4;
+  for (let c = r6.length - 1; c >= 4; c--) {
+    if (r6[c] && String(r6[c]).trim()) { lastDataCol = c; break; }
+  }
+  // Set endCol for each program
+  for (let i = 0; i < programs.length; i++) {
+    if (i + 1 < programs.length) {
+      programs[i].endCol = programs[i + 1].startCol - 1;
+    } else {
+      programs[i].endCol = lastDataCol;
+    }
+    programs[i].width = programs[i].endCol - programs[i].startCol + 1;
+    programs[i].color = PROG_COLORS[i % PROG_COLORS.length];
+    programs[i].shortName = makeShortName(programs[i].name);
+    programs[i].isAggregate = /Дастурлар\s*доирасида/i.test(programs[i].name);
+  }
+  return programs;
+}
+
+function makeShortName(name) {
+  // Make a short label for charts
+  const map = [
+    [/Доимий\s*иш\s*ўринлари/i, 'Доимий иш ўринлари'],
+    [/Аҳоли\s*даромадлари/i, 'Аҳоли даромадлари'],
+    [/Микролойиҳалар/i, 'Микролойиҳалар'],
+    [/Дастурлар\s*доирасида/i, 'Жами (агрегат)'],
+    [/Қичик\s*бизнесни?\s*қўллаб|Кичик\s*бизнесни?\s*қўллаб/i, 'Қичик бизнес'],
+    [/Бизнесга\s*биринчи\s*қадам/i, 'Биринчи қадам'],
+    [/Маҳалла\s*лойиҳаси/i, 'Маҳалла лойиҳаси'],
+    [/Оилавий\s*тадбиркорлик/i, 'Оилавий тадбиркорлик'],
+  ];
+  for (const [rx, label] of map) {
+    if (rx.test(name)) return label;
+  }
+  return name.length > 30 ? name.substring(0, 28) + '…' : name;
+}
+
+// --- map program columns based on width
+// Pattern A (14 cols): annual + ytdPlan + monthPlan + 4 weeks + totalAlloc + monthAlloc + ytdExecSum + ytdExecPct + monthExecSum + monthExecPct + reportDayPct
+// Pattern B (9 cols): annual + ytdPlan + monthPlan + totalAlloc + monthAlloc + ytdExecSum + ytdExecPct + monthExecSum + monthExecPct
+// Pattern C (8 cols): ytdPlan + monthPlan + totalAlloc + monthAlloc + ytdExecSum + ytdExecPct + monthExecSum + monthExecPct (aggregate, no annual)
+function mapProgramColumns(p, data) {
+  const s = p.startCol;
+  const w = p.width;
+  const c = { weeks: [] };
+  if (w === 14) {
+    c.annualPlan = s + 0;
+    c.ytdPlan = s + 1;
+    c.monthPlan = s + 2;
+    c.weeks = [s + 3, s + 4, s + 5, s + 6];
+    c.totalAllocated = s + 7;
+    c.monthAllocated = s + 8;
+    c.ytdExecSum = s + 9;
+    c.ytdExecPct = s + 10;
+    c.monthExecSum = s + 11;
+    c.monthExecPct = s + 12;
+    c.reportDayPct = s + 13;
+    c.shape = 'big';
+    c.hasWeekly = true;
+    c.hasAnnual = true;
+  } else if (w === 9) {
+    c.annualPlan = s + 0;
+    c.ytdPlan = s + 1;
+    c.monthPlan = s + 2;
+    c.totalAllocated = s + 3;
+    c.monthAllocated = s + 4;
+    c.ytdExecSum = s + 5;
+    c.ytdExecPct = s + 6;
+    c.monthExecSum = s + 7;
+    c.monthExecPct = s + 8;
+    c.shape = 'mid';
+    c.hasWeekly = false;
+    c.hasAnnual = true;
+  } else if (w === 8) {
+    c.ytdPlan = s + 0;
+    c.monthPlan = s + 1;
+    c.totalAllocated = s + 2;
+    c.monthAllocated = s + 3;
+    c.ytdExecSum = s + 4;
+    c.ytdExecPct = s + 5;
+    c.monthExecSum = s + 6;
+    c.monthExecPct = s + 7;
+    c.shape = 'agg';
+    c.hasWeekly = false;
+    c.hasAnnual = false;
+  } else {
+    // Unknown shape: try best-effort by header keywords
+    c.shape = 'unknown';
+    c.hasWeekly = false;
+    c.hasAnnual = false;
+    console.warn('Unknown program shape (width=' + w + '): ' + p.name);
+  }
+  return c;
+}
+
+// --- parse bank/branch rows starting at row 8 (index 7), JAMI is at index 6
+function parseBankRows(data, programs) {
+  const mainBanks = [];
+  let curBank = null;
+  // Add JAMI first as a special bank
+  const jamiRow = data[6] || [];
+  const jami = {
+    name: 'Жами (вилоят бўйича)',
+    type: 'Жами',
+    mfo: '',
+    hudud: '',
+    isJami: true,
+    programs: extractProgramData(jamiRow, programs),
+    branches: []
+  };
+  mainBanks.push(jami);
+
+  for (let i = 7; i < data.length; i++) {
+    const row = data[i];
+    if (!row) continue;
+    const hudud = row[0] ? String(row[0]).trim() : '';
+    const mfo = row[1] != null ? String(row[1]).trim() : '';
+    const num = row[2];
+    const name = row[3] ? String(row[3]).trim() : '';
+    if (!name) continue;
+
+    const isBosh = (num === null || num === undefined || num === '') && !hudud;
+    if (isBosh) {
+      curBank = {
+        name,
+        type: 'Бош банк',
+        mfo,
+        hudud: '',
+        isJami: false,
+        programs: extractProgramData(row, programs),
+        branches: []
+      };
+      mainBanks.push(curBank);
+    } else if (curBank) {
+      let branchType = 'Филиал';
+      if (/БХМ/i.test(name)) branchType = 'БХМ';
+      else if (/БХО/i.test(name)) branchType = 'БХО';
+      else if (/КХКМ/i.test(name)) branchType = 'КХКМ';
+      else if (/филиал/i.test(name)) branchType = 'Филиал';
+      curBank.branches.push({
+        name,
+        type: branchType,
+        mfo,
+        hudud,
+        parent: curBank.name,
+        programs: extractProgramData(row, programs)
+      });
+    }
+  }
+  return mainBanks;
+}
+
+function extractProgramData(row, programs) {
+  const out = {};
+  programs.forEach(p => {
+    const c = p.cols;
+    out[p.name] = {
+      annualPlan: getNum(row, c.annualPlan),
+      ytdPlan: getNum(row, c.ytdPlan),
+      monthPlan: getNum(row, c.monthPlan),
+      weeks: (c.weeks || []).map(wc => getNum(row, wc)),
+      totalAllocated: getNum(row, c.totalAllocated),
+      monthAllocated: getNum(row, c.monthAllocated),
+      ytdExecSum: getNum(row, c.ytdExecSum),
+      ytdExecPct: getNum(row, c.ytdExecPct),
+      monthExecSum: getNum(row, c.monthExecSum),
+      monthExecPct: getNum(row, c.monthExecPct),
+      reportDayPct: getNum(row, c.reportDayPct)
+    };
+  });
+  return out;
+}
+
+function getNum(row, idx) {
+  if (idx === undefined || idx === null) return null;
+  const v = row[idx];
+  if (v === null || v === undefined || v === '') return null;
+  if (typeof v === 'number') return isNaN(v) || !isFinite(v) ? null : Math.round(v * 100) / 100;
+  const str = String(v).replace(/\s/g, '').replace(',', '.');
+  const n = parseFloat(str);
+  return isNaN(n) || !isFinite(n) ? null : Math.round(n * 100) / 100;
+}
+
+// --- detect placeholder programs (whose JAMI numbers are identical to another)
+function detectPlaceholders(programs, mainBanks) {
+  const jami = mainBanks[0];
+  if (!jami) return;
+  const fingerprints = {};
+  programs.forEach(p => {
+    const d = jami.programs[p.name];
+    if (!d) return;
+    const fp = JSON.stringify([d.annualPlan, d.ytdPlan, d.totalAllocated, d.ytdExecSum]);
+    if (!fingerprints[fp]) fingerprints[fp] = [];
+    fingerprints[fp].push(p);
+  });
+  // Programs sharing identical fingerprints (other than aggregate) are placeholders
+  for (const fp in fingerprints) {
+    const group = fingerprints[fp].filter(p => !p.isAggregate);
+    if (group.length > 1) {
+      // Mark all but the LAST one as placeholder (last is usually the "real" Қичик бизнес)
+      // Actually we mark all but the one that has the most data - approximated by "later in order"
+      for (let i = 0; i < group.length - 1; i++) {
+        group[i].isPlaceholder = true;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// APP INIT & RENDER
+// ============================================================================
+
+function initApp() {
+  // Initialize filters
+  initBankFilter();
+  initHududFilter();
+  initProgramFilter();
+  // Update month-name placeholders in DOM
+  updateMonthLabels();
+  // Render everything
+  renderInfoBanner();
+  renderKPIs();
+  renderProgramCards();
+  renderOverview();
+  renderBanksTab();
+  renderHududsTab();
+  renderWeeklyTab();
+  renderDetailsTab();
+}
+
+function updateMonthLabels() {
+  const m = bankData.meta.month;
+  document.querySelectorAll('.month-name').forEach(el => el.textContent = m);
+  // Update view filter labels
+  const vf = document.getElementById('viewFilter');
+  vf.options[0].textContent = 'Январ-' + m;
+  vf.options[1].textContent = 'Фақат ' + m + ' ойи';
+  // Update header subtitle
+  const reportDateStr = bankData.meta.reportDate ? bankData.meta.reportDate.full : '';
+  document.getElementById('headerSubtitle').textContent =
+    '2026 йил январ-' + m.toLowerCase() + ' ойлари дастурлар таҳлили' +
+    (reportDateStr ? ' · ' + reportDateStr + ' ҳолатига' : '');
+  // Update programs section title
+  document.getElementById('programsTitle').textContent =
+    'Дастурлар бўйича Январ-' + m + ' натижалари';
+  // Update weekly tab
+  document.getElementById('weeklyTabLabel').textContent = m + ' ҳафталари';
+}
+
+function renderInfoBanner() {
+  const m = bankData.meta;
+  const banks = bankData.mainBanks.filter(b => !b.isJami).length;
+  const branches = bankData.mainBanks.reduce((s, b) => s + b.branches.length, 0);
+  const placeholders = bankData.programs.filter(p => p.isPlaceholder).length;
+  document.getElementById('bannerTitle').textContent =
+    `Январ-${m.month} 2026 ҳисобот таҳлили`;
+  let txt = `Ҳисобот ойи: <strong>${m.month}</strong>. Файл маълумот санаси: <strong>${m.reportDate ? m.reportDate.full : 'аниқланмади'}</strong>. Дашбоард ҳисобот ойини автоматик тарзда сарлавҳалардан аниқлайди — кейинги ой файли юкланса барча сарлавҳа ва жадваллар ўзи янгиланади.`;
+  if (placeholders > 0) {
+    txt += ` <strong style="color:var(--warn)">${placeholders} та дастур ўрнидўшбосар (placeholder) маълумот тутади</strong> — улар кейинроқ реал маълумот билан тўлдирилади.`;
+  }
+  document.getElementById('bannerText').innerHTML = txt;
+  document.getElementById('bannerMeta').innerHTML = `
+    <span><strong>${bankData.programs.length}</strong> та дастур</span>
+    <span><strong>${banks}</strong> та банк</span>
+    <span><strong>${branches}</strong> та филиал/БХМ/БХО</span>
+    <span><strong>${bankData.hududs.length}</strong> та ҳудуд</span>
+  `;
+}
+
+// ============================================================================
+// FILTERS
+// ============================================================================
+
+function initBankFilter() {
+  const banks = bankData.mainBanks.filter(b => !b.isJami).map(b => b.name);
+  selectedBanks = [...banks];
+  buildMultiSelect('bankFilter', banks, selectedBanks, 'банк', (sel) => {
+    selectedBanks = sel;
+    onFiltersChange();
+  });
+}
+
+function initHududFilter() {
+  const hududs = [...bankData.hududs];
+  selectedHududs = [...hududs];
+  buildMultiSelect('hududFilter', hududs, selectedHududs, 'ҳудуд', (sel) => {
+    selectedHududs = sel;
+    onFiltersChange();
+  });
+}
+
+function initProgramFilter() {
+  const sel = document.getElementById('programFilter');
+  sel.innerHTML = '<option value="all">Барча дастурлар</option>';
+  bankData.programs.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = (p.isAggregate ? '◈ ' : '') + p.shortName +
+      (p.isPlaceholder ? ' (placeholder)' : '');
+    sel.appendChild(opt);
+  });
+  sel.value = 'all';
+  selectedProgram = 'all';
+}
+
+function buildMultiSelect(containerId, options, selected, noun, onChange) {
+  const dd = document.getElementById(containerId + 'Dropdown');
+  dd.innerHTML = `
+    <div class="ms-search">
+      <input type="text" placeholder="Излаш..." oninput="filterMultiSelect('${containerId}', this.value)">
+    </div>
+    <div class="ms-actions">
+      <button onclick="msSelectAll('${containerId}', true)">Барчаси</button>
+      <button onclick="msSelectAll('${containerId}', false)">Бекор</button>
+    </div>
+    <div class="ms-options">
+      ${options.map(opt => `
+        <label class="ms-option ${selected.includes(opt) ? 'selected' : ''}" data-value="${escapeHtml(opt)}">
+          <input type="checkbox" ${selected.includes(opt) ? 'checked' : ''} onchange="msToggle('${containerId}', '${escapeAttr(opt)}', this.checked)">
+          <span>${escapeHtml(opt)}</span>
+        </label>
+      `).join('')}
+    </div>
+  `;
+  dd._opts = options;
+  dd._noun = noun;
+  dd._onChange = onChange;
+  updateMsLabel(containerId);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) {
+  return String(s).replace(/'/g, "\\'");
+}
+
+function toggleMultiSelect(id) {
+  // Close others first
+  document.querySelectorAll('.multi-select-dropdown.open').forEach(d => {
+    if (d.id !== id + 'Dropdown') d.classList.remove('open');
+  });
+  document.querySelectorAll('.multi-select-trigger.active').forEach(t => {
+    if (!t.parentElement.querySelector('.multi-select-dropdown.open')) t.classList.remove('active');
+  });
+  const dd = document.getElementById(id + 'Dropdown');
+  const tr = document.querySelector('#' + id + ' .multi-select-trigger');
+  dd.classList.toggle('open');
+  tr.classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.multi-select')) {
+    document.querySelectorAll('.multi-select-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.multi-select-trigger.active').forEach(t => t.classList.remove('active'));
+  }
+});
+
+function msToggle(containerId, value, checked) {
+  const sel = (containerId === 'bankFilter') ? selectedBanks : selectedHududs;
+  if (checked) {
+    if (!sel.includes(value)) sel.push(value);
+  } else {
+    const i = sel.indexOf(value);
+    if (i >= 0) sel.splice(i, 1);
+  }
+  // Update label class
+  const lbl = document.querySelector(`#${containerId}Dropdown .ms-option[data-value="${escapeAttr(value)}"]`);
+  if (lbl) {
+    if (checked) lbl.classList.add('selected'); else lbl.classList.remove('selected');
+  }
+  updateMsLabel(containerId);
+  const dd = document.getElementById(containerId + 'Dropdown');
+  if (dd._onChange) dd._onChange(sel);
+}
+
+function msSelectAll(containerId, all) {
+  const dd = document.getElementById(containerId + 'Dropdown');
+  const opts = dd._opts || [];
+  if (containerId === 'bankFilter') selectedBanks = all ? [...opts] : [];
+  else selectedHududs = all ? [...opts] : [];
+  // Refresh checkboxes
+  dd.querySelectorAll('.ms-option').forEach(lbl => {
+    const cb = lbl.querySelector('input');
+    if (cb) cb.checked = all;
+    if (all) lbl.classList.add('selected'); else lbl.classList.remove('selected');
+  });
+  updateMsLabel(containerId);
+  const sel = (containerId === 'bankFilter') ? selectedBanks : selectedHududs;
+  if (dd._onChange) dd._onChange(sel);
+}
+
+function filterMultiSelect(containerId, query) {
+  const q = query.toLowerCase().trim();
+  const dd = document.getElementById(containerId + 'Dropdown');
+  dd.querySelectorAll('.ms-option').forEach(lbl => {
+    const v = lbl.getAttribute('data-value').toLowerCase();
+    lbl.style.display = q === '' || v.includes(q) ? '' : 'none';
+  });
+}
+
+function updateMsLabel(containerId) {
+  const sel = (containerId === 'bankFilter') ? selectedBanks : selectedHududs;
+  const dd = document.getElementById(containerId + 'Dropdown');
+  const total = (dd._opts || []).length;
+  const noun = dd._noun || '';
+  const lbl = document.getElementById(containerId + 'Label');
+  if (sel.length === total) lbl.textContent = `Барча ${noun}лар (${total})`;
+  else if (sel.length === 0) lbl.textContent = `Танланмаган`;
+  else if (sel.length === 1) lbl.textContent = sel[0];
+  else lbl.textContent = `${sel.length} та ${noun} танланган`;
+}
+
+function onFiltersChange() {
+  selectedProgram = document.getElementById('programFilter').value;
+  viewMode = document.getElementById('viewFilter').value;
+  renderKPIs();
+  renderProgramCards();
+  renderOverview();
+  renderBanksTab();
+  renderHududsTab();
+  renderWeeklyTab();
+  renderDetailsTab();
+}
+
+function resetFilters() {
+  selectedBanks = bankData.mainBanks.filter(b => !b.isJami).map(b => b.name);
+  selectedHududs = [...bankData.hududs];
+  selectedProgram = 'all';
+  viewMode = 'ytd';
+  document.getElementById('programFilter').value = 'all';
+  document.getElementById('viewFilter').value = 'ytd';
+  // Reset multi-selects
+  initBankFilter();
+  initHududFilter();
+  onFiltersChange();
+}
+
+// ============================================================================
+// AGGREGATION HELPERS — these power KPIs, cards, charts, tables
+// ============================================================================
+
+// Get the list of "active" (non-Jami) banks based on filter
+function getActiveBanks() {
+  return bankData.mainBanks.filter(b =>
+    !b.isJami && selectedBanks.includes(b.name)
+  );
+}
+
+// Get filtered branches across all active banks (respects hudud filter)
+function getActiveBranches() {
+  const out = [];
+  getActiveBanks().forEach(b => {
+    b.branches.forEach(br => {
+      if (selectedHududs.includes(br.hudud)) out.push(br);
+    });
+  });
+  return out;
+}
+
+// For bank-level numbers, we sum branch data when hudud filter is partial,
+// otherwise use bosh bank's data (which is the bank's already-aggregated total).
+function getBankTotal(bank, programIdx, metric) {
+  // If selecting all hududs for this bank → use bosh bank values directly
+  const allHududsSelected = bankData.hududs.every(h => selectedHududs.includes(h));
+  const programs = (programIdx === 'all') ? bankData.programs : [bankData.programs[programIdx]];
+  let total = 0;
+  // When 'all programs' selected, skip BOTH the aggregate (avoids double-count
+  // with itself) AND placeholders (which contain duplicate copies of Қичик бизнес data).
+  // When a specific program is selected, the user explicitly chose it — show it as-is.
+  if (allHududsSelected) {
+    programs.forEach(p => {
+      if (programIdx === 'all' && (p.isAggregate || p.isPlaceholder)) return;
+      const d = bank.programs[p.name];
+      if (d && d[metric] != null) total += d[metric];
+    });
+  } else {
+    bank.branches.forEach(br => {
+      if (!selectedHududs.includes(br.hudud)) return;
+      programs.forEach(p => {
+        if (programIdx === 'all' && (p.isAggregate || p.isPlaceholder)) return;
+        const d = br.programs[p.name];
+        if (d && d[metric] != null) total += d[metric];
+      });
+    });
+  }
+  return total;
+}
+
+// Compute totals across all selected banks (and selected program)
+function aggregateMetric(metric) {
+  const programIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram, 10);
+  let total = 0;
+  getActiveBanks().forEach(b => { total += getBankTotal(b, programIdx, metric); });
+  return total;
+}
+
+// Compute completion percentage from sum_actual / sum_plan
+function computePct(actual, plan) {
+  if (!plan || plan === 0) return null;
+  return (actual / plan) * 100;
+}
+
+// ============================================================================
+// KPI HERO RENDER
+// ============================================================================
+
+function renderKPIs() {
+  const m = bankData.meta.month;
+  const ml = m.toLowerCase();
+  const grid = document.getElementById('kpiGrid');
+
+  // Aggregate all metrics from filtered data — same logic as before
+  const annualPlan = aggregateMetric('annualPlan');
+  const ytdPlan = aggregateMetric('ytdPlan');
+  const ytdAlloc = aggregateMetric('totalAllocated');
+  const ytdExec = aggregateMetric('ytdExecSum');
+  const monthPlan = aggregateMetric('monthPlan');
+  const monthAlloc = aggregateMetric('monthAllocated');
+  const monthExec = aggregateMetric('monthExecSum');
+  const ytdExecPct = computePct(ytdExec, ytdPlan);
+  const monthExecPct = computePct(monthExec, monthPlan);
+  const annualPct = computePct(ytdAlloc, annualPlan);
+
+  // Build hero (the dramatic primary metric) and rail (supporting metrics)
+  // based on which view mode is active. Hero is always a percentage —
+  // percentages are the most "headline-worthy" because they convey a
+  // judgement (good/bad) at a glance, while absolute values just convey size.
+  let hero, rail = [];
+
+  if (viewMode === 'month') {
+    // Month-only view: hero is the month execution percentage
+    const heroPct = monthExecPct;
+    const heroStatus = statusFor(heroPct, 100, 75);
+    hero = {
+      eyebrow: `${m} ойи режа бажарилиши`,
+      number: heroPct != null ? heroPct.toFixed(1) : '—',
+      pctMark: heroPct != null,
+      status: heroStatus,
+      statusText: heroStatus === 'up' ? 'режадан юқори' : (heroStatus === 'neutral' ? 'режа атрофида' : 'режадан паст'),
+      detail: monthExec > 0
+        ? `<strong>${fmtSum(monthExec)}</strong> млн сўм ажратилиб, <strong>${m}</strong> ойи режасининг <strong>${heroPct.toFixed(1)}%</strong> бажарилди.`
+        : `<strong>${m}</strong> ойи учун маълумот мавжуд эмас.`,
+      metric: 'monthExecSum',
+      label: `${m} ойи бажарилиши`
+    };
+    rail = [
+      { label: `${m} режаси`, value: fmtSum(monthPlan), unit: 'млн сўм', sub: '', metric: 'monthPlan' },
+      { label: `${m} да ажратилган`, value: fmtSum(monthAlloc), unit: 'млн сўм',
+        sub: monthPlan > 0 ? `Режанинг <strong>${(monthAlloc/monthPlan*100).toFixed(1)}%</strong>` : '', metric: 'monthAllocated' },
+      { label: `Январ-${m} жами ажр.`, value: fmtSum(ytdAlloc), unit: 'млн сўм', sub: '', metric: 'totalAllocated' },
+      { label: 'Йиллик режа', value: fmtSum(annualPlan), unit: 'млн сўм',
+        sub: annualPct != null ? `Бажарилиши <strong>${annualPct.toFixed(1)}%</strong>` : '', metric: 'annualPlan' }
+    ];
+  } else if (viewMode === 'year') {
+    // Year view: hero is annual plan execution percentage
+    const heroPct = annualPct;
+    const heroStatus = statusFor(heroPct, 25, 15);
+    hero = {
+      eyebrow: 'Йиллик режа бажарилиши',
+      number: heroPct != null ? heroPct.toFixed(1) : '—',
+      pctMark: heroPct != null,
+      status: heroStatus,
+      statusText: heroStatus === 'up' ? 'жадаллик билан' : (heroStatus === 'neutral' ? 'ўрта суръат' : 'паст суръат'),
+      detail: ytdAlloc > 0
+        ? `Йиллик <strong>${fmtSum(annualPlan)}</strong> млн сўм режадан <strong>${fmtSum(ytdAlloc)}</strong> ажратилиб, режанинг <strong>${heroPct.toFixed(1)}%</strong> ҳозирча бажарилди.`
+        : 'Йиллик ажратилган маълумот мавжуд эмас.',
+      metric: 'totalAllocated',
+      label: 'Йиллик режа бажарилиши'
+    };
+    rail = [
+      { label: 'Йиллик режа', value: fmtSum(annualPlan), unit: 'млн сўм', sub: '', metric: 'annualPlan' },
+      { label: 'Жами ажратилган', value: fmtSum(ytdAlloc), unit: 'млн сўм',
+        sub: `Январ-${ml} ҳолатига`, metric: 'totalAllocated' },
+      { label: `Январ-${m} режа`, value: fmtSum(ytdPlan), unit: 'млн сўм', sub: '', metric: 'ytdPlan' },
+      { label: `${m} ойи бажарилиши`,
+        value: monthExecPct != null ? monthExecPct.toFixed(1) + '%' : '—', unit: '',
+        sub: `<strong>${fmtSum(monthExec)}</strong> млн сўм`, metric: 'monthExecSum' }
+    ];
+  } else {
+    // Default YTD view: hero is YTD execution percentage —
+    // most actionable insight for a Central Bank monitoring report
+    const heroPct = ytdExecPct;
+    const heroStatus = statusFor(heroPct, 100, 75);
+    const overflow = ytdExec - ytdPlan;
+    hero = {
+      eyebrow: `Январ-${m} режа бажарилиши`,
+      number: heroPct != null ? heroPct.toFixed(1) : '—',
+      pctMark: heroPct != null,
+      status: heroStatus,
+      statusText: heroStatus === 'up' ? 'режадан юқори' : (heroStatus === 'neutral' ? 'режа атрофида' : 'режадан паст'),
+      detail: ytdExec > 0
+        ? `Январдан <strong>${m.toLowerCase()}гача</strong> жами <strong>${fmtSum(ytdExec)}</strong> млн сўм ажратилди — режанинг <strong>${heroPct.toFixed(1)}%</strong>${overflow > 0 ? `, режадан <strong>${fmtSum(overflow)}</strong> млн сўм ортиқча` : ''}.`
+        : 'Бажарилиш маълумоти мавжуд эмас.',
+      metric: 'ytdExecSum',
+      label: `Январ-${m} бажарилиши`
+    };
+    rail = [
+      { label: 'Жами ажратилган', value: fmtSum(ytdAlloc), unit: 'млн сўм',
+        sub: ytdPlan > 0 ? `Январ-${ml} режасининг <strong>${(ytdAlloc/ytdPlan*100).toFixed(1)}%</strong>` : '',
+        metric: 'totalAllocated' },
+      { label: 'Йиллик режа', value: fmtSum(annualPlan), unit: 'млн сўм',
+        sub: annualPct != null ? `Бажарилиши <strong>${annualPct.toFixed(1)}%</strong>` : '',
+        metric: 'annualPlan' },
+      { label: `Январ-${m} режа`, value: fmtSum(ytdPlan), unit: 'млн сўм', sub: '', metric: 'ytdPlan' },
+      { label: `${m} ойи бажарилиши`,
+        value: monthExecPct != null ? monthExecPct.toFixed(1) + '%' : '—', unit: '',
+        sub: `<strong>${fmtSum(monthExec)}</strong> млн сўм`,
+        metric: 'monthExecSum' }
+    ];
+  }
+
+  // Render: hero on left (1.45fr) + rail on right (1fr)
+  // Hero number gets a separate <span class="pct-mark"> for the % so it can
+  // be styled smaller and lighter — like a typographic suffix.
+  grid.innerHTML = `
+    <div class="kpi-hero-primary" onclick="openKpiDetails('${hero.metric}', '${escapeAttr(hero.label)}')">
+      <div class="kpi-hero-eyebrow">${hero.eyebrow}</div>
+      ${hero.status ? `<div class="kpi-hero-status ${hero.status}">${hero.statusText}</div>` : ''}
+      <div class="kpi-hero-number">${hero.number}${hero.pctMark ? '<span class="pct-mark">%</span>' : ''}</div>
+      <div class="kpi-hero-detail">${hero.detail}</div>
+    </div>
+    <div class="kpi-hero-rail">
+      ${rail.map(r => `
+        <div class="kpi-rail-item" onclick="openKpiDetails('${r.metric}', '${escapeAttr(r.label)}')">
+          <div class="kpi-rail-label">${r.label}</div>
+          <div class="kpi-rail-value">${r.value}${r.unit ? '<span class="kpi-rail-unit">' + r.unit + '</span>' : ''}</div>
+          ${r.sub ? '<div class="kpi-rail-sub">' + r.sub + '</div>' : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// Maps a percentage to a status colour. up = green (above good threshold),
+// neutral = grey (acceptable), down = red (below acceptable threshold)
+function statusFor(pct, good, ok) {
+  if (pct == null) return null;
+  if (pct >= good) return 'up';
+  if (pct >= ok) return 'neutral';
+  return 'down';
+}
+
+function badge(pct, suffix) {
+  if (pct == null) return '<span class="kpi-badge neutral">маълумот йўқ</span>';
+  const cls = pct >= 100 ? 'up' : (pct >= 75 ? 'neutral' : 'down');
+  const arrow = pct >= 100 ? '↑' : (pct >= 75 ? '·' : '↓');
+  return `<span class="kpi-badge ${cls}">${arrow} ${pct.toFixed(1)}%</span> <span style="color:var(--text-3)">${suffix || ''}</span>`;
+}
+
+function fmtSum(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (Math.abs(n) >= 1000000) return (n / 1000000).toFixed(2) + ' трлн';
+  if (Math.abs(n) >= 1000) return (n / 1000).toFixed(2) + ' млрд';
+  return n.toLocaleString('en-US', { maximumFractionDigits: 1 });
+}
+
+function fmtNum(n, dp) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return n.toLocaleString('en-US', { maximumFractionDigits: dp != null ? dp : 1 });
+}
+
+function fmtPct(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return n.toFixed(1) + '%';
+}
+
+// ============================================================================
+// PROGRAM CARDS RENDER
+// ============================================================================
+
+function renderProgramCards() {
+  const grid = document.getElementById('programGrid');
+  const m = bankData.meta.month;
+  const cards = [];
+  bankData.programs.forEach((p, idx) => {
+    if (p.isAggregate) return; // skip aggregate in cards (it's a summary)
+    // Sum across selected banks/hududs for this specific program
+    const ytdPlan = sumProgramMetric(idx, 'ytdPlan');
+    const ytdAlloc = sumProgramMetric(idx, 'totalAllocated');
+    const ytdExec = sumProgramMetric(idx, 'ytdExecSum');
+    const monthExec = sumProgramMetric(idx, 'monthExecSum');
+    const monthPlan = sumProgramMetric(idx, 'monthPlan');
+    const annualPlan = sumProgramMetric(idx, 'annualPlan');
+    const ytdPct = computePct(ytdExec, ytdPlan);
+    const monthPct = computePct(monthExec, monthPlan);
+    const fillW = ytdPct != null ? Math.min(150, ytdPct) : 0;
+    const phClass = p.isPlaceholder ? 'placeholder' : '';
+
+    cards.push(`
+      <div class="program-card ${phClass} has-detail"
+           style="--prog-color:${p.color}"
+           onclick="openProgramDetails(${idx})">
+        <div class="pc-header">
+          <div class="pc-name">${escapeHtml(p.shortName)}</div>
+          <div class="pc-shape">${p.cols.shape}</div>
+        </div>
+        <div class="pc-stats">
+          <div class="pc-stat">
+            <div class="pc-stat-label">Йиллик режа</div>
+            <div class="pc-stat-value">${p.cols.hasAnnual ? fmtSum(annualPlan) : '—'}</div>
+          </div>
+          <div class="pc-stat">
+            <div class="pc-stat-label">Январ-${m} режа</div>
+            <div class="pc-stat-value">${fmtSum(ytdPlan)}</div>
+          </div>
+          <div class="pc-stat">
+            <div class="pc-stat-label">Жами ажратилган</div>
+            <div class="pc-stat-value">${fmtSum(ytdAlloc)}</div>
+          </div>
+          <div class="pc-stat">
+            <div class="pc-stat-label">${m} ойи бажарилиши</div>
+            <div class="pc-stat-value">${monthPct != null ? monthPct.toFixed(1) + '%' : '—'}</div>
+          </div>
+        </div>
+        <div class="pc-progress">
+          <div class="pc-progress-label">
+            <span>Январ-${m} бажарилиши</span>
+            <span class="pct">${ytdPct != null ? ytdPct.toFixed(1) + '%' : '—'}</span>
+          </div>
+          <div class="pc-progress-bar">
+            <div class="pc-progress-fill" style="width:${fillW}%"></div>
+          </div>
+        </div>
+        <div class="detail-hint">Батафсил кўриш учун босинг</div>
+      </div>
+    `);
+  });
+  grid.innerHTML = cards.join('');
+}
+
+function sumProgramMetric(progIdx, metric) {
+  const p = bankData.programs[progIdx];
+  if (!p) return 0;
+  const allHududsSelected = bankData.hududs.every(h => selectedHududs.includes(h));
+  let total = 0;
+  getActiveBanks().forEach(b => {
+    if (allHududsSelected) {
+      const d = b.programs[p.name];
+      if (d && d[metric] != null) total += d[metric];
+    } else {
+      b.branches.forEach(br => {
+        if (!selectedHududs.includes(br.hudud)) return;
+        const d = br.programs[p.name];
+        if (d && d[metric] != null) total += d[metric];
+      });
+    }
+  });
+  return total;
+}
+
+// ============================================================================
+// CHARTS
+// ============================================================================
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function renderOverview() {
+  const m = bankData.meta.month;
+  // Only non-aggregate, non-placeholder for clarity (but keep placeholders in muted)
+  const realPrograms = bankData.programs.filter(p => !p.isAggregate);
+  const labels = realPrograms.map(p => p.shortName);
+  const colors = realPrograms.map(p => p.color);
+
+  // Plan vs Actual chart
+  const planData = realPrograms.map(p => sumProgramMetric(bankData.programs.indexOf(p), 'ytdPlan'));
+  const actualData = realPrograms.map(p => sumProgramMetric(bankData.programs.indexOf(p), 'ytdExecSum'));
+  destroyChart('planActual');
+  charts.planActual = new Chart(document.getElementById('planActualChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Январ-' + m + ' режа', data: planData, backgroundColor: 'rgba(148,163,184,0.7)', borderColor: '#64748b', borderWidth: 1 },
+        { label: 'Амалда бажарилиши', data: actualData, backgroundColor: colors.map(c => hexToRgba(c, 0.85)), borderColor: colors, borderWidth: 1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 } } },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + fmtSum(ctx.raw) + ' млн сўм' } }
+      },
+      scales: { y: { ticks: { callback: (v) => fmtSum(v), font: { size: 11 } } }, x: { ticks: { font: { size: 10 } } } }
+    }
+  });
+
+  // Completion % chart
+  const pctData = realPrograms.map(p => {
+    const idx = bankData.programs.indexOf(p);
+    const plan = sumProgramMetric(idx, 'ytdPlan');
+    const actual = sumProgramMetric(idx, 'ytdExecSum');
+    return computePct(actual, plan) || 0;
+  });
+  destroyChart('completion');
+  charts.completion = new Chart(document.getElementById('completionChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Бажарилиш %',
+        data: pctData,
+        backgroundColor: pctData.map(p => p >= 100 ? '#22c55e' : (p >= 75 ? '#f59e0b' : '#ef4444')),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + '%' } },
+        datalabels: {
+          anchor: 'end', align: 'right',
+          formatter: (v) => v.toFixed(1) + '%',
+          font: { weight: 700, size: 10 }
+        }
+      },
+      scales: { x: { ticks: { callback: (v) => v + '%', font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+    },
+    plugins: [ChartDataLabels]
+  });
+
+  // Distribution donut
+  const distData = realPrograms.map(p => sumProgramMetric(bankData.programs.indexOf(p), 'totalAllocated'));
+  destroyChart('distribution');
+  charts.distribution = new Chart(document.getElementById('distributionChart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: distData, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '55%',
+      plugins: {
+        legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12 } },
+        tooltip: { callbacks: { label: (ctx) => ctx.label + ': ' + fmtSum(ctx.raw) + ' млн сўм' } },
+        datalabels: {
+          color: '#fff', font: { weight: 700, size: 11 },
+          formatter: (v, ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const pct = total > 0 ? (v / total * 100) : 0;
+            return pct < 4 ? '' : pct.toFixed(0) + '%';
+          }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+
+  // Top banks chart
+  const banks = getActiveBanks().map(b => ({
+    name: b.name,
+    val: getBankTotal(b, selectedProgram === 'all' ? 'all' : parseInt(selectedProgram), 'totalAllocated')
+  })).sort((a, b) => b.val - a.val).slice(0, 10);
+  destroyChart('topBanks');
+  charts.topBanks = new Chart(document.getElementById('topBanksChart'), {
+    type: 'bar',
+    data: {
+      labels: banks.map(b => b.name),
+      datasets: [{
+        label: 'Жами ажратилган',
+        data: banks.map(b => b.val),
+        backgroundColor: '#2563eb',
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (ctx) => fmtSum(ctx.raw) + ' млн сўм' } }
+      },
+      scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+    }
+  });
+}
+
+function hexToRgba(hex, a) {
+  const m = hex.replace('#', '').match(/.{2}/g);
+  if (!m) return hex;
+  return `rgba(${parseInt(m[0],16)},${parseInt(m[1],16)},${parseInt(m[2],16)},${a})`;
+}
+
+// ============================================================================
+// BANKS TAB
+// ============================================================================
+
+function renderBanksTab() {
+  const m = bankData.meta.month;
+  const banks = getActiveBanks();
+  const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
+  // Build rows
+  const rows = banks.map(b => {
+    const plan = getBankTotal(b, progIdx, 'ytdPlan');
+    const actual = getBankTotal(b, progIdx, 'totalAllocated');
+    const exec = getBankTotal(b, progIdx, 'ytdExecSum');
+    const monthAlloc = getBankTotal(b, progIdx, 'monthAllocated');
+    const monthExec = getBankTotal(b, progIdx, 'monthExecSum');
+    const monthPlan = getBankTotal(b, progIdx, 'monthPlan');
+    return {
+      name: b.name,
+      branchCount: b.branches.length,
+      ytdPlan: plan,
+      totalAllocated: actual,
+      ytdExecSum: exec,
+      ytdPct: computePct(exec, plan),
+      monthPlan,
+      monthAllocated: monthAlloc,
+      monthExecSum: monthExec,
+      monthPct: computePct(monthExec, monthPlan)
+    };
+  });
+  // Sort
+  rows.sort((a, b) => {
+    let av = a[banksSortKey], bv = b[banksSortKey];
+    if (av == null) av = -Infinity;
+    if (bv == null) bv = -Infinity;
+    return banksSortDir === 'asc' ? av - bv : bv - av;
+  });
+
+  // Table
+  const headers = [
+    { key: 'name', label: 'Банк', sortable: false },
+    { key: 'branchCount', label: 'Филиал', cls: 'center' },
+    { key: 'ytdPlan', label: `Январ-${m} режа`, cls: 'num' },
+    { key: 'totalAllocated', label: 'Жами ажратилган', cls: 'num' },
+    { key: 'ytdExecSum', label: `Январ-${m} бажарилиши`, cls: 'num' },
+    { key: 'ytdPct', label: '% YTD', cls: 'center' },
+    { key: 'monthAllocated', label: `${m} ойида ажр.`, cls: 'num' },
+    { key: 'monthPct', label: `% ${m}`, cls: 'center' }
+  ];
+  const thead = `<tr>${headers.map(h => `
+    <th class="${h.cls || ''} ${h.sortable !== false ? 'sortable' : ''} ${banksSortKey === h.key ? banksSortDir : ''}"
+        ${h.sortable !== false ? `onclick="sortBanks('${h.key}')"` : ''}>${h.label}</th>
+  `).join('')}</tr>`;
+  const tbody = rows.map(r => `
+    <tr class="bank-row" onclick="openBankDetails('${escapeAttr(r.name)}')">
+      <td class="name-cell">${escapeHtml(r.name)}</td>
+      <td class="center">${r.branchCount}</td>
+      <td class="num">${fmtSum(r.ytdPlan)}</td>
+      <td class="num">${fmtSum(r.totalAllocated)}</td>
+      <td class="num">${fmtSum(r.ytdExecSum)}</td>
+      <td class="center">${pctCell(r.ytdPct)}</td>
+      <td class="num">${fmtSum(r.monthAllocated)}</td>
+      <td class="center">${pctCell(r.monthPct)}</td>
+    </tr>
+  `).join('');
+  const tableEl = document.getElementById('banksTable');
+  tableEl.querySelector('thead').innerHTML = thead;
+  tableEl.querySelector('tbody').innerHTML = tbody;
+  document.getElementById('banksTableMeta').textContent =
+    `${rows.length} та банк · ${selectedProgram === 'all' ? 'барча дастурлар' : bankData.programs[parseInt(selectedProgram)].shortName}`;
+
+  // Banks ranking chart
+  destroyChart('banksRanking');
+  const top = rows.slice(0, 14);
+  charts.banksRanking = new Chart(document.getElementById('banksRankingChart'), {
+    type: 'bar',
+    data: {
+      labels: top.map(r => r.name),
+      datasets: [
+        { label: `Январ-${m} режа`, data: top.map(r => r.ytdPlan), backgroundColor: 'rgba(148,163,184,0.7)' },
+        { label: 'Жами ажратилган', data: top.map(r => r.totalAllocated), backgroundColor: '#2563eb' }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 11 } } },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + fmtSum(ctx.raw) } }
+      },
+      scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+    }
+  });
+}
+
+function pctCell(pct) {
+  if (pct == null) return '<span class="pct-cell zero">—</span>';
+  let cls = 'high';
+  if (pct < 75) cls = 'low'; else if (pct < 100) cls = 'med';
+  if (pct === 0) cls = 'zero';
+  return `<span class="pct-cell ${cls}">${pct.toFixed(1)}%</span>`;
+}
+
+function sortBanks(key) {
+  if (banksSortKey === key) banksSortDir = banksSortDir === 'desc' ? 'asc' : 'desc';
+  else { banksSortKey = key; banksSortDir = 'desc'; }
+  renderBanksTab();
+}
+
+// ============================================================================
+// HUDUDS TAB
+// ============================================================================
+
+function renderHududsTab() {
+  const m = bankData.meta.month;
+  const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
+  // Aggregate per hudud across selected banks
+  const hMap = {};
+  getActiveBanks().forEach(b => {
+    b.branches.forEach(br => {
+      if (!selectedHududs.includes(br.hudud)) return;
+      const programs = (progIdx === 'all') ? bankData.programs : [bankData.programs[progIdx]];
+      programs.forEach(p => {
+        if (progIdx === 'all' && (p.isAggregate || p.isPlaceholder)) return;
+        const d = br.programs[p.name];
+        if (!d) return;
+        if (!hMap[br.hudud]) hMap[br.hudud] = {
+          hudud: br.hudud, branchCount: 0, banks: new Set(),
+          ytdPlan: 0, totalAllocated: 0, ytdExecSum: 0, monthAllocated: 0, monthExecSum: 0, monthPlan: 0
+        };
+        hMap[br.hudud].ytdPlan += d.ytdPlan || 0;
+        hMap[br.hudud].totalAllocated += d.totalAllocated || 0;
+        hMap[br.hudud].ytdExecSum += d.ytdExecSum || 0;
+        hMap[br.hudud].monthAllocated += d.monthAllocated || 0;
+        hMap[br.hudud].monthExecSum += d.monthExecSum || 0;
+        hMap[br.hudud].monthPlan += d.monthPlan || 0;
+      });
+      // Count branch + bank
+      if (!hMap[br.hudud]._countedBranches) hMap[br.hudud]._countedBranches = new Set();
+      hMap[br.hudud]._countedBranches.add(br.name);
+      hMap[br.hudud].banks.add(b.name);
+    });
+  });
+  Object.values(hMap).forEach(h => {
+    h.branchCount = h._countedBranches ? h._countedBranches.size : 0;
+    h.bankCount = h.banks.size;
+    h.ytdPct = computePct(h.ytdExecSum, h.ytdPlan);
+    h.monthPct = computePct(h.monthExecSum, h.monthPlan);
+  });
+  const list = Object.values(hMap).sort((a, b) => b.totalAllocated - a.totalAllocated);
+  const maxAlloc = list.length ? list[0].totalAllocated : 1;
+
+  // Render hudud cards
+  const grid = document.getElementById('hududGrid');
+  grid.innerHTML = list.map(h => `
+    <div class="hudud-card" onclick="openHududDetails('${escapeAttr(h.hudud)}')">
+      <div class="hudud-name">${escapeHtml(h.hudud)}</div>
+      <div class="hudud-meta">${h.bankCount} банк · ${h.branchCount} филиал</div>
+      <div class="hudud-stats">
+        <div>
+          <div class="hudud-stat-label">Январ-${m} режа</div>
+          <div class="hudud-stat-value">${fmtSum(h.ytdPlan)}</div>
+        </div>
+        <div>
+          <div class="hudud-stat-label">Жами ажратилган</div>
+          <div class="hudud-stat-value">${fmtSum(h.totalAllocated)}</div>
+        </div>
+        <div>
+          <div class="hudud-stat-label">% бажарилиши</div>
+          <div class="hudud-stat-value">${pctCell(h.ytdPct)}</div>
+        </div>
+        <div>
+          <div class="hudud-stat-label">${m} ойида ажр.</div>
+          <div class="hudud-stat-value">${fmtSum(h.monthAllocated)}</div>
+        </div>
+      </div>
+      <div class="hudud-bar">
+        <div class="hudud-bar-fill" style="width:${maxAlloc > 0 ? (h.totalAllocated / maxAlloc * 100) : 0}%"></div>
+      </div>
+    </div>
+  `).join('');
+
+  // Hududs chart
+  destroyChart('hududs');
+  const top = list.slice(0, 22);
+  charts.hududs = new Chart(document.getElementById('hududsChart'), {
+    type: 'bar',
+    data: {
+      labels: top.map(h => h.hudud),
+      datasets: [
+        { label: `Январ-${m} режа`, data: top.map(h => h.ytdPlan), backgroundColor: 'rgba(148,163,184,0.7)' },
+        { label: 'Жами ажратилган', data: top.map(h => h.totalAllocated), backgroundColor: '#16a34a' }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 11 } } },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + fmtSum(ctx.raw) } }
+      },
+      scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+    }
+  });
+}
+
+// ============================================================================
+// WEEKLY TAB
+// ============================================================================
+
+function renderWeeklyTab() {
+  const m = bankData.meta.month;
+  // Determine which program to use
+  let progIdx = selectedProgram === 'all' ? -1 : parseInt(selectedProgram);
+  // If 'all' OR selected program has no weekly, find first program with weekly
+  if (progIdx === -1 || !bankData.programs[progIdx]?.cols.hasWeekly) {
+    progIdx = bankData.programs.findIndex(p => p.cols.hasWeekly && !p.isPlaceholder);
+    if (progIdx === -1) progIdx = bankData.programs.findIndex(p => p.cols.hasWeekly);
+  }
+  const grid = document.getElementById('weekGrid');
+  if (progIdx === -1) {
+    grid.innerHTML = '<div class="info-banner warn"><div class="info-banner-icon">⚠</div><div class="info-banner-content"><div class="info-banner-title">Ҳафталик маълумот мавжуд эмас</div><div class="info-banner-text">Танланган дастурда ёки умуман файлда ҳафталик режа кўрсаткичлари мавжуд эмас.</div></div></div>';
+    destroyChart('weekly');
+    return;
+  }
+
+  const p = bankData.programs[progIdx];
+  // Sum weeks across selected banks
+  const weekSums = [0, 0, 0, 0];
+  getActiveBanks().forEach(b => {
+    const allHududsSelected = bankData.hududs.every(h => selectedHududs.includes(h));
+    if (allHududsSelected) {
+      const d = b.programs[p.name];
+      if (d && d.weeks) d.weeks.forEach((w, i) => { if (w != null) weekSums[i] += w; });
+    } else {
+      b.branches.forEach(br => {
+        if (!selectedHududs.includes(br.hudud)) return;
+        const d = br.programs[p.name];
+        if (d && d.weeks) d.weeks.forEach((w, i) => { if (w != null) weekSums[i] += w; });
+      });
+    }
+  });
+
+  // Detect week label patterns from data parser (use canonical labels for current month)
+  const weekLabels = ['1-4', '6-10', '13-17', '20-24'];
+  const monthPlan = sumProgramMetric(progIdx, 'monthPlan');
+
+  grid.innerHTML = weekLabels.map((lbl, i) => `
+    <div class="week-card w${i}">
+      <div class="week-label">${lbl} ${m.toLowerCase()} (${i + 1}-ҳафта режа)</div>
+      <div class="week-value">${fmtSum(weekSums[i])}</div>
+      <div class="week-pct">${monthPlan > 0 ? (weekSums[i] / monthPlan * 100).toFixed(1) + '% — ' : ''}${escapeHtml(p.shortName)}</div>
+    </div>
+  `).join('');
+
+  // Cumulative chart
+  const cumul = [];
+  let acc = 0;
+  weekSums.forEach(w => { acc += w; cumul.push(acc); });
+
+  destroyChart('weekly');
+  charts.weekly = new Chart(document.getElementById('weeklyChart'), {
+    type: 'line',
+    data: {
+      labels: weekLabels.map(l => l + ' ' + m.toLowerCase()),
+      datasets: [
+        { label: 'Ҳафталик режа', data: weekSums, backgroundColor: '#2563eb44', borderColor: '#2563eb', tension: 0.3, fill: true, pointRadius: 6 },
+        { label: 'Кумулятив', data: cumul, borderColor: '#16a34a', backgroundColor: 'transparent', tension: 0.3, type: 'line', pointRadius: 4, borderDash: [5, 5] }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + fmtSum(ctx.raw) } }
+      },
+      scales: { y: { ticks: { callback: (v) => fmtSum(v) } } }
+    }
+  });
+}
+
+// ============================================================================
+// DETAILS TAB — full bank+branch table
+// ============================================================================
+
+function renderDetailsTab() {
+  const m = bankData.meta.month;
+  const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
+  const banks = getActiveBanks();
+
+  // Build header
+  const headers = [
+    { label: '№', cls: 'center' },
+    { label: 'Банк / филиал', cls: '' },
+    { label: 'Ҳудуд', cls: '' },
+    { label: 'МФО', cls: 'center' },
+    { label: 'Йиллик режа', cls: 'num' },
+    { label: `Январ-${m} режа`, cls: 'num' },
+    { label: 'Жами ажр.', cls: 'num' },
+    { label: `${m} да ажр.`, cls: 'num' },
+    { label: `Январ-${m} бажарилиши`, cls: 'num' },
+    { label: '% YTD', cls: 'center' },
+    { label: `${m} ойи бажарилиши`, cls: 'num' },
+    { label: `% ${m}`, cls: 'center' }
+  ];
+
+  const rowsHtml = [];
+  let i = 0;
+  banks.forEach(b => {
+    i++;
+    const bAnnual = getBankTotal(b, progIdx, 'annualPlan');
+    const bYtdPlan = getBankTotal(b, progIdx, 'ytdPlan');
+    const bAlloc = getBankTotal(b, progIdx, 'totalAllocated');
+    const bMonthAlloc = getBankTotal(b, progIdx, 'monthAllocated');
+    const bExec = getBankTotal(b, progIdx, 'ytdExecSum');
+    const bMonthExec = getBankTotal(b, progIdx, 'monthExecSum');
+    const bMonthPlan = getBankTotal(b, progIdx, 'monthPlan');
+    const bYtdPct = computePct(bExec, bYtdPlan);
+    const bMonthPct = computePct(bMonthExec, bMonthPlan);
+    rowsHtml.push(`
+      <tr class="bank-row" onclick="openBankDetails('${escapeAttr(b.name)}')">
+        <td class="center">${i}</td>
+        <td class="name-cell"><strong>${escapeHtml(b.name)}</strong></td>
+        <td>—</td>
+        <td class="center">—</td>
+        <td class="num">${fmtSum(bAnnual)}</td>
+        <td class="num">${fmtSum(bYtdPlan)}</td>
+        <td class="num">${fmtSum(bAlloc)}</td>
+        <td class="num">${fmtSum(bMonthAlloc)}</td>
+        <td class="num">${fmtSum(bExec)}</td>
+        <td class="center">${pctCell(bYtdPct)}</td>
+        <td class="num">${fmtSum(bMonthExec)}</td>
+        <td class="center">${pctCell(bMonthPct)}</td>
+      </tr>
+    `);
+    // Branches
+    b.branches.forEach(br => {
+      if (!selectedHududs.includes(br.hudud)) return;
+      // Per branch sums (across programs or selected program)
+      const programs = (progIdx === 'all') ? bankData.programs : [bankData.programs[progIdx]];
+      let aPlan = 0, ytdPlan = 0, alloc = 0, mAlloc = 0, exec = 0, mExec = 0, mPlan = 0;
+      programs.forEach(p => {
+        if (progIdx === 'all' && (p.isAggregate || p.isPlaceholder)) return;
+        const d = br.programs[p.name];
+        if (!d) return;
+        aPlan += d.annualPlan || 0;
+        ytdPlan += d.ytdPlan || 0;
+        alloc += d.totalAllocated || 0;
+        mAlloc += d.monthAllocated || 0;
+        exec += d.ytdExecSum || 0;
+        mExec += d.monthExecSum || 0;
+        mPlan += d.monthPlan || 0;
+      });
+      const ytdPct = computePct(exec, ytdPlan);
+      const mPct = computePct(mExec, mPlan);
+      rowsHtml.push(`
+        <tr>
+          <td class="center"></td>
+          <td class="name-cell branch-name">${escapeHtml(br.name)}</td>
+          <td>${escapeHtml(br.hudud || '—')}</td>
+          <td class="center">${escapeHtml(br.mfo || '—')}</td>
+          <td class="num">${fmtSum(aPlan)}</td>
+          <td class="num">${fmtSum(ytdPlan)}</td>
+          <td class="num">${fmtSum(alloc)}</td>
+          <td class="num">${fmtSum(mAlloc)}</td>
+          <td class="num">${fmtSum(exec)}</td>
+          <td class="center">${pctCell(ytdPct)}</td>
+          <td class="num">${fmtSum(mExec)}</td>
+          <td class="center">${pctCell(mPct)}</td>
+        </tr>
+      `);
+    });
+  });
+
+  // Total row
+  const tAnnual = aggregateMetric('annualPlan');
+  const tYtdPlan = aggregateMetric('ytdPlan');
+  const tAlloc = aggregateMetric('totalAllocated');
+  const tMonthAlloc = aggregateMetric('monthAllocated');
+  const tExec = aggregateMetric('ytdExecSum');
+  const tMonthExec = aggregateMetric('monthExecSum');
+  const tMonthPlan = aggregateMetric('monthPlan');
+  const tYtdPct = computePct(tExec, tYtdPlan);
+  const tMonthPct = computePct(tMonthExec, tMonthPlan);
+  rowsHtml.push(`
+    <tr class="total-row">
+      <td class="center">∑</td>
+      <td><strong>ЖАМИ (танланган)</strong></td>
+      <td>—</td>
+      <td class="center">—</td>
+      <td class="num">${fmtSum(tAnnual)}</td>
+      <td class="num">${fmtSum(tYtdPlan)}</td>
+      <td class="num">${fmtSum(tAlloc)}</td>
+      <td class="num">${fmtSum(tMonthAlloc)}</td>
+      <td class="num">${fmtSum(tExec)}</td>
+      <td class="center">${pctCell(tYtdPct)}</td>
+      <td class="num">${fmtSum(tMonthExec)}</td>
+      <td class="center">${pctCell(tMonthPct)}</td>
+    </tr>
+  `);
+
+  const tableEl = document.getElementById('detailsTable');
+  tableEl.querySelector('thead').innerHTML = `<tr>${headers.map(h => `<th class="${h.cls || ''}">${h.label}</th>`).join('')}</tr>`;
+  tableEl.querySelector('tbody').innerHTML = rowsHtml.join('');
+  document.getElementById('detailsTableMeta').textContent =
+    `${banks.length} та банк ва ${getActiveBranches().length} та филиал · ${selectedProgram === 'all' ? 'барча дастурлар' : bankData.programs[parseInt(selectedProgram)].shortName}`;
+}
+
+// ============================================================================
+// TAB SWITCHING
+// ============================================================================
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+  // Re-resize charts after tab show
+  setTimeout(() => {
+    Object.values(charts).forEach(c => { try { c.resize(); } catch (e) {} });
+  }, 50);
+}
+
+// ============================================================================
+// MODAL DETAIL VIEWS — clickable drill-down for cards and rows
+// ============================================================================
+
+// Generic modal open/close
+function openModal(title, subtitle, html) {
+  document.getElementById('modalTitle').innerHTML = title;
+  document.getElementById('modalSubtitle').innerHTML = subtitle;
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+  document.body.style.overflow = '';
+  // Destroy modal-only charts
+  Object.keys(charts).forEach(k => {
+    if (k.startsWith('modal_')) {
+      try { charts[k].destroy(); } catch (e) {}
+      delete charts[k];
+    }
+  });
+}
+
+// ESC closes modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !document.getElementById('modal').classList.contains('hidden')) {
+    closeModal();
+  }
+});
+
+// --- Stat box helper for modal sections
+function modalStat(label, value, sub, cls) {
+  return `<div class="modal-stat ${cls || ''}">
+    <div class="modal-stat-label">${label}</div>
+    <div class="modal-stat-value">${value}</div>
+    ${sub ? '<div class="modal-stat-sub">' + sub + '</div>' : ''}
+  </div>`;
+}
+
+// ============================================================================
+// PROGRAM DRILL-DOWN — clicked from program card
+// ============================================================================
+
+function openProgramDetails(idx) {
+  const p = bankData.programs[idx];
+  if (!p) return;
+  const m = bankData.meta.month;
+
+  // Compute totals for this specific program (not affected by selectedProgram)
+  const annual = sumProgramMetric(idx, 'annualPlan');
+  const ytdPlan = sumProgramMetric(idx, 'ytdPlan');
+  const monthPlan = sumProgramMetric(idx, 'monthPlan');
+  const totalAlloc = sumProgramMetric(idx, 'totalAllocated');
+  const monthAlloc = sumProgramMetric(idx, 'monthAllocated');
+  const ytdExec = sumProgramMetric(idx, 'ytdExecSum');
+  const monthExec = sumProgramMetric(idx, 'monthExecSum');
+  const ytdPct = computePct(ytdExec, ytdPlan);
+  const monthPct = computePct(monthExec, monthPlan);
+  const annualPct = computePct(totalAlloc, annual);
+
+  // Bank-level breakdown for this program
+  const allHududsSelected = bankData.hududs.every(h => selectedHududs.includes(h));
+  const bankBreakdown = getActiveBanks().map(b => {
+    let bYtdPlan = 0, bAlloc = 0, bExec = 0, bMonthPlan = 0, bMonthExec = 0, bMonthAlloc = 0;
+    if (allHududsSelected) {
+      const d = b.programs[p.name] || {};
+      bYtdPlan = d.ytdPlan || 0;
+      bAlloc = d.totalAllocated || 0;
+      bExec = d.ytdExecSum || 0;
+      bMonthPlan = d.monthPlan || 0;
+      bMonthExec = d.monthExecSum || 0;
+      bMonthAlloc = d.monthAllocated || 0;
+    } else {
+      b.branches.forEach(br => {
+        if (!selectedHududs.includes(br.hudud)) return;
+        const d = br.programs[p.name] || {};
+        bYtdPlan += d.ytdPlan || 0;
+        bAlloc += d.totalAllocated || 0;
+        bExec += d.ytdExecSum || 0;
+        bMonthPlan += d.monthPlan || 0;
+        bMonthExec += d.monthExecSum || 0;
+        bMonthAlloc += d.monthAllocated || 0;
+      });
+    }
+    return {
+      name: b.name, branchCount: b.branches.length,
+      ytdPlan: bYtdPlan, alloc: bAlloc, exec: bExec, monthAlloc: bMonthAlloc,
+      ytdPct: computePct(bExec, bYtdPlan),
+      monthPct: computePct(bMonthExec, bMonthPlan)
+    };
+  }).filter(b => b.alloc > 0 || b.ytdPlan > 0).sort((a, b) => b.alloc - a.alloc);
+
+  // Hudud-level breakdown for this program
+  const hMap = {};
+  getActiveBanks().forEach(b => {
+    b.branches.forEach(br => {
+      if (!selectedHududs.includes(br.hudud)) return;
+      const d = br.programs[p.name] || {};
+      if (!hMap[br.hudud]) hMap[br.hudud] = {
+        hudud: br.hudud, branchCount: 0, ytdPlan: 0, alloc: 0, exec: 0, monthAlloc: 0
+      };
+      hMap[br.hudud].branchCount++;
+      hMap[br.hudud].ytdPlan += d.ytdPlan || 0;
+      hMap[br.hudud].alloc += d.totalAllocated || 0;
+      hMap[br.hudud].exec += d.ytdExecSum || 0;
+      hMap[br.hudud].monthAlloc += d.monthAllocated || 0;
+    });
+  });
+  const hududList = Object.values(hMap).filter(h => h.alloc > 0 || h.ytdPlan > 0)
+    .sort((a, b) => b.alloc - a.alloc);
+
+  // Build HTML
+  let html = '';
+
+  // Section 1: Key stats
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Асосий кўрсаткичлар</div>
+      <div class="modal-stats-grid">
+        ${p.cols.hasAnnual ? modalStat('Йиллик режа', fmtSum(annual) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
+          annualPct != null ? `Йиллик бажарилиши: <strong>${annualPct.toFixed(1)}%</strong>` : '', 'dark') : ''}
+        ${modalStat(`Январ-${m} режаси`, fmtSum(ytdPlan) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>', '', '')}
+        ${modalStat('Жами ажратилган', fmtSum(totalAlloc) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
+          ytdPlan > 0 ? `Январ-${m} режасининг <strong>${(totalAlloc/ytdPlan*100).toFixed(1)}%</strong>` : '', 'success')}
+        ${modalStat(`Январ-${m} бажарилиши`, fmtSum(ytdExec) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
+          ytdPct != null ? `<strong>${ytdPct.toFixed(1)}%</strong> режанинг` : '',
+          ytdPct >= 100 ? 'success' : (ytdPct >= 75 ? 'warning' : 'danger'))}
+        ${modalStat(`${m} ойи режа`, fmtSum(monthPlan) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
+          monthAlloc > 0 ? `<strong>${fmtSum(monthAlloc)}</strong> ажратилган` : '', '')}
+        ${modalStat(`${m} ойи бажарилиши`, monthPct != null ? monthPct.toFixed(1) + '%' : '—',
+          `<strong>${fmtSum(monthExec)}</strong> млн сўм`,
+          monthPct >= 100 ? 'success' : (monthPct >= 75 ? 'warning' : 'danger'))}
+      </div>
+    </div>
+  `;
+
+  // Section 2: Weekly breakdown (only if hasWeekly)
+  if (p.cols.hasWeekly) {
+    const weekSums = [0, 0, 0, 0];
+    getActiveBanks().forEach(b => {
+      if (allHududsSelected) {
+        const d = b.programs[p.name];
+        if (d && d.weeks) d.weeks.forEach((w, i) => { if (w != null) weekSums[i] += w; });
+      } else {
+        b.branches.forEach(br => {
+          if (!selectedHududs.includes(br.hudud)) return;
+          const d = br.programs[p.name];
+          if (d && d.weeks) d.weeks.forEach((w, i) => { if (w != null) weekSums[i] += w; });
+        });
+      }
+    });
+    const weekLabels = ['1-4', '6-10', '13-17', '20-24'];
+    html += `
+      <div class="modal-section">
+        <div class="modal-section-title">${m} ойи ҳафталик режаси</div>
+        <div class="modal-stats-grid">
+          ${weekLabels.map((lbl, i) => modalStat(`${lbl} ${m.toLowerCase()}`,
+            fmtSum(weekSums[i]) + ' <span style="font-size:0.7rem">млн</span>',
+            monthPlan > 0 ? `${(weekSums[i] / monthPlan * 100).toFixed(1)}% ой режасининг` : '',
+            '')).join('')}
+        </div>
+        <div class="modal-chart-container" style="margin-top:18px"><canvas id="modal_weeklyChart"></canvas></div>
+      </div>
+    `;
+  }
+
+  // Section 3: Top banks
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Барча банклар бўйича таҳлил <span style="font-size:0.78rem;color:var(--text-3);font-weight:500;margin-left:auto;letter-spacing:0.02em">${bankBreakdown.length} та банк</span></div>
+      <div class="modal-grid-2">
+        <div class="modal-chart-container"><canvas id="modal_progBanksChart"></canvas></div>
+        <div style="overflow-y:auto;max-height:280px">
+          <table class="dt" style="font-size:0.78rem">
+            <thead>
+              <tr>
+                <th>Банк</th>
+                <th class="num">Жами ажр.</th>
+                <th class="center">% YTD</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bankBreakdown.map(b => `
+                <tr style="cursor:pointer" onclick="closeModal();setTimeout(()=>openBankDetails('${escapeAttr(b.name)}'),100)">
+                  <td>${escapeHtml(b.name)}</td>
+                  <td class="num">${fmtSum(b.alloc)}</td>
+                  <td class="center">${pctCell(b.ytdPct)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Section 4: Hudud breakdown
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Ҳудудлар бўйича тақсимот <span style="font-size:0.78rem;color:var(--text-3);font-weight:500;margin-left:auto;letter-spacing:0.02em">${hududList.length} та ҳудуд</span></div>
+      <div class="modal-chart-container tall"><canvas id="modal_progHududsChart"></canvas></div>
+    </div>
+  `;
+
+  openModal(
+    `${escapeHtml(p.name)}`,
+    `${p.isAggregate ? 'Агрегат · ' : ''}Январ-${m} 2026 ҳолатига · ${p.startCol + 1}-${p.endCol + 1}-устунлар (${p.cols.shape} тури)`,
+    html
+  );
+
+  // After modal opens, render charts
+  setTimeout(() => {
+    if (p.cols.hasWeekly) renderProgramWeeklyChart(p, allHududsSelected);
+    renderProgramBanksChart(bankBreakdown, p);
+    renderProgramHududsChart(hududList, p);
+  }, 100);
+}
+
+function renderProgramWeeklyChart(p, allHududsSelected) {
+  const m = bankData.meta.month;
+  const weekSums = [0, 0, 0, 0];
+  getActiveBanks().forEach(b => {
+    if (allHududsSelected) {
+      const d = b.programs[p.name];
+      if (d && d.weeks) d.weeks.forEach((w, i) => { if (w != null) weekSums[i] += w; });
+    } else {
+      b.branches.forEach(br => {
+        if (!selectedHududs.includes(br.hudud)) return;
+        const d = br.programs[p.name];
+        if (d && d.weeks) d.weeks.forEach((w, i) => { if (w != null) weekSums[i] += w; });
+      });
+    }
+  });
+  const weekLabels = ['1-4 ' + m.toLowerCase(), '6-10 ' + m.toLowerCase(),
+                     '13-17 ' + m.toLowerCase(), '20-24 ' + m.toLowerCase()];
+  let acc = 0;
+  const cum = weekSums.map(w => { acc += w; return acc; });
+  const ctx = document.getElementById('modal_weeklyChart');
+  if (!ctx) return;
+  charts.modal_weekly = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: weekLabels,
+      datasets: [
+        { label: 'Ҳафталик', data: weekSums, backgroundColor: p.color + 'cc', borderRadius: 4 },
+        { label: 'Кумулятив', data: cum, type: 'line', borderColor: '#0f172a', backgroundColor: 'transparent', tension: 0.3, pointRadius: 5, borderWidth: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtSum(c.raw) } } },
+      scales: { y: { ticks: { callback: (v) => fmtSum(v) } } }
+    }
+  });
+}
+
+function renderProgramBanksChart(banks, p) {
+  const ctx = document.getElementById('modal_progBanksChart');
+  if (!ctx) return;
+  const top = banks.slice(0, 12);
+  charts.modal_progBanks = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top.map(b => b.name),
+      datasets: [
+        { label: 'Режа', data: top.map(b => b.ytdPlan), backgroundColor: 'rgba(148,163,184,0.6)' },
+        { label: 'Ажратилган', data: top.map(b => b.alloc), backgroundColor: p.color }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 10 } } },
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtSum(c.raw) } }
+      },
+      scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+    }
+  });
+}
+
+function renderProgramHududsChart(hududs, p) {
+  const ctx = document.getElementById('modal_progHududsChart');
+  if (!ctx) return;
+  const top = hududs.slice(0, 22);
+  charts.modal_progHududs = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top.map(h => h.hudud),
+      datasets: [
+        { label: 'Январ-ой режа', data: top.map(h => h.ytdPlan), backgroundColor: 'rgba(148,163,184,0.6)' },
+        { label: 'Жами ажратилган', data: top.map(h => h.alloc), backgroundColor: p.color }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 10 } } },
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtSum(c.raw) } }
+      },
+      scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+    }
+  });
+}
+
+// ============================================================================
+// HUDUD DRILL-DOWN — clicked from hudud card
+// ============================================================================
+
+function openHududDetails(hududName) {
+  const m = bankData.meta.month;
+  const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
+
+  // Aggregate this hudud across selected banks
+  const hData = {
+    ytdPlan: 0, totalAllocated: 0, ytdExecSum: 0, monthAllocated: 0,
+    monthExecSum: 0, monthPlan: 0, annualPlan: 0
+  };
+  // Per-bank within hudud
+  const bankMap = {};
+  // Per-program within hudud
+  const progMap = {};
+  bankData.programs.forEach(p => {
+    progMap[p.name] = {
+      program: p, ytdPlan: 0, alloc: 0, exec: 0, monthAlloc: 0, monthExec: 0, monthPlan: 0, branches: []
+    };
+  });
+  // List of branches in this hudud
+  const branches = [];
+
+  getActiveBanks().forEach(b => {
+    let bAcc = { name: b.name, ytdPlan: 0, alloc: 0, exec: 0, monthAlloc: 0, branchCount: 0 };
+    b.branches.forEach(br => {
+      if (br.hudud !== hududName) return;
+      bAcc.branchCount++;
+      const branchAcc = {
+        name: br.name, type: br.type, mfo: br.mfo, parent: b.name,
+        ytdPlan: 0, alloc: 0, exec: 0, monthAlloc: 0, ytdPct: null
+      };
+      bankData.programs.forEach(p => {
+        if (progIdx === 'all' && (p.isAggregate || p.isPlaceholder)) return;
+        if (progIdx !== 'all' && bankData.programs[progIdx].name !== p.name) return;
+        const d = br.programs[p.name];
+        if (!d) return;
+        hData.ytdPlan += d.ytdPlan || 0;
+        hData.totalAllocated += d.totalAllocated || 0;
+        hData.ytdExecSum += d.ytdExecSum || 0;
+        hData.monthAllocated += d.monthAllocated || 0;
+        hData.monthExecSum += d.monthExecSum || 0;
+        hData.monthPlan += d.monthPlan || 0;
+        hData.annualPlan += d.annualPlan || 0;
+        bAcc.ytdPlan += d.ytdPlan || 0;
+        bAcc.alloc += d.totalAllocated || 0;
+        bAcc.exec += d.ytdExecSum || 0;
+        bAcc.monthAlloc += d.monthAllocated || 0;
+        branchAcc.ytdPlan += d.ytdPlan || 0;
+        branchAcc.alloc += d.totalAllocated || 0;
+        branchAcc.exec += d.ytdExecSum || 0;
+        branchAcc.monthAlloc += d.monthAllocated || 0;
+      });
+      // Per-program at branch granularity (always)
+      bankData.programs.forEach(p => {
+        const d = br.programs[p.name];
+        if (!d) return;
+        progMap[p.name].ytdPlan += d.ytdPlan || 0;
+        progMap[p.name].alloc += d.totalAllocated || 0;
+        progMap[p.name].exec += d.ytdExecSum || 0;
+        progMap[p.name].monthAlloc += d.monthAllocated || 0;
+        progMap[p.name].monthExec += d.monthExecSum || 0;
+        progMap[p.name].monthPlan += d.monthPlan || 0;
+      });
+      branchAcc.ytdPct = computePct(branchAcc.exec, branchAcc.ytdPlan);
+      branches.push(branchAcc);
+    });
+    if (bAcc.branchCount > 0) bankMap[b.name] = bAcc;
+  });
+
+  const banksList = Object.values(bankMap).sort((a, b) => b.alloc - a.alloc);
+  const programsList = Object.values(progMap).filter(p => !p.program.isPlaceholder && p.alloc > 0)
+    .sort((a, b) => b.alloc - a.alloc);
+  branches.sort((a, b) => b.alloc - a.alloc);
+
+  const ytdPct = computePct(hData.ytdExecSum, hData.ytdPlan);
+  const monthPct = computePct(hData.monthExecSum, hData.monthPlan);
+
+  let html = '';
+
+  // Section 1: Hudud key stats
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Ҳудуд кўрсаткичлари</div>
+      <div class="modal-stats-grid">
+        ${modalStat('Банк сони', banksList.length + ' та', `${branches.length} та филиал/БХМ`, 'dark')}
+        ${modalStat(`Январ-${m} режа`, fmtSum(hData.ytdPlan) + ' <span style="font-size:0.7rem">млн</span>', '', '')}
+        ${modalStat('Жами ажратилган', fmtSum(hData.totalAllocated) + ' <span style="font-size:0.7rem">млн</span>',
+          hData.ytdPlan > 0 ? `Режанинг <strong>${(hData.totalAllocated/hData.ytdPlan*100).toFixed(1)}%</strong>` : '', 'success')}
+        ${modalStat(`Январ-${m} бажарилиши`, ytdPct != null ? ytdPct.toFixed(1) + '%' : '—',
+          `<strong>${fmtSum(hData.ytdExecSum)}</strong> млн сўм`,
+          ytdPct >= 100 ? 'success' : (ytdPct >= 75 ? 'warning' : 'danger'))}
+        ${modalStat(`${m} да ажратилган`, fmtSum(hData.monthAllocated) + ' <span style="font-size:0.7rem">млн</span>', '', '')}
+        ${modalStat(`${m} ойи бажарилиши`, monthPct != null ? monthPct.toFixed(1) + '%' : '—',
+          `<strong>${fmtSum(hData.monthExecSum)}</strong> млн сўм`,
+          monthPct >= 100 ? 'success' : (monthPct >= 75 ? 'warning' : 'danger'))}
+      </div>
+    </div>
+  `;
+
+  // Section 2: Banks in this hudud
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Шу ҳудудда фаолият юритувчи банклар</div>
+      <table class="dt" style="font-size:0.81rem">
+        <thead>
+          <tr>
+            <th>Банк</th>
+            <th class="center">Филиал</th>
+            <th class="num">Январ-${m} режа</th>
+            <th class="num">Жами ажр.</th>
+            <th class="num">Бажарилиши</th>
+            <th class="center">% YTD</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${banksList.map(b => `
+            <tr style="cursor:pointer" onclick="closeModal();setTimeout(()=>openBankDetails('${escapeAttr(b.name)}'),100)">
+              <td><strong>${escapeHtml(b.name)}</strong></td>
+              <td class="center">${b.branchCount}</td>
+              <td class="num">${fmtSum(b.ytdPlan)}</td>
+              <td class="num">${fmtSum(b.alloc)}</td>
+              <td class="num">${fmtSum(b.exec)}</td>
+              <td class="center">${pctCell(computePct(b.exec, b.ytdPlan))}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // Section 3: Branches list
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Барча филиаллар <span style="margin-left:auto;color:var(--text-3);letter-spacing:0.02em;font-weight:500">${branches.length} та</span></div>
+      <div style="max-height:340px;overflow-y:auto">
+        <table class="dt" style="font-size:0.79rem">
+          <thead>
+            <tr>
+              <th>Филиал</th>
+              <th>Бош банк</th>
+              <th class="center">МФО</th>
+              <th class="num">Январ-${m} режа</th>
+              <th class="num">Жами ажр.</th>
+              <th class="center">% YTD</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${branches.map(br => `
+              <tr>
+                <td>${escapeHtml(br.name)}</td>
+                <td style="font-size:0.74rem;color:var(--text-2)">${escapeHtml(br.parent)}</td>
+                <td class="center" style="font-size:0.74rem">${escapeHtml(br.mfo || '—')}</td>
+                <td class="num">${fmtSum(br.ytdPlan)}</td>
+                <td class="num">${fmtSum(br.alloc)}</td>
+                <td class="center">${pctCell(br.ytdPct)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Section 4: Program breakdown chart
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Дастурлар бўйича тақсимот</div>
+      <div class="modal-grid-2">
+        <div class="modal-chart-container"><canvas id="modal_hududProgsChart"></canvas></div>
+        <div style="overflow-y:auto;max-height:280px">
+          <table class="dt" style="font-size:0.78rem">
+            <thead><tr><th>Дастур</th><th class="num">Жами ажр.</th><th class="center">% YTD</th></tr></thead>
+            <tbody>
+              ${programsList.map(p => `
+                <tr style="cursor:pointer" onclick="closeModal();setTimeout(()=>openProgramDetails(${bankData.programs.indexOf(p.program)}),100)">
+                  <td>${escapeHtml(p.program.shortName)}</td>
+                  <td class="num">${fmtSum(p.alloc)}</td>
+                  <td class="center">${pctCell(computePct(p.exec, p.ytdPlan))}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  openModal(
+    `${escapeHtml(hududName)}`,
+    `${branches.length} та филиал · ${banksList.length} та банк · Январ-${m} 2026`,
+    html
+  );
+
+  setTimeout(() => {
+    const ctx = document.getElementById('modal_hududProgsChart');
+    if (!ctx) return;
+    charts.modal_hududProgs = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: programsList.map(p => p.program.shortName),
+        datasets: [
+          { label: 'Январ-ой режа', data: programsList.map(p => p.ytdPlan), backgroundColor: 'rgba(148,163,184,0.6)' },
+          { label: 'Жами ажратилган', data: programsList.map(p => p.alloc),
+            backgroundColor: programsList.map(p => p.program.color) }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtSum(c.raw) } } },
+        scales: { y: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, x: { ticks: { font: { size: 9 } } } }
+      }
+    });
+  }, 100);
+}
+
+// ============================================================================
+// BANK DRILL-DOWN — clicked from bank row
+// ============================================================================
+
+function openBankDetails(bankName) {
+  const m = bankData.meta.month;
+  const bank = bankData.mainBanks.find(b => b.name === bankName);
+  if (!bank) return;
+  const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
+
+  // Bank totals (across all programs, respecting filter)
+  const allHududsSelected = bankData.hududs.every(h => selectedHududs.includes(h));
+  const ytdPlan = getBankTotal(bank, progIdx, 'ytdPlan');
+  const totalAlloc = getBankTotal(bank, progIdx, 'totalAllocated');
+  const ytdExec = getBankTotal(bank, progIdx, 'ytdExecSum');
+  const monthAlloc = getBankTotal(bank, progIdx, 'monthAllocated');
+  const monthExec = getBankTotal(bank, progIdx, 'monthExecSum');
+  const monthPlan = getBankTotal(bank, progIdx, 'monthPlan');
+  const annualPlan = getBankTotal(bank, progIdx, 'annualPlan');
+  const ytdPct = computePct(ytdExec, ytdPlan);
+  const monthPct = computePct(monthExec, monthPlan);
+
+  // Per-program for this bank
+  const progBreakdown = bankData.programs.map(p => {
+    let pPlan = 0, pAlloc = 0, pExec = 0, pMonthAlloc = 0;
+    if (allHududsSelected) {
+      const d = bank.programs[p.name] || {};
+      pPlan = d.ytdPlan || 0;
+      pAlloc = d.totalAllocated || 0;
+      pExec = d.ytdExecSum || 0;
+      pMonthAlloc = d.monthAllocated || 0;
+    } else {
+      bank.branches.forEach(br => {
+        if (!selectedHududs.includes(br.hudud)) return;
+        const d = br.programs[p.name] || {};
+        pPlan += d.ytdPlan || 0;
+        pAlloc += d.totalAllocated || 0;
+        pExec += d.ytdExecSum || 0;
+        pMonthAlloc += d.monthAllocated || 0;
+      });
+    }
+    return {
+      program: p, ytdPlan: pPlan, alloc: pAlloc, exec: pExec, monthAlloc: pMonthAlloc,
+      ytdPct: computePct(pExec, pPlan)
+    };
+  }).filter(x => !x.program.isPlaceholder && (x.alloc > 0 || x.ytdPlan > 0));
+
+  // Branches of this bank
+  const branches = bank.branches.filter(br => selectedHududs.includes(br.hudud)).map(br => {
+    let bPlan = 0, bAlloc = 0, bExec = 0, bMonthAlloc = 0;
+    bankData.programs.forEach(p => {
+      if (progIdx === 'all' && (p.isAggregate || p.isPlaceholder)) return;
+      if (progIdx !== 'all' && bankData.programs[progIdx].name !== p.name) return;
+      const d = br.programs[p.name] || {};
+      bPlan += d.ytdPlan || 0;
+      bAlloc += d.totalAllocated || 0;
+      bExec += d.ytdExecSum || 0;
+      bMonthAlloc += d.monthAllocated || 0;
+    });
+    return {
+      name: br.name, type: br.type, hudud: br.hudud, mfo: br.mfo,
+      ytdPlan: bPlan, alloc: bAlloc, exec: bExec, monthAlloc: bMonthAlloc,
+      ytdPct: computePct(bExec, bPlan)
+    };
+  }).sort((a, b) => b.alloc - a.alloc);
+
+  // Hudud distribution
+  const hMap = {};
+  branches.forEach(br => {
+    if (!hMap[br.hudud]) hMap[br.hudud] = { hudud: br.hudud, branches: 0, alloc: 0, ytdPlan: 0 };
+    hMap[br.hudud].branches++;
+    hMap[br.hudud].alloc += br.alloc;
+    hMap[br.hudud].ytdPlan += br.ytdPlan;
+  });
+  const hududsList = Object.values(hMap).sort((a, b) => b.alloc - a.alloc);
+
+  let html = '';
+
+  // Key stats
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">${escapeHtml(bank.name)} — асосий кўрсаткичлар</div>
+      <div class="modal-stats-grid">
+        ${modalStat('Филиаллар сони', branches.length + ' та',
+          hududsList.length + ' та ҳудудда', 'dark')}
+        ${modalStat('Йиллик режа', fmtSum(annualPlan) + ' <span style="font-size:0.7rem">млн</span>', '', '')}
+        ${modalStat(`Январ-${m} режа`, fmtSum(ytdPlan) + ' <span style="font-size:0.7rem">млн</span>', '', '')}
+        ${modalStat('Жами ажратилган', fmtSum(totalAlloc) + ' <span style="font-size:0.7rem">млн</span>',
+          ytdPlan > 0 ? `Режанинг <strong>${(totalAlloc/ytdPlan*100).toFixed(1)}%</strong>` : '', 'success')}
+        ${modalStat(`Январ-${m} бажарилиши`, ytdPct != null ? ytdPct.toFixed(1) + '%' : '—',
+          `<strong>${fmtSum(ytdExec)}</strong> млн сўм`,
+          ytdPct >= 100 ? 'success' : (ytdPct >= 75 ? 'warning' : 'danger'))}
+        ${modalStat(`${m} ойи бажарилиши`, monthPct != null ? monthPct.toFixed(1) + '%' : '—',
+          `<strong>${fmtSum(monthExec)}</strong> млн сўм`,
+          monthPct >= 100 ? 'success' : (monthPct >= 75 ? 'warning' : 'danger'))}
+      </div>
+    </div>
+  `;
+
+  // Programs breakdown
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Дастурлар бўйича тақсимот <span style="margin-left:auto;color:var(--text-3);letter-spacing:0.02em;font-weight:500">${progBreakdown.length} та дастур</span></div>
+      <div class="modal-grid-2">
+        <div class="modal-chart-container"><canvas id="modal_bankProgsChart"></canvas></div>
+        <div style="overflow-y:auto;max-height:280px">
+          <table class="dt" style="font-size:0.78rem">
+            <thead>
+              <tr><th>Дастур</th><th class="num">Жами ажр.</th><th class="center">% YTD</th></tr>
+            </thead>
+            <tbody>
+              ${progBreakdown.map(x => `
+                <tr style="cursor:pointer" onclick="closeModal();setTimeout(()=>openProgramDetails(${bankData.programs.indexOf(x.program)}),100)">
+                  <td>${escapeHtml(x.program.shortName)}</td>
+                  <td class="num">${fmtSum(x.alloc)}</td>
+                  <td class="center">${pctCell(x.ytdPct)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Branches list
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Филиаллар <span style="margin-left:auto;color:var(--text-3);letter-spacing:0.02em;font-weight:500">${branches.length} та</span></div>
+      <div style="max-height:340px;overflow-y:auto">
+        <table class="dt" style="font-size:0.79rem">
+          <thead>
+            <tr>
+              <th>Филиал</th>
+              <th>Тури</th>
+              <th>Ҳудуд</th>
+              <th class="center">МФО</th>
+              <th class="num">Январ-${m} режа</th>
+              <th class="num">Жами ажр.</th>
+              <th class="center">% YTD</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${branches.map(br => `
+              <tr style="cursor:pointer" onclick="closeModal();setTimeout(()=>openHududDetails('${escapeAttr(br.hudud)}'),100)">
+                <td>${escapeHtml(br.name)}</td>
+                <td>${escapeHtml(br.type)}</td>
+                <td>${escapeHtml(br.hudud)}</td>
+                <td class="center" style="font-size:0.74rem">${escapeHtml(br.mfo || '—')}</td>
+                <td class="num">${fmtSum(br.ytdPlan)}</td>
+                <td class="num">${fmtSum(br.alloc)}</td>
+                <td class="center">${pctCell(br.ytdPct)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Hudud distribution
+  if (hududsList.length > 1) {
+    html += `
+      <div class="modal-section">
+        <div class="modal-section-title">Ҳудудлар бўйича тақсимот</div>
+        <div class="modal-chart-container"><canvas id="modal_bankHududsChart"></canvas></div>
+      </div>
+    `;
+  }
+
+  openModal(
+    `${escapeHtml(bank.name)}`,
+    `${branches.length} та филиал · ${hududsList.length} та ҳудуд · Январ-${m} 2026`,
+    html
+  );
+
+  setTimeout(() => {
+    // Programs chart
+    const pCtx = document.getElementById('modal_bankProgsChart');
+    if (pCtx) {
+      charts.modal_bankProgs = new Chart(pCtx, {
+        type: 'doughnut',
+        data: {
+          labels: progBreakdown.map(x => x.program.shortName),
+          datasets: [{
+            data: progBreakdown.map(x => x.alloc),
+            backgroundColor: progBreakdown.map(x => x.program.color),
+            borderWidth: 2, borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '55%',
+          plugins: {
+            legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 10 } },
+            tooltip: { callbacks: { label: (c) => c.label + ': ' + fmtSum(c.raw) + ' млн' } },
+            datalabels: {
+              color: '#fff', font: { weight: 700, size: 10 },
+              formatter: (v, ctx) => {
+                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                return total > 0 && (v / total) >= 0.05 ? (v / total * 100).toFixed(0) + '%' : '';
+              }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }
+    // Hududs chart
+    const hCtx = document.getElementById('modal_bankHududsChart');
+    if (hCtx && hududsList.length > 1) {
+      charts.modal_bankHududs = new Chart(hCtx, {
+        type: 'bar',
+        data: {
+          labels: hududsList.map(h => h.hudud),
+          datasets: [{
+            label: 'Жами ажратилган', data: hududsList.map(h => h.alloc),
+            backgroundColor: '#2563eb', borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmtSum(c.raw) + ' млн' } } },
+          scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+        }
+      });
+    }
+  }, 100);
+}
+
+// ============================================================================
+// KPI DRILL-DOWN — clicked from KPI hero card
+// ============================================================================
+
+function openKpiDetails(metric, label) {
+  const m = bankData.meta.month;
+  // Compute breakdown by program and by bank for this metric
+  const progRows = bankData.programs.map(p => {
+    const idx = bankData.programs.indexOf(p);
+    return {
+      program: p,
+      val: sumProgramMetric(idx, metric)
+    };
+  }).filter(x => !x.program.isPlaceholder && x.val !== 0);
+
+  // Sort programs by value desc
+  progRows.sort((a, b) => Math.abs(b.val) - Math.abs(a.val));
+  const totalProg = progRows.filter(x => !x.program.isAggregate).reduce((s, x) => s + x.val, 0);
+
+  // Bank breakdown for this metric
+  const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
+  const bankRows = getActiveBanks().map(b => ({
+    name: b.name, val: getBankTotal(b, progIdx, metric)
+  })).filter(b => b.val > 0).sort((a, b) => b.val - a.val);
+
+  let html = '';
+
+  // Section: Programs breakdown
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Дастурлар бўйича таҳлил</div>
+      <div class="modal-grid-2">
+        <div class="modal-chart-container"><canvas id="modal_kpiProgsChart"></canvas></div>
+        <div style="overflow-y:auto;max-height:280px">
+          <table class="dt" style="font-size:0.79rem">
+            <thead>
+              <tr><th>Дастур</th><th class="num">Қиймат</th><th class="center">Улуш</th></tr>
+            </thead>
+            <tbody>
+              ${progRows.map(x => {
+                const share = totalProg > 0 && !x.program.isAggregate ? (x.val / totalProg * 100) : null;
+                return `
+                  <tr style="cursor:pointer" onclick="closeModal();setTimeout(()=>openProgramDetails(${bankData.programs.indexOf(x.program)}),100)">
+                    <td>${escapeHtml(x.program.shortName)}${x.program.isAggregate ? ' <span style="font-size:0.62rem;color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em">агр.</span>' : ''}${x.program.isPlaceholder ? ' <span style="font-size:0.62rem;color:var(--warm);text-transform:uppercase;letter-spacing:0.08em">плс.</span>' : ''}</td>
+                    <td class="num">${typeof x.val === 'number' && metric.includes('Pct') ? (x.val * 100).toFixed(1) + '%' : fmtSum(x.val)}</td>
+                    <td class="center">${share != null ? share.toFixed(1) + '%' : '—'}</td>
+                  </tr>
+                `;
+              }).join('')}
+              <tr class="total-row">
+                <td>ЖАМИ (агрегатдан ташқари)</td>
+                <td class="num">${fmtSum(totalProg)}</td>
+                <td class="center">100%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Section: Top banks
+  html += `
+    <div class="modal-section">
+      <div class="modal-section-title">Банклар бўйича таҳлил <span style="margin-left:auto;color:var(--text-3);letter-spacing:0.02em;font-weight:500">${bankRows.length} та банк</span></div>
+      <div class="modal-chart-container tall"><canvas id="modal_kpiBanksChart"></canvas></div>
+    </div>
+  `;
+
+  openModal(
+    `${escapeHtml(label)}`,
+    `Танланган кўрсаткич бўйича дастур ва банк таҳлили · Январ-${m} 2026`,
+    html
+  );
+
+  setTimeout(() => {
+    const pCtx = document.getElementById('modal_kpiProgsChart');
+    if (pCtx) {
+      const realPrograms = progRows.filter(x => !x.program.isAggregate);
+      charts.modal_kpiProgs = new Chart(pCtx, {
+        type: 'doughnut',
+        data: {
+          labels: realPrograms.map(x => x.program.shortName),
+          datasets: [{
+            data: realPrograms.map(x => x.val),
+            backgroundColor: realPrograms.map(x => x.program.color),
+            borderWidth: 2, borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '55%',
+          plugins: {
+            legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 10 } },
+            tooltip: { callbacks: { label: (c) => c.label + ': ' + fmtSum(c.raw) + ' млн' } },
+            datalabels: {
+              color: '#fff', font: { weight: 700, size: 10 },
+              formatter: (v, ctx) => {
+                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                return total > 0 && (v / total) >= 0.05 ? (v / total * 100).toFixed(0) + '%' : '';
+              }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }
+    const bCtx = document.getElementById('modal_kpiBanksChart');
+    if (bCtx) {
+      charts.modal_kpiBanks = new Chart(bCtx, {
+        type: 'bar',
+        data: {
+          labels: bankRows.map(b => b.name),
+          datasets: [{ label: label, data: bankRows.map(b => b.val), backgroundColor: '#2563eb', borderRadius: 4 }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmtSum(c.raw) + ' млн' } } },
+          scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+        }
+      });
+    }
+  }, 100);
+}
+
+// ============================================================================
+// EXCEL EXPORT
+// ============================================================================
+
+function exportToExcel() {
+  showLoading('Excel формирлаш...');
+  setTimeout(() => {
+    try {
+      const m = bankData.meta.month;
+      const wb = XLSX.utils.book_new();
+
+      // Sheet 1: Summary
+      const sumRows = [
+        [`Тошкент вилояти банклари — Январ-${m} 2026 ҳисобот`],
+        [`Сана: ${bankData.meta.reportDate ? bankData.meta.reportDate.full : '—'}`],
+        []
+      ];
+      sumRows.push(['Дастур', 'Тури', 'Йиллик режа', `Январ-${m} режа`, 'Жами ажратилган', `${m} ойида`, `Январ-${m} бажарилиши`, '% YTD', `${m} % бажарилиши`]);
+      bankData.programs.forEach((p, idx) => {
+        const ytdPlan = sumProgramMetric(idx, 'ytdPlan');
+        const ytdAlloc = sumProgramMetric(idx, 'totalAllocated');
+        const ytdExec = sumProgramMetric(idx, 'ytdExecSum');
+        const monthAlloc = sumProgramMetric(idx, 'monthAllocated');
+        const monthPlan = sumProgramMetric(idx, 'monthPlan');
+        const monthExec = sumProgramMetric(idx, 'monthExecSum');
+        const annualPlan = sumProgramMetric(idx, 'annualPlan');
+        sumRows.push([
+          p.shortName, p.cols.shape,
+          annualPlan, ytdPlan, ytdAlloc, monthAlloc, ytdExec,
+          computePct(ytdExec, ytdPlan), computePct(monthExec, monthPlan)
+        ]);
+      });
+      const ws1 = XLSX.utils.aoa_to_sheet(sumRows);
+      ws1['!cols'] = [{ wch: 32 }, { wch: 8 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 9 }, { wch: 11 }];
+      XLSX.utils.book_append_sheet(wb, ws1, 'Дастурлар хулоса');
+
+      // Sheet 2: Banks
+      const bankHeader = ['№', 'Банк', 'Филиал сони', 'Йиллик режа', `Январ-${m} режа`, 'Жами ажратилган', `${m} да ажр.`, `Январ-${m} бажарилиши`, '% YTD', `${m} бажарилиши`, `% ${m}`];
+      const bankRows = [bankHeader];
+      const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
+      let i = 0;
+      getActiveBanks().forEach(b => {
+        i++;
+        bankRows.push([
+          i, b.name, b.branches.length,
+          getBankTotal(b, progIdx, 'annualPlan'),
+          getBankTotal(b, progIdx, 'ytdPlan'),
+          getBankTotal(b, progIdx, 'totalAllocated'),
+          getBankTotal(b, progIdx, 'monthAllocated'),
+          getBankTotal(b, progIdx, 'ytdExecSum'),
+          computePct(getBankTotal(b, progIdx, 'ytdExecSum'), getBankTotal(b, progIdx, 'ytdPlan')),
+          getBankTotal(b, progIdx, 'monthExecSum'),
+          computePct(getBankTotal(b, progIdx, 'monthExecSum'), getBankTotal(b, progIdx, 'monthPlan'))
+        ]);
+      });
+      const ws2 = XLSX.utils.aoa_to_sheet(bankRows);
+      ws2['!cols'] = [{ wch: 5 }, { wch: 28 }, { wch: 9 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 18 }, { wch: 9 }, { wch: 16 }, { wch: 9 }];
+      XLSX.utils.book_append_sheet(wb, ws2, 'Банклар');
+
+      // Sheet 3: Hududs
+      const hHeader = ['№', 'Ҳудуд', 'Банк сони', 'Филиал сони', `Январ-${m} режа`, 'Жами ажратилган', `Январ-${m} бажарилиши`, '% YTD', `${m} ойида`];
+      const hRows = [hHeader];
+      // Re-aggregate hududs (similar logic)
+      const hMap = {};
+      getActiveBanks().forEach(b => {
+        b.branches.forEach(br => {
+          if (!selectedHududs.includes(br.hudud)) return;
+          const programs = (progIdx === 'all') ? bankData.programs : [bankData.programs[progIdx]];
+          programs.forEach(p => {
+            if (progIdx === 'all' && (p.isAggregate || p.isPlaceholder)) return;
+            const d = br.programs[p.name];
+            if (!d) return;
+            if (!hMap[br.hudud]) hMap[br.hudud] = { hudud: br.hudud, banks: new Set(), branches: new Set(),
+              ytdPlan: 0, totalAllocated: 0, ytdExecSum: 0, monthAllocated: 0 };
+            hMap[br.hudud].ytdPlan += d.ytdPlan || 0;
+            hMap[br.hudud].totalAllocated += d.totalAllocated || 0;
+            hMap[br.hudud].ytdExecSum += d.ytdExecSum || 0;
+            hMap[br.hudud].monthAllocated += d.monthAllocated || 0;
+          });
+          hMap[br.hudud].branches.add(br.name);
+          hMap[br.hudud].banks.add(b.name);
+        });
+      });
+      let j = 0;
+      Object.values(hMap).sort((a, b) => b.totalAllocated - a.totalAllocated).forEach(h => {
+        j++;
+        hRows.push([
+          j, h.hudud, h.banks.size, h.branches.size,
+          h.ytdPlan, h.totalAllocated, h.ytdExecSum,
+          computePct(h.ytdExecSum, h.ytdPlan), h.monthAllocated
+        ]);
+      });
+      const ws3 = XLSX.utils.aoa_to_sheet(hRows);
+      ws3['!cols'] = [{ wch: 5 }, { wch: 22 }, { wch: 11 }, { wch: 13 }, { wch: 14 }, { wch: 16 }, { wch: 18 }, { wch: 9 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, ws3, 'Ҳудудлар');
+
+      // Sheet 4: All branches detail
+      const dHeader = ['Банк', 'Филиал', 'Ҳудуд', 'МФО', 'Тури', 'Дастур', 'Йиллик режа', `Январ-${m} режа`, 'Жами ажратилган', `${m} да ажр.`, `Январ-${m} бажарилиши`, '% YTD', `${m} ойи бажарилиши`];
+      const dRows = [dHeader];
+      getActiveBanks().forEach(b => {
+        b.branches.forEach(br => {
+          if (!selectedHududs.includes(br.hudud)) return;
+          bankData.programs.forEach(p => {
+            if (p.isAggregate) return;
+            const d = br.programs[p.name];
+            if (!d) return;
+            dRows.push([
+              b.name, br.name, br.hudud, br.mfo, br.type, p.shortName,
+              d.annualPlan, d.ytdPlan, d.totalAllocated, d.monthAllocated, d.ytdExecSum,
+              computePct(d.ytdExecSum, d.ytdPlan), d.monthExecSum
+            ]);
+          });
+        });
+      });
+      const ws4 = XLSX.utils.aoa_to_sheet(dRows);
+      ws4['!cols'] = [{ wch: 22 }, { wch: 26 }, { wch: 18 }, { wch: 8 }, { wch: 9 }, { wch: 22 }, { wch: 13 }, { wch: 13 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 9 }, { wch: 16 }];
+      XLSX.utils.book_append_sheet(wb, ws4, 'Барча филиаллар');
+
+      const fname = `банклар_таҳлил_Январ-${m}_2026.xlsx`;
+      XLSX.writeFile(wb, fname);
+    } catch (err) {
+      console.error(err);
+      alert('Экспорт хатоси: ' + err.message);
+    }
+    hideLoading();
+  }, 100);
+}
+
+</script>
+</body>
+</html>

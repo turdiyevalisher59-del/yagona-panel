@@ -1,0 +1,41 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.tmp
+*.bak
+
+# Node
+node_modules/
+.npm
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Vercel
+.vercel
+.env
+.env.local
+.env.production
+
+# Python (eski saytga yuklash papkasidan qolgan)
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Backup va vaqtinchalik fayllar
+*~
+.~lock.*
+*.orig
+
+# Git tarix
+.git/
+
+.vercel
+.env*.local

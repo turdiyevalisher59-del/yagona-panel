@@ -1,0 +1,320 @@
+/* Premium Light Background Styles */
+/* Professional light theme with soft gradients */
+
+/* Main body background - Light premium gradient */
+body {
+    background: linear-gradient(135deg, #e8f4f8 0%, #f0f4ff 50%, #f8f9ff 100%) !important;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Subtle decorative overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at 0% 0%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 100% 100%, rgba(118, 75, 162, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Content wrapper */
+body>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* Dashboard section */
+.dashboard {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 250, 255, 0.9) 100%) !important;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+/* Bank detail sections */
+.bank-detail-section {
+    background: linear-gradient(180deg, #f0f4ff 0%, #e8f4f8 50%, #f8f9ff 100%) !important;
+    min-height: 100vh;
+}
+
+.bank-detail-section::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at 20% 30%, rgba(102, 126, 234, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bank-detail-section>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* Statistics section */
+.bank-detail-content,
+.statistics-section,
+.stats-section,
+[class*="statistic"],
+[class*="stats-container"] {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.98)) !important;
+}
+
+/* Info cards - soft glassmorphism */
+.info-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 126, 234, 0.15) !important;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08) !important;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(102, 126, 234, 0.3) !important;
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15) !important;
+    transform: translateY(-3px);
+}
+
+/* Bank cards - clean premium style */
+.bank-card {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px);
+    box-shadow:
+        0 10px 40px rgba(102, 126, 234, 0.1),
+        0 0 0 1px rgba(102, 126, 234, 0.08) !important;
+    border-radius: 20px !important;
+    transition: all 0.3s ease;
+}
+
+.bank-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 20px 60px rgba(102, 126, 234, 0.15),
+        0 0 0 1px rgba(102, 126, 234, 0.2) !important;
+}
+
+/* Dashboard header */
+.dashboard-header h2 {
+    color: #1a1a2e !important;
+    text-shadow: none;
+}
+
+/* Stats section on bank detail */
+.bank-detail-stats {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Apartment types section */
+.apartment-types,
+.xonadon-turlari,
+[class*="apartment"],
+[class*="xonadon"],
+.info-section,
+.detail-section,
+.content-card,
+.data-card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* List items in apartment types */
+.apartment-item,
+.xonadon-item,
+.type-item {
+    background: rgba(248, 250, 255, 0.8) !important;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.08);
+    transition: all 0.3s ease;
+}
+
+.apartment-item:hover,
+.xonadon-item:hover,
+.type-item:hover {
+    background: rgba(102, 126, 234, 0.08) !important;
+}
+
+/* Progress bars */
+.progress-bar,
+.sotish-bar,
+[class*="progress"] {
+    background: rgba(102, 126, 234, 0.1) !important;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill,
+.sotish-fill,
+[class*="progress"]>div {
+    background: linear-gradient(90deg, #667eea, #764ba2) !important;
+}
+
+/* Modal styling */
+.modal-content {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.98)) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* Floating elements - soft glow */
+.voice-assistant-btn {
+    box-shadow:
+        0 4px 20px rgba(102, 126, 234, 0.4),
+        0 0 30px rgba(102, 126, 234, 0.15) !important;
+}
+
+.share-main-btn {
+    box-shadow:
+        0 4px 15px rgba(102, 126, 234, 0.35),
+        0 0 25px rgba(102, 126, 234, 0.1) !important;
+}
+
+/* Grid pattern overlay - subtle */
+.dashboard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        linear-gradient(rgba(102, 126, 234, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(102, 126, 234, 0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.dashboard>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* Print button */
+.print-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    color: #fff !important;
+}
+
+.print-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Back button */
+.back-btn {
+    background: rgba(102, 126, 234, 0.1) !important;
+    border: 1px solid rgba(102, 126, 234, 0.2) !important;
+    color: #667eea !important;
+}
+
+.back-btn:hover {
+    background: rgba(102, 126, 234, 0.2) !important;
+}
+
+/* TTS button */
+.tts-btn {
+    background: rgba(102, 126, 234, 0.1) !important;
+    border: 1px solid rgba(102, 126, 234, 0.2) !important;
+}
+
+.tts-btn:hover {
+    background: rgba(102, 126, 234, 0.2) !important;
+}
+
+/* Text colors for light theme */
+.bank-detail-section h1,
+.bank-detail-section h2,
+.bank-detail-section h3,
+.bank-detail-section h4,
+.bank-detail-title {
+    color: #1a1a2e !important;
+}
+
+.bank-detail-section p,
+.bank-detail-section span,
+.info-card p {
+    color: #4a4a6a !important;
+}
+
+.info-card h4 {
+    color: #1a1a2e !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #764ba2, #667eea);
+}
+
+/* Cards and boxes in detail section */
+.bank-detail-section .card,
+.bank-detail-section .box,
+.bank-detail-section .panel,
+.bank-detail-section .container {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+/* Price and value cards */
+.price-card,
+.value-card,
+.stat-card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 126, 234, 0.1) !important;
+}
+
+/* Table styling */
+table {
+    background: transparent !important;
+}
+
+th,
+td {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(102, 126, 234, 0.1) !important;
+}
+
+th {
+    background: rgba(102, 126, 234, 0.1) !important;
+    color: #1a1a2e !important;
+}
+
+/* Hero section keep original dark */
+.hero {
+    position: relative;
+}

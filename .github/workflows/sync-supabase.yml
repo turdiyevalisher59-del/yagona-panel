@@ -1,0 +1,43 @@
+name: Sync to Supabase Storage
+
+# Push qilinganda yoki qo'lda ishga tushirilganda barcha fayllarni
+# Supabase Storage bucket'iga yuklash
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:    # Qo'lda ishga tushirish (Actions tab → Run workflow)
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # Oxirgi 2 ta commit (o'zgargan fayllarni topish uchun)
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --no-save mime-types
+
+      - name: Sync changed files to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_BUCKET: ${{ secrets.SUPABASE_BUCKET }}
+          # Birinchi push'da to'liq sync qilish uchun
+          FULL_SYNC: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+        run: node scripts/sync-to-supabase.js
+
+      - name: Sync xulosasi
+        if: always()
+        run: |
+          echo "✅ Supabase sync tugadi"
+          echo "Bucket: ${{ secrets.SUPABASE_BUCKET || 'MB-dashboard' }}"
+          echo "URL: ${{ secrets.SUPABASE_URL }}"

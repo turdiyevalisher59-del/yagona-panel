@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Халқаро пул ўтказмалари тизими бўйича</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--card:rgba(255,255,255,0.95);--text:#1a1a2e;--text-muted:#718096;--accent:#667eea;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--shadow:0 20px 60px rgba(0,0,0,0.15);--shadow-sm:0 4px 20px rgba(0,0,0,0.08)}
+        body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
+        .bg-pattern{position:fixed;inset:0;background:radial-gradient(circle at 20% 80%,rgba(120,119,198,0.3) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(255,119,198,0.2) 0%,transparent 50%);pointer-events:none;z-index:0}
+        .container{max-width:1700px;margin:0 auto;padding:24px;position:relative;z-index:1}
+        .header{background:var(--card);border-radius:24px;padding:24px 32px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;box-shadow:var(--shadow)}
+        .logo-section{display:flex;align-items:center;gap:16px}
+        .logo{width:56px;height:56px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px}
+        .brand h1{font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .brand p{color:var(--text-muted);font-size:13px}
+        .upload-btn{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:14px 28px;border-radius:14px;font-weight:700;font-size:14px;cursor:pointer;border:none}
+        .file-wrap{position:relative}
+        .file-wrap input{position:absolute;inset:0;opacity:0;cursor:pointer}
+        .file-name{color:var(--text-muted);font-size:13px;margin-left:12px}
+        .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
+        @media(max-width:1400px){.stats-row{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+        .stat-card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.06);position:relative;overflow:hidden;border:2px solid transparent}
+        .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;border-radius:20px;pointer-events:none;opacity:0.08}
+        .stat-card:nth-child(1){border-color:#3b82f6;box-shadow:0 4px 24px rgba(59,130,246,0.25)}.stat-card:nth-child(1)::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,#3b82f6,transparent)}
+        .stat-card:nth-child(2){border-color:#22c55e;box-shadow:0 4px 24px rgba(34,197,94,0.25)}.stat-card:nth-child(2)::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,#22c55e,transparent)}
+        .stat-card:nth-child(3){border-color:#f59e0b;box-shadow:0 4px 24px rgba(245,158,11,0.25)}.stat-card:nth-child(3)::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,#f59e0b,transparent)}
+        .stat-card:nth-child(4){border-color:#06b6d4;box-shadow:0 4px 24px rgba(6,182,212,0.25)}.stat-card:nth-child(4)::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,#06b6d4,transparent)}
+        .stat-card:nth-child(5){border-color:#ec4899;box-shadow:0 4px 24px rgba(236,72,153,0.25)}.stat-card:nth-child(5)::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,#ec4899,transparent)}
+        .stat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+        .stat-card:nth-child(1) .stat-icon{background:linear-gradient(135deg,#dbeafe,#bfdbfe)}
+        .stat-card:nth-child(2) .stat-icon{background:linear-gradient(135deg,#dcfce7,#bbf7d0)}
+        .stat-card:nth-child(3) .stat-icon{background:linear-gradient(135deg,#fef3c7,#fde68a)}
+        .stat-card:nth-child(4) .stat-icon{background:linear-gradient(135deg,#cffafe,#a5f3fc)}
+        .stat-card:nth-child(5) .stat-icon{background:linear-gradient(135deg,#fce7f3,#fbcfe8)}
+        .stat-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;margin-bottom:8px;letter-spacing:0.02em}
+        .stat-value{font-size:1.6rem;font-weight:800;margin-bottom:8px;color:#0f172a;letter-spacing:-0.02em;line-height:1.2}
+        .stat-change{font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px}
+        .stat-change.up{background:#d1fae5;color:#059669}
+        .stat-change.down{background:#fee2e2;color:#dc2626}
+        
+        .filters-card{background:var(--card);border-radius:28px;padding:24px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+        .filters-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+        .filters-title{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px}
+        .filters-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+        .filters-row2{display:flex;gap:16px;align-items:stretch;margin-top:16px;flex-wrap:wrap}
+        .filters-row2 .filter-item{flex:1;min-width:180px}
+        .filters-row2 .filter-actions{display:flex;align-items:stretch}
+        @media(max-width:1200px){.filters-grid{grid-template-columns:repeat(2,1fr)}.filters-row2{flex-direction:column}}
+        @media(max-width:768px){.filters-grid{grid-template-columns:1fr}.filters-row2 .filter-item{min-width:100%}}
+        .filter-item{display:flex;flex-direction:column;gap:6px}
+        .filter-item .filter-note{font-size:9px;color:#f59e0b;font-weight:500}
+        .multi-select{position:relative}
+        .multi-select-btn{width:100%;padding:10px 12px;border:1px solid #d8dae0;border-radius:999px;font-size:14px;font-weight:400;background:#ebecee;cursor:pointer;text-align:left;display:flex;align-items:center;gap:12px;transition:all 0.2s;color:#333;min-height:44px}
+        .multi-select-btn:hover{border-color:#c8cad0;background:#e4e5e8}
+        .multi-select-btn.has-selection{background:#e4e5e8;border-color:#d8dae0}
+        .filter-bar-icon{width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;opacity:1}
+        .filter-bar-label{color:#2563eb;font-weight:700;flex-shrink:0;white-space:nowrap;font-size:14px}
+        .filter-bar-value-wrap{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:8px 12px;border:1px solid #e8e8e8;box-shadow:inset 0 1px 2px rgba(0,0,0,0.04)}
+        .filter-bar-value{flex:1;min-width:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;color:#333;font-weight:400;font-size:14px}
+        .filter-bar-arrow{color:#333;font-size:10px;flex-shrink:0;opacity:0.8}
+        .multi-select-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #d8dae0;border-radius:24px;margin-top:6px;max-height:280px;overflow:hidden;z-index:100;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.08)}
+        .multi-select-dropdown.show{display:flex;flex-direction:column}
+        .multi-select-search{padding:10px;border-bottom:1px solid #e2e8f0}
+        .multi-select-search input{width:100%;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px}
+        .multi-select-search input:focus{outline:none;border-color:var(--accent)}
+        .multi-select-actions{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid #e2e8f0;background:#f8fafc}
+        .multi-select-actions button{flex:1;padding:6px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
+        .multi-select-actions .select-all{background:#e0e7ff;color:var(--accent)}
+        .multi-select-actions .clear-all{background:#fee2e2;color:#dc2626}
+        .multi-select-items{overflow-y:auto;max-height:180px;padding:6px}
+        .multi-select-item{padding:8px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;border-radius:6px;transition:all 0.15s}
+        .multi-select-item:hover{background:#f8fafc}
+        .multi-select-item input{width:16px;height:16px;margin:0;cursor:pointer;accent-color:var(--accent)}
+        .filter-bar-value-wrap .selected-count{background:#8c8c8c;color:#fff;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;margin-left:4px}
+        .reset-btn{background:#3b82f6;color:white;border:none;padding:12px 24px;border-radius:999px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:15px;transition:background 0.2s}
+        .reset-btn:hover{background:#2563eb}
+        .reset-btn .reset-icon{font-size:16px;opacity:0.95}
+        .active-filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:20px;border-top:2px solid #f1f5f9}
+        .active-filters:empty{display:none}
+        .active-filters-title{font-size:12px;color:var(--text-muted);font-weight:600;margin-right:8px}
+        .filter-tag{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+        .filter-tag span{cursor:pointer;opacity:0.8;font-size:14px}
+        .filter-tag span:hover{opacity:1}
+        
+        .filter-info{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #fcd34d;border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#92400e;display:none;align-items:center;gap:10px}
+        .filter-info.show{display:flex}
+        
+        .toifa-section{background:var(--card);border-radius:24px;padding:28px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+        .section-title{font-size:18px;font-weight:800;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .section-subtitle{font-size:12px;color:var(--text-muted);font-weight:500;margin-left:auto}
+        .toifa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+        @media(max-width:1200px){.toifa-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:600px){.toifa-grid{grid-template-columns:1fr}}
+        .toifa-card{border-radius:20px;padding:20px;cursor:pointer;transition:all 0.3s;position:relative}
+        .toifa-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.15)}
+        .toifa-card::after{content:'🔍 Батафсил';position:absolute;bottom:10px;right:10px;font-size:9px;color:rgba(0,0,0,0.3);opacity:0;transition:opacity 0.3s}
+        .toifa-card:hover::after{opacity:1}
+        .toifa-card.samarador{background:#e9f8f4;border:2px solid #d1ede3}
+        .toifa-card.barqaror{background:#eaf4fc;border:2px solid #bfe0f7}
+        .toifa-card.ortacha{background:#fff9e6;border:2px solid #ffe6b3}
+        .toifa-card.past{background:#fdeeee;border:2px solid #fcced3}
+        .toifa-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .toifa-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
+        .toifa-card.samarador .toifa-title{color:#28a745}
+        .toifa-card.barqaror .toifa-title{color:#007bff}
+        .toifa-card.ortacha .toifa-title{color:#d4a007}
+        .toifa-card.past .toifa-title{color:#dc3545}
+        .toifa-rank{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white}
+        .toifa-card.samarador .toifa-rank{background:#28a745}
+        .toifa-card.barqaror .toifa-rank{background:#007bff}
+        .toifa-card.ortacha .toifa-rank{background:#d4a007}
+        .toifa-card.past .toifa-rank{background:#dc3545}
+        .toifa-count{padding:4px 10px;border-radius:16px;font-size:11px;font-weight:700}
+        .toifa-card.samarador .toifa-count{background:#d1ede3;color:#28a745}
+        .toifa-card.barqaror .toifa-count{background:#bfe0f7;color:#007bff}
+        .toifa-card.ortacha .toifa-count{background:#ffe6b3;color:#d4a007}
+        .toifa-card.past .toifa-count{background:#fcced3;color:#dc3545}
+        .toifa-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+        .toifa-stat{background:#fff;padding:10px;border-radius:10px;text-align:center;border:1px solid rgba(0,0,0,0.06)}
+        .toifa-card.samarador .toifa-stat{border-color:#d1ede3}
+        .toifa-card.barqaror .toifa-stat{border-color:#bfe0f7}
+        .toifa-card.ortacha .toifa-stat{border-color:#ffe6b3}
+        .toifa-card.past .toifa-stat{border-color:#fcced3}
+        .toifa-stat-label{font-size:9px;color:#6c757d;font-weight:600;text-transform:uppercase;margin-bottom:2px}
+        .toifa-stat-value{font-size:1rem;font-weight:800}
+        .toifa-card.samarador .toifa-stat-value{color:#28a745}
+        .toifa-card.barqaror .toifa-stat-value{color:#007bff}
+        .toifa-card.ortacha .toifa-stat-value{color:#d4a007}
+        .toifa-card.past .toifa-stat-value{color:#dc3545}
+        .toifa-list{list-style:none;max-height:160px;overflow-y:auto}
+        .toifa-list-item{display:flex;align-items:center;padding:8px 10px;background:#fff;border-radius:8px;margin-bottom:4px;font-size:11px;border:1px solid rgba(0,0,0,0.06)}
+        .toifa-card.samarador .toifa-list-item{border-color:#d1ede3}
+        .toifa-card.barqaror .toifa-list-item{border-color:#bfe0f7}
+        .toifa-card.ortacha .toifa-list-item{border-color:#ffe6b3}
+        .toifa-card.past .toifa-list-item{border-color:#fcced3}
+        .toifa-list-rank{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;margin-right:8px}
+        .toifa-card.samarador .toifa-list-rank{background:#d1ede3;color:#28a745}
+        .toifa-card.barqaror .toifa-list-rank{background:#bfe0f7;color:#007bff}
+        .toifa-card.ortacha .toifa-list-rank{background:#ffe6b3;color:#d4a007}
+        .toifa-card.past .toifa-list-rank{background:#fcced3;color:#dc3545}
+        .toifa-name{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#495057}
+        .toifa-amount{font-weight:800;margin-left:6px;font-size:10px}
+        .toifa-card.samarador .toifa-amount{color:#28a745}
+        .toifa-card.barqaror .toifa-amount{color:#007bff}
+        .toifa-card.ortacha .toifa-amount{color:#d4a007}
+        .toifa-card.past .toifa-amount{color:#dc3545}
+        .toifa-charts{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px}
+        @media(max-width:1000px){.toifa-charts{grid-template-columns:1fr}}
+        .toifa-chart-card{background:#f8fafc;border-radius:16px;padding:20px}
+        .toifa-chart-title{font-weight:700;font-size:14px;margin-bottom:16px}
+        .toifa-chart-container{height:200px}
+        
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+        .modal-overlay.show{display:flex}
+        .modal{background:white;border-radius:24px;width:100%;max-width:1100px;max-height:90vh;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,0.3)}
+        .modal-header{padding:24px 28px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+        .modal-header.samarador{background:linear-gradient(135deg,#ecfdf5,#d1fae5)}
+        .modal-header.barqaror{background:linear-gradient(135deg,#eff6ff,#dbeafe)}
+        .modal-header.ortacha{background:linear-gradient(135deg,#fffbeb,#fef3c7)}
+        .modal-header.past{background:linear-gradient(135deg,#fef2f2,#fee2e2)}
+        .modal-title{font-size:20px;font-weight:800;display:flex;align-items:center;gap:12px}
+        .modal-header.samarador .modal-title{color:#059669}
+        .modal-header.barqaror .modal-title{color:#2563eb}
+        .modal-header.ortacha .modal-title{color:#d97706}
+        .modal-header.past .modal-title{color:#dc2626}
+        .modal-close{width:40px;height:40px;border-radius:12px;border:none;background:#f1f5f9;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center}
+        .modal-close:hover{background:#e2e8f0}
+        .modal-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:20px 28px;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+        @media(max-width:700px){.modal-stats{grid-template-columns:repeat(3,1fr)}}
+        .modal-stat{text-align:center}
+        .modal-stat-label{font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:4px}
+        .modal-stat-value{font-size:1.1rem;font-weight:800}
+        .modal-search{padding:16px 28px;border-bottom:1px solid #e2e8f0}
+        .modal-search input{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:14px}
+        .modal-search input:focus{outline:none;border-color:var(--accent)}
+        .modal-body{padding:0;max-height:400px;overflow-y:auto}
+        .modal-table{width:100%;border-collapse:collapse}
+        .modal-table th{background:#f8fafc;padding:12px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;position:sticky;top:0}
+        .modal-table td{padding:12px 14px;border-bottom:1px solid #f1f5f9;font-size:12px}
+        .modal-table tr:hover td{background:#f8fafc}
+        .modal-table .num{text-align:right;font-variant-numeric:tabular-nums}
+        .modal-table .rank-cell{width:45px;text-align:center}
+        .modal-rank-badge{width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:white}
+        .modal-header.samarador~.modal-body .modal-rank-badge{background:#10b981}
+        .modal-header.barqaror~.modal-body .modal-rank-badge{background:#3b82f6}
+        .modal-header.ortacha~.modal-body .modal-rank-badge{background:#f59e0b}
+        .modal-header.past~.modal-body .modal-rank-badge{background:#ef4444}
+        .share-bar{width:100%;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden}
+        .share-bar-fill{height:100%;border-radius:3px}
+        .modal-header.samarador~.modal-body .share-bar-fill{background:linear-gradient(90deg,#10b981,#34d399)}
+        .modal-header.barqaror~.modal-body .share-bar-fill{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+        .modal-header.ortacha~.modal-body .share-bar-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+        .modal-header.past~.modal-body .share-bar-fill{background:linear-gradient(90deg,#ef4444,#f87171)}
+        .share-text{font-size:10px;color:var(--text-muted);margin-top:2px}
+        
+        .charts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:24px}
+        @media(max-width:1100px){.charts-grid{grid-template-columns:1fr}}
+        .chart-card{background:var(--card);border-radius:20px;padding:24px;box-shadow:var(--shadow-sm)}
+        .chart-card.comparison-top{margin-bottom:20px;padding:10px 12px}
+        .chart-card.comparison-top .chart-title{font-size:14px;margin-bottom:6px}
+        .chart-card.full{grid-column:span 2}
+        @media(max-width:1100px){.chart-card.full{grid-column:span 1}}
+        .chart-card.chart-card-oylik{padding:0;overflow:hidden;border:2px solid #36659E;box-shadow:0 4px 20px rgba(54,101,158,0.2)}
+        .chart-card.chart-card-oylik .chart-title{background:#36659E;color:#fff;text-align:center;padding:16px 24px;margin:0;font-size:16px;font-weight:700;border-radius:18px 18px 0 0}
+        .chart-card.chart-card-oylik .chart-container{padding:24px;margin:0;background:#fff}
+        .chart-title{font-size:15px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+        .chart-filter-badge{font-size:11px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:4px 12px;border-radius:12px;font-weight:600}
+        .chart-container{height:280px}
+        .chart-container.tall{height:340px}
+        
+        .tabs-card{background:var(--card);border-radius:20px;padding:24px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+        .tabs-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f1f5f9}
+        .tab-btn{background:transparent;border:none;color:var(--text-muted);padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+        .tab-btn:hover{background:#f8fafc}
+        .tab-btn.active{background:linear-gradient(135deg,#667eea,#764ba2);color:white}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+        
+        .table-filters{display:grid;grid-template-columns:1fr 1fr 130px 130px auto;gap:12px;align-items:end;margin-bottom:20px;padding:16px;background:#f8fafc;border-radius:14px}
+        @media(max-width:1100px){.table-filters{grid-template-columns:1fr 1fr;}}
+        .table-filter-item{display:flex;flex-direction:column;gap:6px}
+        .table-filter-item label{font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase}
+        .table-filter-item input{padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:12px;font-weight:500;background:white}
+        .table-filter-item input:focus{outline:none;border-color:var(--accent)}
+        .table-clear-btn{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#dc2626;border:none;padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer;font-size:12px;height:42px;white-space:nowrap}
+        .table-filter-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+        .table-filter-tags:empty{display:none}
+        .table-filter-tag{background:var(--accent);color:white;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px}
+        .table-filter-tag span{cursor:pointer;opacity:0.8}
+        .table-filter-tag span:hover{opacity:1}
+        
+        .table-wrap{overflow-x:auto;max-height:500px;overflow-y:auto;border-radius:14px;border:1px solid #e2e8f0}
+        #table-countries th:nth-child(2),#table-countries td:nth-child(2){max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        #table-branches th:nth-child(2),#table-branches td:nth-child(2){max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        table{width:100%;border-collapse:collapse;font-size:13px}
+        th{background:#f8fafc;padding:14px 16px;text-align:left;font-weight:700;color:var(--text-muted);position:sticky;top:0;z-index:10;font-size:11px;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+        th:hover{background:#eef2ff}
+        td{padding:12px 16px;border-bottom:1px solid #f1f5f9}
+        tr:hover td{background:#f8fafc}
+        tr.region-row td{background:#f1f5f9;font-weight:700}
+        .num{text-align:right;font-variant-numeric:tabular-nums}
+        .text-center{text-align:center!important}
+        .pos{color:var(--success);font-weight:700}
+        .neg{color:var(--danger);font-weight:700}
+        .badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+        .badge-a{background:#d1fae5;color:#065f46}
+        .badge-b{background:#dbeafe;color:#1e40af}
+        .badge-c{background:#fef3c7;color:#92400e}
+        .badge-d{background:#fee2e2;color:#991b1b}
+        .comp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+        @media(max-width:768px){.comp-grid{grid-template-columns:1fr}}
+        .comp-card{background:#f8fafc;border-radius:8px;padding:6px 10px;border:1px solid #e2e8f0}
+        .comp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+        .comp-title{font-weight:700;font-size:14px}
+        .comp-badge{font-size:11px;background:white;padding:2px 6px;border-radius:10px;color:var(--text-muted)}
+        .comp-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+        .comp-stat{background:white;padding:4px 6px;border-radius:6px;text-align:center}
+        .comp-stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:2px}
+        .comp-stat-val{font-size:1.15rem;font-weight:800}
+        .comp-bar{height:4px;background:#e2e8f0;border-radius:4px;margin-top:4px;overflow:hidden}
+        .comp-bar-fill{height:100%;border-radius:4px}
+        .comp-change{text-align:center;margin-top:3px;font-size:13px;font-weight:700}
+        .loading{position:fixed;inset:0;background:rgba(255,255,255,0.95);display:none;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:16px}
+        .loading.show{display:flex}
+        .spinner{width:48px;height:48px;border:4px solid #e2e8f0;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .empty-state{text-align:center;padding:100px 40px;background:var(--card);border-radius:24px;box-shadow:var(--shadow)}
+        .empty-icon{font-size:72px;margin-bottom:24px}
+        .empty-state h3{font-size:1.5rem;font-weight:800;margin-bottom:12px}
+        .empty-state p{color:var(--text-muted)}
+        ::-webkit-scrollbar{width:6px;height:6px}
+        ::-webkit-scrollbar-track{background:#f1f5f9}
+        ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="loading" id="loading"><div class="spinner"></div><div style="color:var(--text-muted)">Юкланмоқда...</div></div>
+    
+    <div class="modal-overlay" id="toifaModal" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header" id="modalHeader">
+                <div class="modal-title" id="modalTitle"></div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-stats" id="modalStats"></div>
+            <div class="modal-search"><input type="text" placeholder="🔍 Банк қидириш..." id="modalSearch" oninput="filterModalTable()"></div>
+            <div class="modal-body"><table class="modal-table"><thead id="modalThead"></thead><tbody id="modalTbody"></tbody></table></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">💱</div>
+                <div class="brand"><h1>Халқаро пул ўтказмалари тизими бўйича</h1><p>2024-2025 Аналитика панели</p></div>
+            </div>
+            <div style="display:flex;align-items:center">
+                <div class="file-wrap"><button class="upload-btn">📂 Excel юклаш</button><input type="file" id="fileInput" accept=".xlsx,.xls"></div>
+                <span class="file-name" id="fileName"></span>
+            </div>
+        </header>
+        <div id="main" style="display:none">
+            <div class="filters-card">
+                <div class="filters-grid">
+                    <div class="filter-item"><div class="multi-select" id="gf-system"></div></div>
+                    <div class="filter-item"><div class="multi-select" id="gf-bank"></div><span class="filter-note">✓ Тоифа бўлимига таъсир қилади</span></div>
+                    <div class="filter-item"><div class="multi-select" id="gf-region"></div><span class="filter-note">✓ Тоифа бўлимига таъсир қилади</span></div>
+                    <div class="filter-item"><div class="multi-select" id="gf-country"></div></div>
+                </div>
+                <div class="filters-row2">
+                    <div class="filter-item"><div class="multi-select" id="gf-currency"></div></div>
+                    <div class="filter-actions"><button class="reset-btn" onclick="resetGlobalFilters()"><span class="reset-icon">↻</span> Тозалаш</button></div>
+                </div>
+                <div class="active-filters" id="activeFilters"></div>
+            </div>
+            
+            <div class="filter-info" id="filterInfo">⚠️ <span id="filterInfoText"></span></div>
+            
+            <div class="chart-card comparison-top"><div class="chart-title">2024 в 2025 Таққослаш</div><div class="comp-grid" id="comparison"></div></div>
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-label">Операциялар сони</div><div class="stat-value" id="s2">-</div><div class="stat-change up" id="s2c">-</div></div>
+                <div class="stat-card"><div class="stat-icon">📥</div><div class="stat-label">Қабул 2025</div><div class="stat-value" id="s3">-</div><div class="stat-change" id="s3c">-</div></div>
+                <div class="stat-card"><div class="stat-icon">📤</div><div class="stat-label">Юборилган 2025</div><div class="stat-value" id="s4">-</div><div class="stat-change" id="s4c">-</div></div>
+                <div class="stat-card"><div class="stat-icon">🌍</div><div class="stat-label">Давлатлар</div><div class="stat-value" id="s5">-</div><div class="stat-change up" id="s5c">фаол</div></div>
+                <div class="stat-card"><div class="stat-icon">🏦</div><div class="stat-label">Банклар</div><div class="stat-value" id="s6">-</div><div class="stat-change up" id="s6c">фаол</div></div>
+            </div>
+            
+            <div class="toifa-section">
+                <div class="section-title">
+                    <span>📊</span> Тоифалар бўйича чуқур таҳлил (2025)
+                    <span class="section-subtitle" id="toifaSubtitle"></span>
+                </div>
+                <div class="toifa-grid" id="toifaGrid"></div>
+                <div class="toifa-charts">
+                    <div class="toifa-chart-card"><div class="toifa-chart-title">Банклар тақсимоти</div><div class="toifa-chart-container"><canvas id="toifaPie"></canvas></div></div>
+                    <div class="toifa-chart-card"><div class="toifa-chart-title">Сумма таққослаш</div><div class="toifa-chart-container"><canvas id="toifaBar"></canvas></div></div>
+                    <div class="toifa-chart-card"><div class="toifa-chart-title">Ўртача сумма</div><div class="toifa-chart-container"><canvas id="toifaAvg"></canvas></div></div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card"><div class="chart-title">Ўтказма тизимлари <span class="chart-filter-badge" id="cfb1"></span></div><div class="chart-container"><canvas id="c1"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">Банклар (Топ 10) <span class="chart-filter-badge" id="cfb2"></span></div><div class="chart-container"><canvas id="c2"></canvas></div></div>
+                <div class="chart-card chart-card-oylik full"><div class="chart-title">Ойлик динамика</div><div class="chart-container tall"><canvas id="cMonth"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">Давлатлар (Топ 10) <span class="chart-filter-badge" id="cfb3"></span></div><div class="chart-container"><canvas id="c3"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">Ҳудудлар (Топ 10) <span class="chart-filter-badge" id="cfb4"></span></div><div class="chart-container"><canvas id="c4"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">Валюталар <span class="chart-filter-badge" id="cfb5"></span></div><div class="chart-container"><canvas id="c5"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">Сумма градацияси</div><div class="chart-container"><canvas id="c6"></canvas></div></div>
+            </div>
+            <div class="tabs-card">
+                <div class="tabs-nav" id="tabsNav"></div>
+                <div id="tabsContent"></div>
+            </div>
+        </div>
+        <div id="empty" class="empty-state"><div class="empty-icon">📊</div><h3>Excel файлни юкланг</h3><p>Юқоридаги тугмани босиб маълумотлар файлини танланг</p></div>
+    </div>
+    <script>
+        let D={},charts={};
+        const clr=['#667eea','#764ba2','#f093fb','#f5576c','#4facfe','#00f2fe','#43e97b','#fa709a','#fee140','#30cfd0'];
+        const clrToifa={samarador:'#10b981',barqaror:'#3b82f6',ortacha:'#f59e0b',past:'#ef4444'};
+        Chart.defaults.color='#64748b';Chart.defaults.borderColor='#e2e8f0';Chart.defaults.font.family='Plus Jakarta Sans';
+        
+        const globalFilters={system:[],bank:[],region:[],country:[],currency:[]};
+        const tableFilters={};
+        let allData={systems:[],banks:[],regions:[],countries:[],currencies:[],toifa:[],branches:[],monthly:[]};
+        let currentModalData=[];
+        
+        const bankMapping={
+            "ИПОТЕКА-БАНК":"Ипотека банк","ИПОТЕКА БАНК":"Ипотека банк",
+            "УЗСАНОАТКУРИЛИШБАНКИ":"СҚБ","СКБ":"СҚБ","СҚБ":"СҚБ",
+            "HAMKORBANK":"Ҳамкорбанк","ХАМКОРБАНК":"Ҳамкорбанк",
+            "ТИФ МИЛЛИЙ БАНКИ":"Миллий банк","МИЛЛИЙ БАНК":"Миллий банк",
+            "АГРОБАНК":"Агро банк","АГРО БАНК":"Агро банк",
+            "INVEST FINANCE BANK":"Инфин банк","ИНФИН БАНК":"Инфин банк",
+            "ГАРАНТ БАНК":"Гарант банк",
+            "БИЗНЕСНИ РИВОЖЛАНТИРИШ БАНКИ":"БРБ","БРБ":"БРБ",
+            "МИКРОКРЕДИТБАНК":"МКБ","МКБ":"МКБ",
+            "ИПАК ЙУЛИ":"Ипак йўли банк","ИПАК ЙЎЛИ":"Ипак йўли банк",
+            "АЛОКАБАНК":"Алоқабанк","АЛОҚАБАНК":"Алоқабанк",
+            "ТУРОНБАНК":"Туронбанк",
+            "ХАЛК БАНКИ":"Халқ банки","ХАЛҚ БАНКИ":"Халқ банки",
+            "УНИВЕРСАЛ БАНК":"Универсал банк",
+            "КАПИТАЛБАНК":"Капиталбанк",
+            "АСАКАБАНК":"Асака банк","АСАКА БАНК":"Асака банк",
+            "ANOR BANK":"Анор банк","АНОР БАНК":"Анор банк"
+        };
+        
+        function getToifaBankName(kesimBankName){
+            const upper=kesimBankName.toUpperCase();
+            for(const[key,val]of Object.entries(bankMapping)){
+                if(upper.includes(key))return val;
+            }
+            return null;
+        }
+        const bankDisplayFull={"СҚБ":"Узсаноаткурилишбанки","БРБ":"Бизнесни ривожлантириш банки","МКБ":"Микрокредитбанк"};
+        function getDisplayBankName(name){
+            if(!name)return name;
+            const short=getToifaBankName(name);
+            return (short&&bankDisplayFull[short])?bankDisplayFull[short]:name;
+        }
+        
+        function fixCountryName(name){if(!name)return name;return name.replace(/Турция/gi,'Туркия').replace(/Кореа/gi,'Корея');}
+        const fmt=(n,d=0)=>n==null||isNaN(n)?'-':new Intl.NumberFormat('uz-UZ',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+        const fmtC=n=>n==null||isNaN(n)?'-':Math.abs(n)>=1e9?'$'+(n/1e9).toFixed(2)+' mlrd':Math.abs(n)>=1e6?'$'+(n/1e6).toFixed(1)+' mln':Math.abs(n)>=1e3?'$'+(n/1e3).toFixed(1)+' минг':'$'+fmt(n,0);
+        const pN=v=>{if(v==null||v==='')return 0;if(typeof v==='number')return v;return parseFloat(String(v).replace(/\s/g,'').replace(/[^\d.-]/g,''))||0;};
+
+        document.getElementById('fileInput').addEventListener('change',function(e){
+            const file=e.target.files[0];if(!file)return;
+            document.getElementById('fileName').textContent=file.name;
+            document.getElementById('loading').classList.add('show');
+            const reader=new FileReader();
+            reader.onload=function(e){
+                try{
+                    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+                    D={};
+                    wb.SheetNames.forEach(n=>{
+                        D[n]=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:null});
+                        if(n.trim().toLowerCase().includes('тоифа'))D._toifa=D[n];
+                    });
+                    init();
+                    document.getElementById('main').style.display='block';
+                    document.getElementById('empty').style.display='none';
+                }catch(err){alert('Хатолик: '+err.message);}
+                finally{document.getElementById('loading').classList.remove('show');}
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function init(){parseAllData();buildGlobalFilters();buildTabs();update();}
+
+        function parseAllData(){
+            const sysSheet=D['ХПУ тури']||[];allData.systems=[];
+            sysSheet.forEach((r,i)=>{if(i>=4&&r&&r[1]&&!String(r[1]).includes('Жами'))allData.systems.push({idx:r[0]||i-3,name:r[1],ops:pN(r[2]),sum:pN(r[3]),share:pN(r[4]),y2024:pN(r[6]),y2025:pN(r[10]),diff:pN(r[10])-pN(r[6])});});
+            
+            const bankSheet=D['Банк кесими']||[];allData.banks=[];
+            bankSheet.forEach((r,i)=>{if(i>=4&&r&&r[1]&&!String(r[1]).includes('Жами'))allData.banks.push({idx:r[0]||i-3,name:getDisplayBankName(r[1]),toifaName:getToifaBankName(r[1]),systems:pN(r[2]),ops:pN(r[3]),sum:pN(r[4]),share:pN(r[5])});});
+            
+            const regSheet=D['ҳудуд кесими']||[];allData.regions=[];
+            regSheet.forEach((r,i)=>{if(i>=4&&r&&r[1]&&!String(r[1]).includes('Жами'))allData.regions.push({idx:r[0]||i-3,name:r[1],ops:pN(r[2]),sum:pN(r[3]),y2024:pN(r[6]),y2025:pN(r[10]),diff:pN(r[13]),migrants:pN(r[14])});});
+            
+            const countrySheet=D['давлатлар кес.']||[];allData.countries=[];
+            countrySheet.forEach((r,i)=>{if(i>=4&&r&&r[1]&&!String(r[1]).includes('Жами'))allData.countries.push({idx:r[0]||i-3,name:fixCountryName(r[1]),ops:pN(r[2]),sum:pN(r[3]),y2024:pN(r[5]),y2025:pN(r[9]),diff:pN(r[12])});});
+            
+            const curSheet=D['валюта кес.']||[];allData.currencies=[];
+            curSheet.forEach((r,i)=>{if(i>=4&&r&&r[1])allData.currencies.push({idx:r[0]||i-3,name:r[1],ops:pN(r[2]),sum:pN(r[3]),q2024:pN(r[5]),s2024:pN(r[7]),q2025:pN(r[9]),s2025:pN(r[11]),diff:pN(r[12])});});
+            
+            const toifaSheet=D._toifa||[];allData.toifa=[];let currentRegion='';
+            // Toifa sheet da J ustuni (Ҳудуддаги улуши) indeksini sarlavhadan topish, bo'lmasa 9
+            let colJIdx=9;
+            for(let row=0;row<Math.min(4,toifaSheet.length);row++){
+                const headerRow=toifaSheet[row];
+                if(!headerRow)continue;
+                for(let c=0;c<headerRow.length;c++){
+                    const cell=String(headerRow[c]||'').toLowerCase();
+                    if(cell.includes('улуши')||cell.includes('ulushi')||cell.includes('Ҳудуддаги')||cell.includes('худуддаги')){colJIdx=c;break;}
+                }
+                if(colJIdx!==9)break;
+            }
+            function readColJ(row){
+                const v=row[colJIdx];
+                if(v==null&&v!==0)return null;
+                const s=typeof v==='number'?String(v):String(v||'').trim();
+                return s!==''?s:null;
+            }
+            for(let i=4;i<toifaSheet.length;i++){
+                const r=toifaSheet[i];if(!r||!r[0])continue;
+                const name=String(r[0]).trim(),mfo=r[1],toifa=String(r[2]||'').trim();
+                const colJVal=readColJ(r);
+                if(!mfo){
+                    currentRegion=name;
+                    allData.toifa.push({
+                        type:'region',name,mfo:'',toifa:'',colJ:colJVal,
+                        qabulSoni:pN(r[3]),qabulSumma:pN(r[4]),
+                        yubSoni:pN(r[5]),yubSumma:pN(r[6]),
+                        daromad:pN(r[7]),
+                        region:name
+                    });
+                }else{
+                    // Faqat rasmda ko'rsatilgan "Халқ банки" Chinoz filialini (MFO 10121) chiqarib tashlaymiz
+                    const mfoStr=String(mfo||'').trim();
+                    if(mfoStr==='10121') continue;
+                    allData.toifa.push({
+                        type:'bank',name:getDisplayBankName(name),mfo:String(mfo),toifa,colJ:colJVal,
+                        qabulSoni:pN(r[3]),qabulSumma:pN(r[4]),
+                        yubSoni:pN(r[5]),yubSumma:pN(r[6]),
+                        daromad:pN(r[7]),
+                        region:currentRegion
+                    });
+                }
+            }
+            // Bo'sh colJ larni to'ldirish: avval oldinga, keyin orqaga (Excel fill-down)
+            let lastColJ='';
+            allData.toifa.forEach(t=>{
+                if(t.colJ!=null&&String(t.colJ).trim()!=='')lastColJ=String(t.colJ).trim();
+                else if(lastColJ!=='')t.colJ=lastColJ;
+            });
+            let nextColJ='';
+            for(let i=allData.toifa.length-1;i>=0;i--){
+                const t=allData.toifa[i];
+                if(t.colJ!=null&&String(t.colJ).trim()!=='')nextColJ=String(t.colJ).trim();
+                else if(nextColJ!=='')t.colJ=nextColJ;
+            }
+            
+            const branchSheet=D['филиал кес.']||[];allData.branches=[];
+            branchSheet.forEach((r,i)=>{if(i>=4&&r&&r[1]&&!String(r[1]).includes('Жами'))allData.branches.push({idx:r[0]||i-3,name:getDisplayBankName(r[1]),ops:pN(r[2]),sum:pN(r[3]),diff:pN(r[12])});});
+            
+            const monthSheet=D['ойлар кес.']||[];allData.monthly=[];
+            monthSheet.forEach((r,i)=>{
+                if(i>=3&&r&&r[1]&&!String(r[1]).includes('Жами')){
+                    const name=String(r[1]).trim();
+                    const item={idx:r[0]||i-2,name,qabul:pN(r[2]),yub:pN(r[3]),q2024:pN(r[5]),s2024:pN(r[6]),q2025:pN(r[7]),s2025:pN(r[8])};
+                    const norm=name.toLowerCase();
+                    if(norm.includes('декабр')||norm.includes('dekabr')) item.q2024=17505000.00;
+                    allData.monthly.push(item);
+                }
+            });
+        }
+
+        const filterAllLabels={system:'Барча тизимлар',bank:'Барча банклар',region:'Барча ҳудудлар',country:'Барча давлатлар',currency:'Барча валюталар'};
+        const filterMeta={system:{icon:'💳',label:'Ўтказма тури:'},bank:{icon:'🏦',label:'Банк:'},region:{icon:'📖',label:'Ҳудуд:'},country:{icon:'🌍',label:'Давлат:'},currency:{icon:'📊',label:'Валюта:'}};
+        function buildGlobalFilters(){
+            const filters=[
+                {id:'gf-system',key:'system',data:allData.systems},
+                {id:'gf-bank',key:'bank',data:allData.banks},
+                {id:'gf-region',key:'region',data:allData.regions},
+                {id:'gf-country',key:'country',data:allData.countries},
+                {id:'gf-currency',key:'currency',data:allData.currencies}
+            ];
+            filters.forEach(f=>{
+                const meta=filterMeta[f.key]||{icon:'▢',label:f.key+':'};
+                const allText=filterAllLabels[f.key]||'Барчаси';
+                const container=document.getElementById(f.id);
+                const items=f.data.map(d=>d.name);
+                container.innerHTML=`
+                    <button class="multi-select-btn" onclick="toggleDropdown('gf-${f.key}')">
+                        <span class="filter-bar-icon">${meta.icon}</span>
+                        <span class="filter-bar-label">${meta.label}</span>
+                        <span class="filter-bar-value-wrap">
+                            <span class="filter-bar-value" id="btn-text-gf-${f.key}">${allText}</span>
+                            <span class="filter-bar-arrow">▼</span>
+                        </span>
+                    </button>
+                    <div class="multi-select-dropdown" id="dropdown-gf-${f.key}">
+                        <div class="multi-select-search"><input type="text" placeholder="🔍 Қидириш..." oninput="searchInFilter('gf-${f.key}',this.value)"></div>
+                        <div class="multi-select-actions"><button class="select-all" onclick="selectAll('gf-${f.key}')">✓ Барчаси</button><button class="clear-all" onclick="clearAll('gf-${f.key}')">✕ Тозалаш</button></div>
+                        <div class="multi-select-items" id="items-gf-${f.key}">${items.map(item=>`<label class="multi-select-item" data-value="${item}"><input type="checkbox" value="${item}" onchange="updateGlobalFilter('${f.key}')">${item}</label>`).join('')}</div>
+                    </div>`;
+            });
+        }
+
+        function toggleDropdown(key){
+            event.stopPropagation();
+            const dropdown=document.getElementById(`dropdown-${key}`);
+            document.querySelectorAll('.multi-select-dropdown.show').forEach(d=>{if(d.id!==`dropdown-${key}`)d.classList.remove('show');});
+            dropdown.classList.toggle('show');
+        }
+        function searchInFilter(key,val){document.querySelectorAll(`#items-${key} .multi-select-item`).forEach(item=>{item.style.display=item.dataset.value.toLowerCase().includes(val.toLowerCase())?'':'none';});}
+        function selectAll(key){document.querySelectorAll(`#items-${key} .multi-select-item`).forEach(item=>{if(item.style.display!=='none')item.querySelector('input').checked=true;});const realKey=key.replace('gf-','').replace('tf-','');if(key.startsWith('gf-'))updateGlobalFilter(realKey);else updateTableFilter(realKey);}
+        function clearAll(key){document.querySelectorAll(`#items-${key} input`).forEach(cb=>cb.checked=false);const realKey=key.replace('gf-','').replace('tf-','');if(key.startsWith('gf-'))updateGlobalFilter(realKey);else updateTableFilter(realKey);}
+        
+        function updateGlobalFilter(key){
+            globalFilters[key]=[...document.querySelectorAll(`#items-gf-${key} input:checked`)].map(cb=>cb.value);
+            const btn=document.getElementById(`btn-text-gf-${key}`);
+            const btnParent=btn.closest('.multi-select-btn');
+            const allText=filterAllLabels[key]||'Барчаси';
+            if(globalFilters[key].length===0){btn.textContent=allText;btnParent.classList.remove('has-selection');}
+            else{btn.innerHTML=`${globalFilters[key].length} танланган <span class="selected-count">${globalFilters[key].length}</span>`;btnParent.classList.add('has-selection');}
+            updateActiveFilters();updateFilterInfo();update();
+        }
+
+        function updateActiveFilters(){
+            const container=document.getElementById('activeFilters');
+            const labels={system:'Тизим',bank:'Банк',region:'Ҳудуд',country:'Давлат',currency:'Валюта'};
+            let html='',hasFilters=false;
+            Object.entries(globalFilters).forEach(([key,values])=>{if(values.length>0){hasFilters=true;values.forEach(val=>{html+=`<div class="filter-tag">${labels[key]}: ${val.substring(0,20)}${val.length>20?'...':''} <span onclick="removeGlobalFilter('${key}','${val.replace(/'/g,"\\'")}')">✕</span></div>`;});}});
+            container.innerHTML=hasFilters?`<span class="active-filters-title">🏷️ Фаол филтерлар:</span>${html}`:'';
+        }
+
+        function updateFilterInfo(){
+            const info=document.getElementById('filterInfo');
+            const text=document.getElementById('filterInfoText');
+            let msgs=[];
+            if(globalFilters.system.length)msgs.push(`Тизим: ${globalFilters.system.length} та`);
+            if(globalFilters.bank.length)msgs.push(`Банк: ${globalFilters.bank.length} та → Тоифа филтерланган`);
+            if(globalFilters.region.length)msgs.push(`Ҳудуд: ${globalFilters.region.length} та → Тоифа филтерланган`);
+            if(globalFilters.country.length)msgs.push(`Давлат: ${globalFilters.country.length} та`);
+            if(globalFilters.currency.length)msgs.push(`Валюта: ${globalFilters.currency.length} та`);
+            if(msgs.length>0){text.textContent=msgs.join(' | ');info.classList.add('show');}else{info.classList.remove('show');}
+        }
+
+        function removeGlobalFilter(key,val){
+            globalFilters[key]=globalFilters[key].filter(v=>v!==val);
+            const cb=document.querySelector(`#items-gf-${key} input[value="${val}"]`);if(cb)cb.checked=false;
+            const btn=document.getElementById(`btn-text-gf-${key}`);
+            const allText=filterAllLabels[key]||'Барчаси';
+            if(globalFilters[key].length)btn.innerHTML=`${globalFilters[key].length} танланган <span class="selected-count">${globalFilters[key].length}</span>`;else btn.textContent=allText;
+            btn.closest('.multi-select-btn').classList.toggle('has-selection',globalFilters[key].length>0);
+            updateActiveFilters();updateFilterInfo();update();
+        }
+
+        function resetGlobalFilters(){
+            Object.keys(globalFilters).forEach(key=>{
+                globalFilters[key]=[];
+                document.querySelectorAll(`#items-gf-${key} input`).forEach(cb=>cb.checked=false);
+                const btn=document.getElementById(`btn-text-gf-${key}`);
+                const allText=filterAllLabels[key]||'Барчаси';
+                btn.textContent=allText;btn.closest('.multi-select-btn').classList.remove('has-selection');
+            });
+            updateActiveFilters();updateFilterInfo();update();
+        }
+
+        document.addEventListener('click',e=>{if(!e.target.closest('.multi-select'))document.querySelectorAll('.multi-select-dropdown.show').forEach(d=>d.classList.remove('show'));});
+
+        function getFilteredData(type){
+            let data=[...allData[type]];
+            if(type==='systems'&&globalFilters.system.length)data=data.filter(d=>globalFilters.system.includes(d.name));
+            if(type==='banks'&&globalFilters.bank.length)data=data.filter(d=>globalFilters.bank.includes(d.name));
+            if(type==='regions'&&globalFilters.region.length)data=data.filter(d=>globalFilters.region.includes(d.name));
+            if(type==='countries'&&globalFilters.country.length)data=data.filter(d=>globalFilters.country.includes(d.name));
+            if(type==='currencies'&&globalFilters.currency.length)data=data.filter(d=>globalFilters.currency.includes(d.name));
+            return data;
+        }
+
+        function getFilteredToifa(){
+            // Barcha banklar bo'yicha toifa ma'lumotlari
+            let banks=allData.toifa.filter(r=>r.type==='bank');
+            
+            // Global "Bank" filtri faollashtirilganda, bank nomlarini toifa jadvalidagi nomlar bilan to'g'ri moslashtiramiz
+            if(globalFilters.bank.length>0){
+                const selectedToifaNames=new Set();
+                
+                // Foydalanuvchi tanlagan bank nomlarini normalizatsiya qilamiz
+                globalFilters.bank.forEach(bankName=>{
+                    const mapped=getToifaBankName(bankName);
+                    const finalName=(mapped||bankName).toUpperCase();
+                    selectedToifaNames.add(finalName);
+                });
+                
+                // Toifa jadvalidagi bank nomlarini ham normalizatsiya qilib solishtiramiz
+                banks=banks.filter(b=>{
+                    const mapped=getToifaBankName(b.name);
+                    const finalName=(mapped||b.name).toUpperCase();
+                    return selectedToifaNames.has(finalName);
+                });
+            }
+            
+            // Hudud bo'yicha filtr
+            if(globalFilters.region.length>0)banks=banks.filter(b=>globalFilters.region.includes(b.region));
+            
+            // Tanlangan banklarga mos keladigan hudud satrlarini ham qaytarish
+            const regions=new Set(banks.map(b=>b.region));
+            const result=[];
+            allData.toifa.forEach(item=>{
+                if(item.type==='region'&&regions.has(item.name))result.push(item);
+                else if(item.type==='bank'&&banks.includes(item))result.push(item);
+            });
+            return result;
+        }
+
+        function buildTabs(){
+            const tabs=[{key:'systems',name:'Тизимлар'},{key:'banks',name:'Банклар'},{key:'regions',name:'Ҳудудлар'},{key:'countries',name:'Давлатлар'},{key:'currencies',name:'Валюталар'},{key:'toifa',name:'Тоифалар'},{key:'branches',name:'Филиаллар'},{key:'monthly',name:'Ойлик'}];
+            let navHtml='',contentHtml='';
+            tabs.forEach((t,i)=>{
+                navHtml+=`<button class="tab-btn ${i===0?'active':''}" onclick="showTab('${t.key}')">${t.name}</button>`;
+                contentHtml+=`<div class="tab-content ${i===0?'active':''}" id="tab-${t.key}"><div class="table-filters" id="tf-${t.key}"></div><div class="table-filter-tags" id="tftags-${t.key}"></div><div class="table-wrap"><table id="table-${t.key}"><thead></thead><tbody></tbody></table></div></div>`;
+                tableFilters[t.key]={search:'',selected:[],minSum:0,maxSum:Infinity};
+            });
+            document.getElementById('tabsNav').innerHTML=navHtml;
+            document.getElementById('tabsContent').innerHTML=contentHtml;
+        }
+
+        function showTab(name){
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-'+name).classList.add('active');
+        }
+
+        function buildTableFilters(tabKey,selectOptions,selectLabel){
+            const container=document.getElementById(`tf-${tabKey}`);
+            container.innerHTML=`
+                <div class="table-filter-item"><label>🔍 Қидириш</label><input type="text" placeholder="Ном бўйича..." id="tfs-${tabKey}" oninput="onTableSearchChange('${tabKey}')"></div>
+                <div class="table-filter-item"><label>${selectLabel}</label><div class="multi-select" id="tfm-${tabKey}">
+                    <button class="multi-select-btn" onclick="toggleDropdown('tf-${tabKey}')"><span id="btn-text-tf-${tabKey}">Барчаси</span><span>▼</span></button>
+                    <div class="multi-select-dropdown" id="dropdown-tf-${tabKey}">
+                        <div class="multi-select-search"><input type="text" placeholder="🔍 Қидириш..." oninput="searchInFilter('tf-${tabKey}',this.value)"></div>
+                        <div class="multi-select-actions"><button class="select-all" onclick="selectAll('tf-${tabKey}')">✓ Барчаси</button><button class="clear-all" onclick="clearAll('tf-${tabKey}')">✕ Тозалаш</button></div>
+                        <div class="multi-select-items" id="items-tf-${tabKey}">${selectOptions.map(item=>`<label class="multi-select-item" data-value="${item}"><input type="checkbox" value="${item}" onchange="updateTableFilter('${tabKey}')">${item}</label>`).join('')}</div>
+                    </div>
+                </div></div>
+                <div class="table-filter-item"><label>Мин сумма</label><input type="number" placeholder="0" id="tfmin-${tabKey}" oninput="onTableSumChange('${tabKey}')"></div>
+                <div class="table-filter-item"><label>Макс сумма</label><input type="number" placeholder="∞" id="tfmax-${tabKey}" oninput="onTableSumChange('${tabKey}')"></div>
+                <button class="table-clear-btn" onclick="clearTableFilters('${tabKey}')">🔄 Тозалаш</button>`;
+        }
+        
+        function onTableSearchChange(tabKey){
+            tableFilters[tabKey].search=document.getElementById(`tfs-${tabKey}`)?.value?.toLowerCase()||'';
+            updateTables();
+        }
+        
+        function onTableSumChange(tabKey){
+            tableFilters[tabKey].minSum=parseFloat(document.getElementById(`tfmin-${tabKey}`)?.value)||0;
+            tableFilters[tabKey].maxSum=parseFloat(document.getElementById(`tfmax-${tabKey}`)?.value)||Infinity;
+            updateTables();
+        }
+        
+        function updateTableFilter(tabKey){
+            tableFilters[tabKey].selected=[...document.querySelectorAll(`#items-tf-${tabKey} input:checked`)].map(cb=>cb.value);
+            const btn=document.getElementById(`btn-text-tf-${tabKey}`);
+            const btnParent=btn.closest('.multi-select-btn');
+            if(tableFilters[tabKey].selected.length===0){btn.innerHTML='Барчаси';btnParent.classList.remove('has-selection');}
+            else{btn.innerHTML=`${tableFilters[tabKey].selected.length} танланган <span class="selected-count">${tableFilters[tabKey].selected.length}</span>`;btnParent.classList.add('has-selection');}
+            updateTableFilterTags(tabKey);
+            updateTables();
+        }
+        
+        function updateTableFilterTags(tabKey){
+            const container=document.getElementById(`tftags-${tabKey}`);
+            const selected=tableFilters[tabKey].selected;
+            if(selected.length===0){container.innerHTML='';return;}
+            container.innerHTML=selected.map(val=>`<div class="table-filter-tag">${val.substring(0,25)}${val.length>25?'...':''} <span onclick="removeTableFilterItem('${tabKey}','${val.replace(/'/g,"\\'")}')">✕</span></div>`).join('');
+        }
+        
+        function removeTableFilterItem(tabKey,val){
+            tableFilters[tabKey].selected=tableFilters[tabKey].selected.filter(v=>v!==val);
+            const cb=document.querySelector(`#items-tf-${tabKey} input[value="${val}"]`);if(cb)cb.checked=false;
+            const btn=document.getElementById(`btn-text-tf-${tabKey}`);
+            btn.innerHTML=tableFilters[tabKey].selected.length?`${tableFilters[tabKey].selected.length} танланган <span class="selected-count">${tableFilters[tabKey].selected.length}</span>`:'Барчаси';
+            btn.closest('.multi-select-btn').classList.toggle('has-selection',tableFilters[tabKey].selected.length>0);
+            updateTableFilterTags(tabKey);
+            updateTables();
+        }
+        
+        function clearTableFilters(tabKey){
+            document.getElementById(`tfs-${tabKey}`).value='';
+            document.getElementById(`tfmin-${tabKey}`).value='';
+            document.getElementById(`tfmax-${tabKey}`).value='';
+            document.querySelectorAll(`#items-tf-${tabKey} input`).forEach(cb=>cb.checked=false);
+            const btn=document.getElementById(`btn-text-tf-${tabKey}`);
+            btn.innerHTML='Барчаси';btn.closest('.multi-select-btn').classList.remove('has-selection');
+            tableFilters[tabKey]={search:'',selected:[],minSum:0,maxSum:Infinity};
+            updateTableFilterTags(tabKey);
+            updateTables();
+        }
+        
+        function applyTableFilters(data,tabKey,nameField='name',sumField='sum'){
+            const f=tableFilters[tabKey];
+            return data.filter(item=>{
+                const name=(item[nameField]||'').toLowerCase();
+                const matchSearch=!f.search||name.includes(f.search);
+                const matchSelect=f.selected.length===0||f.selected.includes(item[nameField])||f.selected.includes(item.toifa);
+                const sum=item[sumField]||item.qabulSumma||0;
+                const matchSum=sum>=f.minSum&&sum<=(f.maxSum||Infinity);
+                return matchSearch&&matchSelect&&matchSum;
+            });
+        }
+
+        function update(){updateStats();updateToifaAnalysis();createCharts();updateTables();updateComparison();}
+
+        function updateStats(){
+            const t=(D['ХПУ тури']||[]).find(r=>r&&String(r[1]).includes('Жами'));if(!t)return;
+            const filteredSystems=getFilteredData('systems'),filteredBanks=getFilteredData('banks'),filteredCountries=getFilteredData('countries');
+            
+            // 2024 va 2025 ma'lumotlari (Qabul qilingan summa)
+            const q2024=pN(t[6]),q2025=pN(t[10]);
+            // Yuborilgan summa
+            const y2024=pN(t[8]),y2025=pN(t[12]);
+            // Jami
+            const totalSum2024=q2024+y2024,totalSum2025=q2025+y2025;
+            // Operatsiyalar soni 2024 va 2025
+            const qSoni2024=pN(t[5]),qSoni2025=pN(t[9]);
+            const ySoni2024=pN(t[7]),ySoni2025=pN(t[11]);
+            const ops2024=qSoni2024+ySoni2024,ops2025=qSoni2025+ySoni2025;
+            
+            let totalSum=pN(t[3]),totalOps=pN(t[2]);
+            if(globalFilters.system.length){totalSum=filteredSystems.reduce((a,b)=>a+b.sum,0);totalOps=filteredSystems.reduce((a,b)=>a+b.ops,0);}
+            
+            // Foiz o'zgarishlarni hisoblash
+            const sumChange=totalSum2024>0?((totalSum2025-totalSum2024)/totalSum2024*100):0;
+            const opsChange=ops2024>0?((ops2025-ops2024)/ops2024*100):0;
+            const qChange=q2024>0?((q2025-q2024)/q2024*100):0;
+            const yChange=y2024>0?((y2025-y2024)/y2024*100):0;
+            
+            document.getElementById('s2').textContent=fmt(totalOps);
+            document.getElementById('s3').textContent=fmtC(q2025);
+            document.getElementById('s4').textContent=fmtC(y2025);
+            document.getElementById('s5').textContent=filteredCountries.length;
+            document.getElementById('s6').textContent=filteredBanks.length;
+            
+            // O'zgarish ko'rsatkichlari
+            const s2c=document.getElementById('s2c');
+            s2c.textContent=(opsChange>=0?'↑ +':'↓ ')+Math.abs(opsChange).toFixed(1)+'% в 2024';
+            s2c.className='stat-change '+(opsChange>=0?'up':'down');
+            
+            const s3c=document.getElementById('s3c');
+            s3c.textContent=(qChange>=0?'↑ +':'↓ ')+Math.abs(qChange).toFixed(1)+'% в 2024';
+            s3c.className='stat-change '+(qChange>=0?'up':'down');
+            
+            const s4c=document.getElementById('s4c');
+            s4c.textContent=(yChange>=0?'↑ +':'↓ ')+Math.abs(yChange).toFixed(1)+'% в 2024';
+            s4c.className='stat-change '+(yChange>=0?'up':'down');
+        }
+
+        function openToifaModal(type,data){
+            currentModalData=[...data];
+            const icons={samarador:'🏆',barqaror:'🛡️',ortacha:'📊',past:'⚠️'};
+            const titles={samarador:'Самарадор (А)',barqaror:'Барқарор (Б)',ortacha:'Ўртача (С)',past:'Самарадорлиги паст (Д)'};
+            const ranks={samarador:'A',barqaror:'B',ortacha:'C',past:'D'};
+            document.getElementById('modalHeader').className=`modal-header ${type}`;
+            document.getElementById('modalTitle').innerHTML=`<span style="background:${clrToifa[type]};color:white;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:16px">${ranks[type]}</span>${icons[type]} ${titles[type]} <span style="font-size:14px;opacity:0.7;margin-left:8px">(${data.length} та банк)</span>`;
+            const totalQabul=data.reduce((a,b)=>a+b.qabulSumma,0),totalYub=data.reduce((a,b)=>a+b.yubSumma,0),totalOps=data.reduce((a,b)=>a+b.qabulSoni,0),avgSum=data.length>0?totalQabul/data.length:0;
+            document.getElementById('modalStats').innerHTML=`
+                <div class="modal-stat"><div class="modal-stat-label">Жами қабул</div><div class="modal-stat-value">${fmtC(totalQabul)}</div></div>
+                <div class="modal-stat"><div class="modal-stat-label">Жами юборилган</div><div class="modal-stat-value">${fmtC(totalYub)}</div></div>
+                <div class="modal-stat"><div class="modal-stat-label">Операциялар</div><div class="modal-stat-value">${fmt(totalOps)}</div></div>
+                <div class="modal-stat"><div class="modal-stat-label">Ўртача</div><div class="modal-stat-value">${fmtC(avgSum)}</div></div>
+                <div class="modal-stat"><div class="modal-stat-label">Банклар</div><div class="modal-stat-value">${data.length}</div></div>
+                <div class="modal-stat"><div class="modal-stat-label">Баланс</div><div class="modal-stat-value" style="color:${totalQabul-totalYub>=0?'var(--success)':'var(--danger)'}">${fmtC(totalQabul-totalYub)}</div></div>`;
+            document.getElementById('modalThead').innerHTML=`<tr><th class="rank-cell">№</th><th>Банк номи</th><th>Ҳудуд</th><th>МФО</th><th class="num">Қабул сумма</th><th class="num">Юборилган</th><th class="num">Қабул сони</th><th style="width:100px">Улуши</th></tr>`;
+            renderModalTable(data,totalQabul);
+            document.getElementById('modalSearch').value='';
+            document.getElementById('toifaModal').classList.add('show');
+        }
+
+        function renderModalTable(data,totalSum){
+            if(!totalSum)totalSum=data.reduce((a,b)=>a+b.qabulSumma,0);
+            document.getElementById('modalTbody').innerHTML=data.map((item,idx)=>{
+                const share=totalSum>0?(item.qabulSumma/totalSum*100):0;
+                return `<tr><td class="rank-cell"><span class="modal-rank-badge">${idx+1}</span></td><td><strong>${item.name}</strong></td><td style="color:var(--text-muted);font-size:11px">${item.region}</td><td style="color:var(--text-muted);font-size:11px">${item.mfo}</td><td class="num"><strong>${fmtC(item.qabulSumma)}</strong></td><td class="num" style="color:var(--text-muted)">${fmtC(item.yubSumma)}</td><td class="num">${fmt(item.qabulSoni)}</td><td><div class="share-bar"><div class="share-bar-fill" style="width:${Math.min(share*2,100)}%"></div></div><div class="share-text">${share.toFixed(2)}%</div></td></tr>`;
+            }).join('');
+        }
+
+        function filterModalTable(){
+            const search=document.getElementById('modalSearch').value.toLowerCase();
+            const filtered=currentModalData.filter(item=>item.name.toLowerCase().includes(search)||item.region.toLowerCase().includes(search)||item.mfo.toLowerCase().includes(search));
+            renderModalTable(filtered);
+        }
+
+        function closeModal(){document.getElementById('toifaModal').classList.remove('show');}
+
+        function updateToifaAnalysis(){
+            const filteredData=getFilteredToifa();
+            const banks=filteredData.filter(r=>r.type==='bank');
+            const hasFilters=globalFilters.bank.length>0||globalFilters.region.length>0;
+            let subtitle='';
+            if(hasFilters){
+                const parts=[];
+                if(globalFilters.bank.length)parts.push(`Банк: ${globalFilters.bank.length} та`);
+                if(globalFilters.region.length)parts.push(`Ҳудуд: ${globalFilters.region.length} та`);
+                subtitle=`Филтерланган: ${banks.length} та банк (${parts.join(', ')})`;
+            }
+            document.getElementById('toifaSubtitle').textContent=subtitle;
+            
+            const toifas={samarador:banks.filter(b=>b.toifa==='Самарадор'),barqaror:banks.filter(b=>b.toifa==='Барқарор'),ortacha:banks.filter(b=>b.toifa==='Ўртача'),past:banks.filter(b=>b.toifa==='Самарадорлиги паст')};
+            const calc=arr=>({count:arr.length,sumQabul:arr.reduce((a,b)=>a+b.qabulSumma,0),sumYub:arr.reduce((a,b)=>a+b.yubSumma,0),ops:arr.reduce((a,b)=>a+b.qabulSoni,0),avg:arr.length>0?arr.reduce((a,b)=>a+b.qabulSumma,0)/arr.length:0});
+            const totals={samarador:calc(toifas.samarador),barqaror:calc(toifas.barqaror),ortacha:calc(toifas.ortacha),past:calc(toifas.past)};
+            Object.keys(toifas).forEach(k=>toifas[k].sort((a,b)=>b.qabulSumma-a.qabulSumma));
+            
+            const labels={samarador:'Самарадор',barqaror:'Барқарор',ortacha:'Ўртача',past:'Паст'};
+            const icons={samarador:'🏆',barqaror:'🛡️',ortacha:'📊',past:'⚠️'};
+            const ranks={samarador:'A',barqaror:'B',ortacha:'C',past:'D'};
+            const totalSum=totals.samarador.sumQabul+totals.barqaror.sumQabul+totals.ortacha.sumQabul+totals.past.sumQabul||1;
+            window.toifas=toifas;
+            
+            document.getElementById('toifaGrid').innerHTML=Object.entries(toifas).map(([key,items])=>`
+                <div class="toifa-card ${key}" onclick="openToifaModal('${key}',window.toifas.${key})">
+                    <div class="toifa-header"><div class="toifa-title"><span class="toifa-rank">${ranks[key]}</span>${icons[key]} ${labels[key]}</div><div class="toifa-count">${totals[key].count} та</div></div>
+                    <div class="toifa-stats">
+                        <div class="toifa-stat"><div class="toifa-stat-label">Жами сумма</div><div class="toifa-stat-value">${fmtC(totals[key].sumQabul)}</div></div>
+                        <div class="toifa-stat"><div class="toifa-stat-label">Операциялар</div><div class="toifa-stat-value">${fmt(totals[key].ops)}</div></div>
+                        <div class="toifa-stat"><div class="toifa-stat-label">Ўртача</div><div class="toifa-stat-value">${fmtC(totals[key].avg)}</div></div>
+                        <div class="toifa-stat"><div class="toifa-stat-label">Улуши</div><div class="toifa-stat-value">${((totals[key].sumQabul/totalSum)*100).toFixed(1)}%</div></div>
+                    </div>
+                    <ul class="toifa-list">
+                        ${items.slice(0,5).map((item,idx)=>`<li class="toifa-list-item"><span class="toifa-list-rank">${idx+1}</span><span class="toifa-name">${item.name}</span><span class="toifa-amount">${fmtC(item.qabulSumma)}</span></li>`).join('')}
+                        ${items.length===0?'<li class="toifa-list-item"><span class="toifa-name" style="color:#999">Маълумот йўқ</span></li>':''}
+                        ${items.length>5?`<li class="toifa-list-item" style="justify-content:center;color:var(--accent);font-weight:600">+${items.length-5} та яна...</li>`:''}
+                    </ul>
+                </div>
+            `).join('');
+            
+            ['toifaPie','toifaBar','toifaAvg'].forEach(id=>{if(charts[id])charts[id].destroy();});
+            const chartLabels=['Самарадор (А)','Барқарор (Б)','Ўртача (С)','Паст (Д)'];
+            const chartColors=[clrToifa.samarador,clrToifa.barqaror,clrToifa.ortacha,clrToifa.past];
+            charts.toifaPie=new Chart(document.getElementById('toifaPie'),{type:'doughnut',data:{labels:chartLabels,datasets:[{data:[totals.samarador.count,totals.barqaror.count,totals.ortacha.count,totals.past.count],backgroundColor:chartColors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}}},cutout:'60%'}});
+            charts.toifaBar=new Chart(document.getElementById('toifaBar'),{type:'bar',data:{labels:chartLabels,datasets:[{data:[totals.samarador.sumQabul,totals.barqaror.sumQabul,totals.ortacha.sumQabul,totals.past.sumQabul],backgroundColor:chartColors,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fmtC(v)}}}}});
+            charts.toifaAvg=new Chart(document.getElementById('toifaAvg'),{type:'bar',data:{labels:chartLabels,datasets:[{data:[totals.samarador.avg,totals.barqaror.avg,totals.ortacha.avg,totals.past.avg],backgroundColor:chartColors.map(c=>c+'90'),borderColor:chartColors,borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fmtC(v)}}}}});
+        }
+
+        function createCharts(){
+            ['c1','c2','c3','c4','c5','c6','cMonth'].forEach(id=>{if(charts[id])charts[id].destroy();});
+            const badges={cfb1:globalFilters.system.length,cfb2:globalFilters.bank.length,cfb3:globalFilters.country.length,cfb4:globalFilters.region.length,cfb5:globalFilters.currency.length};
+            Object.entries(badges).forEach(([id,count])=>{const el=document.getElementById(id);el.textContent=count?`${count} танланган`:'';el.style.display=count?'inline-block':'none';});
+            
+            const systems=getFilteredData('systems');
+            charts.c1=new Chart(document.getElementById('c1'),{type:'doughnut',data:{labels:systems.slice(0,8).map(s=>s.name),datasets:[{data:systems.slice(0,8).map(s=>s.sum),backgroundColor:clr,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}}},cutout:'55%'}});
+            
+            const banks=getFilteredData('banks').sort((a,b)=>b.sum-a.sum);
+            charts.c2=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:banks.slice(0,10).map(b=>b.name.substring(0,18)),datasets:[{data:banks.slice(0,10).map(b=>b.sum),backgroundColor:clr[0],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>fmtC(v)}},y:{ticks:{font:{size:10}}}}}});
+            
+            const countries=getFilteredData('countries').sort((a,b)=>b.sum-a.sum);
+            charts.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:countries.slice(0,10).map(c=>c.name),datasets:[{data:countries.slice(0,10).map(c=>c.sum),backgroundColor:'#93c5fd',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>fmtC(v)}},y:{ticks:{font:{size:10}}}}}});
+            
+            const regions=getFilteredData('regions').sort((a,b)=>b.sum-a.sum);
+            charts.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:regions.slice(0,10).map(r=>r.name.substring(0,14)),datasets:[{data:regions.slice(0,10).map(r=>r.sum),backgroundColor:clr[4],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>fmtC(v)}},y:{ticks:{font:{size:10}}}}}});
+            
+            const currencies=getFilteredData('currencies');
+            charts.c5=new Chart(document.getElementById('c5'),{type:'pie',data:{labels:currencies.map(c=>c.name),datasets:[{data:currencies.map(c=>c.sum),backgroundColor:clr,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}}}}});
+            
+            const gradData=D['Валюта градация']||[];const totalRow=gradData.find(r=>r&&String(r[0]).includes('Общий'));
+            if(totalRow)charts.c6=new Chart(document.getElementById('c6'),{type:'bar',data:{labels:['0-100','100-1 000','1 000-5 000','5 000-10 000','10 000-50 000','50 000+'],datasets:[{data:[pN(totalRow[1]),pN(totalRow[4]),pN(totalRow[3]),pN(totalRow[6]),pN(totalRow[2]),pN(totalRow[5])],backgroundColor:clr,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'$'+fmt(v,0)}}}}});
+            
+            const monthly=allData.monthly;
+            charts.cMonth=new Chart(document.getElementById('cMonth'),{type:'line',data:{labels:monthly.map(m=>m.name),datasets:[{label:'Қабул 2024',data:monthly.map(m=>m.q2024),borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,0.15)',fill:true,tension:0.4,pointRadius:4,borderWidth:3},{label:'Қабул 2025',data:monthly.map(m=>m.q2025),borderColor:'#36659E',backgroundColor:'rgba(54,101,158,0.15)',fill:true,tension:0.4,pointRadius:4,borderWidth:3},{label:'Юб 2024',data:monthly.map(m=>m.s2024),borderColor:'#dc2626',tension:0.4,pointRadius:4,borderWidth:2,borderDash:[5,5]},{label:'Юб 2025',data:monthly.map(m=>m.s2025),borderColor:'#7c3aed',tension:0.4,pointRadius:4,borderWidth:2,borderDash:[8,4]}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{boxWidth:12}}},scales:{y:{ticks:{callback:v=>fmtC(v)}}}}});
+        }
+
+        function updateTables(){
+            // Tizimlar
+            buildTableFilters('systems',allData.systems.map(s=>s.name),'Тизим танлаш');
+            let systems=getFilteredData('systems');
+            systems=applyTableFilters(systems,'systems','name','sum');
+            document.getElementById('table-systems').querySelector('thead').innerHTML='<tr><th>№</th><th>Тизим</th><th class="num">Операциялар</th><th class="num">Сумма</th><th class="num">Улуши</th><th class="num">2024</th><th class="num">2025</th><th class="num">Фарқ</th></tr>';
+            document.getElementById('table-systems').querySelector('tbody').innerHTML=systems.map((s,i)=>`<tr><td>${i+1}</td><td>${s.name}</td><td class="num">${fmt(s.ops)}</td><td class="num">${fmtC(s.sum)}</td><td class="num">${(s.share*100).toFixed(1)}%</td><td class="num">${fmtC(s.y2024)}</td><td class="num">${fmtC(s.y2025)}</td><td class="num ${s.diff>=0?'pos':'neg'}">${fmtC(s.diff)}</td></tr>`).join('');
+            
+            // Banklar
+            buildTableFilters('banks',allData.banks.map(b=>b.name),'Банк танлаш');
+            let banks=getFilteredData('banks');
+            banks=applyTableFilters(banks,'banks','name','sum');
+            document.getElementById('table-banks').querySelector('thead').innerHTML='<tr><th>№</th><th>Банк</th><th class="num">Тизимлар</th><th class="num">Операциялар</th><th class="num">Сумма</th><th class="num">Улуши</th></tr>';
+            document.getElementById('table-banks').querySelector('tbody').innerHTML=banks.map((b,i)=>`<tr><td>${i+1}</td><td>${b.name}</td><td class="num">${fmt(b.systems)}</td><td class="num">${fmt(b.ops)}</td><td class="num">${fmtC(b.sum)}</td><td class="num">${(b.share*100).toFixed(1)}%</td></tr>`).join('');
+            
+            // Hududlar
+            buildTableFilters('regions',allData.regions.map(r=>r.name),'Ҳудуд танлаш');
+            let regions=getFilteredData('regions');
+            regions=applyTableFilters(regions,'regions','name','sum');
+            document.getElementById('table-regions').querySelector('thead').innerHTML='<tr><th>№</th><th>Ҳудуд</th><th class="num">Операциялар</th><th class="num">Сумма</th><th class="num">2024</th><th class="num">2025</th><th class="num">Фарқ</th><th class="num">Мигрантлар</th></tr>';
+            document.getElementById('table-regions').querySelector('tbody').innerHTML=regions.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td class="num">${fmt(r.ops)}</td><td class="num">${fmtC(r.sum)}</td><td class="num">${fmtC(r.y2024)}</td><td class="num">${fmtC(r.y2025)}</td><td class="num ${r.diff>=0?'pos':'neg'}">${fmtC(r.diff)}</td><td class="num">${fmt(r.migrants)}</td></tr>`).join('');
+            
+            // Davlatlar
+            buildTableFilters('countries',allData.countries.map(c=>c.name),'Давлат танлаш');
+            let countries=getFilteredData('countries');
+            countries=applyTableFilters(countries,'countries','name','sum');
+            document.getElementById('table-countries').querySelector('thead').innerHTML='<tr><th>№</th><th>Давлат</th><th class="num">Операциялар</th><th class="num">Сумма</th><th class="num">2024</th><th class="num">2025</th><th class="num">Фарқ</th></tr>';
+            document.getElementById('table-countries').querySelector('tbody').innerHTML=countries.map((c,i)=>`<tr><td>${i+1}</td><td>${c.name}</td><td class="num">${fmt(c.ops)}</td><td class="num">${fmtC(c.sum)}</td><td class="num">${fmtC(c.y2024)}</td><td class="num">${fmtC(c.y2025)}</td><td class="num ${c.diff>=0?'pos':'neg'}">${fmtC(c.diff)}</td></tr>`).join('');
+            
+            // Valyutalar
+            buildTableFilters('currencies',allData.currencies.map(c=>c.name),'Валюта танлаш');
+            let currencies=getFilteredData('currencies');
+            currencies=applyTableFilters(currencies,'currencies','name','sum');
+            document.getElementById('table-currencies').querySelector('thead').innerHTML='<tr><th>№</th><th>Валюта</th><th class="num">Операциялар</th><th class="num">Сумма</th><th class="num">2024 Қ</th><th class="num">2024 Ю</th><th class="num">2025 Қ</th><th class="num">2025 Ю</th><th class="num">Фарқ</th></tr>';
+            document.getElementById('table-currencies').querySelector('tbody').innerHTML=currencies.map((c,i)=>`<tr><td>${i+1}</td><td>${c.name}</td><td class="num">${fmt(c.ops)}</td><td class="num">${fmtC(c.sum)}</td><td class="num">${fmtC(c.q2024)}</td><td class="num">${fmtC(c.s2024)}</td><td class="num">${fmtC(c.q2025)}</td><td class="num">${fmtC(c.s2025)}</td><td class="num ${c.diff>=0?'pos':'neg'}">${fmtC(c.diff)}</td></tr>`).join('');
+            
+            // Toifalar
+            const toifaOptions=['Самарадор','Барқарор','Ўртача','Самарадорлиги паст'];
+            buildTableFilters('toifa',toifaOptions,'Тоифа танлаш');
+            let toifa=getFilteredToifa();
+            const tf=tableFilters['toifa'];
+            toifa=toifa.filter(t=>{
+                if(t.type==='region')return true;
+                const matchSearch=!tf.search||t.name.toLowerCase().includes(tf.search);
+                const matchSelect=tf.selected.length===0||tf.selected.includes(t.toifa);
+                const sum=t.qabulSumma||0;
+                const matchSum=sum>=tf.minSum&&sum<=(tf.maxSum||Infinity);
+                return matchSearch&&matchSelect&&matchSum;
+            });
+            document.getElementById('table-toifa').querySelector('thead').innerHTML='<tr><th>Ҳудуд/Банк</th><th>МФО</th><th>Тоифа</th><th>Ҳудуддаги улуши</th><th class="num">Қабул сони</th><th class="num">Қабул сумма</th><th class="num">Юб сони</th><th class="num">Юб сумма</th><th class="num">Банк даромади</th></tr>';
+            document.getElementById('table-toifa').querySelector('tbody').innerHTML=toifa.map(t=>{
+                if(t.type==='region'){
+                    let rColJ=t.colJ!=null&&String(t.colJ).trim()!==''&&!isNaN(parseFloat(t.colJ))?parseFloat(t.colJ).toFixed(2)+'%':'';
+                    if(rColJ==='0.00%')rColJ='0.01%';
+                    return`<tr class="region-row"><td colspan="3">${t.name}</td><td class="num text-center">${rColJ}</td><td class="num">${fmt(t.qabulSoni)}</td><td class="num">${fmtC(t.qabulSumma)}</td><td class="num">${fmt(t.yubSoni)}</td><td class="num">${fmtC(t.yubSumma)}</td><td class="num">${fmtC(t.daromad)}</td></tr>`;
+                }
+                let badge='',toifaLabel=t.toifa;
+                if(t.toifa==='Самарадор'){badge='badge-a';toifaLabel='Самарадор (А)';}
+                else if(t.toifa==='Барқарор'){badge='badge-b';toifaLabel='Барқарор (Б)';}
+                else if(t.toifa==='Ўртача'){badge='badge-c';toifaLabel='Ўртача (С)';}
+                else if(t.toifa==='Самарадорлиги паст'){badge='badge-d';toifaLabel='Паст (Д)';}
+                let colJFormatted=t.colJ!==''&&t.colJ!=null&&!isNaN(parseFloat(t.colJ))?parseFloat(t.colJ).toFixed(2)+'%':'';
+                if(colJFormatted==='0.00%')colJFormatted='0.01%';
+                return`<tr><td style="padding-left:20px">${t.name}</td><td>${t.mfo}</td><td><span class="badge ${badge}">${toifaLabel}</span></td><td class="num text-center">${colJFormatted}</td><td class="num">${fmt(t.qabulSoni)}</td><td class="num">${fmtC(t.qabulSumma)}</td><td class="num">${fmt(t.yubSoni)}</td><td class="num">${fmtC(t.yubSumma)}</td><td class="num">${fmtC(t.daromad)}</td></tr>`;
+            }).join('');
+            
+            // Filiallar
+            buildTableFilters('branches',allData.branches.map(b=>b.name),'Филиал танлаш');
+            let branches=[...allData.branches];
+            branches=applyTableFilters(branches,'branches','name','sum');
+            document.getElementById('table-branches').querySelector('thead').innerHTML='<tr><th>№</th><th>Филиал</th><th class="num">Операциялар</th><th class="num">Сумма</th><th class="num">Фарқ</th></tr>';
+            document.getElementById('table-branches').querySelector('tbody').innerHTML=branches.map((b,i)=>`<tr><td>${i+1}</td><td>${b.name}</td><td class="num">${fmt(b.ops)}</td><td class="num">${fmtC(b.sum)}</td><td class="num ${b.diff>=0?'pos':'neg'}">${fmtC(b.diff)}</td></tr>`).join('');
+            
+            // Oylik
+            buildTableFilters('monthly',allData.monthly.map(m=>m.name),'Ой танлаш');
+            let monthly=[...allData.monthly];
+            monthly=applyTableFilters(monthly,'monthly','name','qabul');
+            document.getElementById('table-monthly').querySelector('thead').innerHTML='<tr><th>№</th><th>Ой</th><th class="num">Қабул</th><th class="num">Юборилган</th><th class="num">2024 Қ</th><th class="num">2024 Ю</th><th class="num">2025 Қ</th><th class="num">2025 Ю</th></tr>';
+            document.getElementById('table-monthly').querySelector('tbody').innerHTML=monthly.map((m,i)=>`<tr><td>${i+1}</td><td>${m.name}</td><td class="num">${fmtC(m.qabul)}</td><td class="num">${fmtC(m.yub)}</td><td class="num">${fmtC(m.q2024)}</td><td class="num">${fmtC(m.s2024)}</td><td class="num">${fmtC(m.q2025)}</td><td class="num">${fmtC(m.s2025)}</td></tr>`).join('');
+        }
+
+        function updateComparison(){
+            const t=(D['ХПУ тури']||[]).find(r=>r&&String(r[1]).includes('Жами'));if(!t)return;
+            let r24=pN(t[6]),r25=pN(t[10]),s24=pN(t[8]),s25=pN(t[12]);
+            r24=222.9e6; // 2024 Qabul qilingan: 222.9M $
+            s24=55.3e6; // 2024 Yuborilgan: 55.3M $
+            const rCh=r24>0?((r25-r24)/r24*100):0,sCh=s24>0?((s25-s24)/s24*100):0;
+            document.getElementById('comparison').innerHTML=`
+                <div class="comp-card"><div class="comp-header"><span class="comp-title">📥 Қабул қилинган</span><span class="comp-badge">2024 в 2025</span></div><div class="comp-stats"><div class="comp-stat"><div class="comp-stat-label">2024</div><div class="comp-stat-val">${fmtC(r24)}</div></div><div class="comp-stat"><div class="comp-stat-label">2025</div><div class="comp-stat-val" style="color:${r25>r24?'var(--success)':'var(--danger)'}">${fmtC(r25)}</div></div></div><div class="comp-bar"><div class="comp-bar-fill" style="width:${Math.min(100,r24>0?(r25/r24)*100:100)}%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="comp-change" style="color:${rCh>=0?'var(--success)':'var(--danger)'}">${rCh>=0?'↑':'↓'} ${Math.abs(rCh).toFixed(1)}%</div></div>
+                <div class="comp-card"><div class="comp-header"><span class="comp-title">📤 Юборилган</span><span class="comp-badge">2024 в 2025</span></div><div class="comp-stats"><div class="comp-stat"><div class="comp-stat-label">2024</div><div class="comp-stat-val">${fmtC(s24)}</div></div><div class="comp-stat"><div class="comp-stat-label">2025</div><div class="comp-stat-val">${fmtC(s25)}</div></div></div><div class="comp-bar"><div class="comp-bar-fill" style="width:${Math.min(100,s24>0?(s25/s24)*100:100)}%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="comp-change" style="color:${sCh>=0?'var(--success)':'var(--danger)'}">${sCh>=0?'↑':'↓'} ${Math.abs(sCh).toFixed(1)}%</div></div>`;
+        }
+    </script>
+</body>
+</html>

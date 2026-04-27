@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="uz-Cyrl-UZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мурожаатлар таҳлили - Excel Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cbu-blue-900: #001a33;
+            --cbu-blue-800: #002b54;
+            --cbu-blue-700: #003366;
+            --cbu-blue-600: #004080;
+            --cbu-blue-500: #004d99;
+            --cbu-blue-400: #0066cc;
+            --cbu-blue-300: #3399ff;
+            --cbu-blue-100: #cce5ff;
+            --cbu-gold-600: #8b6914;
+            --cbu-gold-500: #c9a227;
+            --cbu-gold-400: #d4b84a;
+            --cbu-gold-100: #faf5e0;
+            --success-500: #10b981;
+            --success-100: #d1fae5;
+            --danger-500: #ef4444;
+            --danger-100: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+        }
+        .dashboard { max-width: 1800px; margin: 0 auto; padding: 1.5rem; }
+        
+        /* Upload Section */
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
+            text-align: center;
+        }
+        .upload-section.has-data { 
+            padding: 0.6rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            gap: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .upload-section h2 { font-size: 1.5rem; color: var(--cbu-blue-700); margin-bottom: 0.5rem; }
+        .upload-section.has-data h2, .upload-section.has-data > p { display: none; }
+        .upload-section > p { color: var(--gray-500); margin-bottom: 1.5rem; }
+        .upload-area {
+            border: 3px dashed var(--gray-300);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            background: var(--gray-50);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .upload-area:hover, .upload-area.dragover { border-color: var(--cbu-blue-400); background: var(--cbu-blue-100); }
+        .upload-area.has-data { 
+            padding: 0; 
+            border: none; 
+            background: transparent;
+            display: none;
+        }
+        .upload-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .upload-area.has-data .upload-icon { display: none; }
+        .upload-text { font-size: 1.1rem; color: var(--gray-700); margin-bottom: 0.5rem; }
+        .upload-hint { font-size: 0.85rem; color: var(--gray-400); }
+        .upload-area.has-data .upload-hint, .upload-area.has-data .upload-text { display: none; }
+        #fileInput { display: none; }
+        .file-info { display: none; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, var(--success-100), var(--cbu-gold-100)); border-radius: 10px; }
+        .file-info.show { display: flex; }
+        .file-info-icon { font-size: 1.4rem; }
+        .file-info-text { flex: 1; text-align: left; }
+        .file-info-name { font-weight: 600; color: var(--gray-800); font-size: 0.85rem; }
+        .file-info-details { font-size: 0.72rem; color: var(--gray-500); }
+        .btn-change { background: var(--cbu-blue-600); color: white; border: none; padding: 0.4rem 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.75rem; white-space: nowrap; }
+        .btn-change:hover { background: var(--cbu-blue-700); }
+        .loading { display: none; flex-direction: column; align-items: center; padding: 2rem; }
+        .loading.show { display: flex; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--gray-200); border-top-color: var(--cbu-blue-500); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 1rem; color: var(--gray-600); }
+        .dashboard-content { display: none; }
+        .dashboard-content.show { display: block; }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--cbu-blue-800) 0%, var(--cbu-blue-700) 40%, var(--cbu-blue-600) 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 51, 102, 0.25);
+        }
+        .header::before { content: ''; position: absolute; top: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(201, 162, 39, 0.15) 0%, transparent 70%); }
+        .header-content { display: flex; align-items: center; gap: 1.5rem; position: relative; z-index: 2; flex-wrap: wrap; }
+        .header-logo { width: 70px; height: 70px; background: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); position: relative; }
+        .header-logo::before { content: ''; position: absolute; inset: -3px; background: linear-gradient(135deg, var(--cbu-gold-500), var(--cbu-gold-400)); border-radius: 18px; z-index: -1; }
+        .header-logo span { font-size: 1.6rem; font-weight: 800; color: var(--cbu-blue-700); }
+        .header-text { flex: 1; min-width: 200px; }
+        .header-text h1 { font-size: 1.75rem; font-weight: 800; color: white; margin-bottom: 0.4rem; }
+        .header-text p { color: rgba(255, 255, 255, 0.8); font-size: 0.95rem; }
+        .header-stats { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .header-stat { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 0.75rem 1.25rem; border-radius: 12px; text-align: center; min-width: 90px; }
+        .header-stat-value { font-family: 'Space Mono', monospace; font-size: 1.3rem; font-weight: 700; color: white; }
+        .header-stat-label { font-size: 0.65rem; color: rgba(255, 255, 255, 0.7); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Filters */
+        .filters {
+            background: white;
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-200);
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 0.35rem; position: relative; }
+        .filter-group.wide { grid-column: span 2; }
+        .filter-group label {
+            font-size: 0.68rem;
+            color: var(--gray-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Multi-select dropdown */
+        .multi-select {
+            position: relative;
+        }
+        .multi-select-btn {
+            width: 100%;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            color: var(--gray-700);
+            padding: 0.55rem 0.75rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .multi-select-btn:hover { border-color: var(--cbu-blue-400); }
+        .multi-select-btn.active { border-color: var(--cbu-blue-500); box-shadow: 0 0 0 3px rgba(0, 77, 153, 0.1); }
+        .multi-select-btn .selected-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .multi-select-btn .arrow {
+            transition: transform 0.2s;
+        }
+        .multi-select-btn.active .arrow {
+            transform: rotate(180deg);
+        }
+        .selected-count {
+            background: var(--cbu-blue-600);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        .multi-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid var(--cbu-blue-400);
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+        }
+        .multi-select-dropdown.show { display: block; }
+        .multi-select-search {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: none;
+            border-bottom: 1px solid var(--gray-200);
+            font-family: inherit;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .multi-select-search::placeholder { color: var(--gray-400); }
+        .multi-select-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        .multi-select-actions button {
+            flex: 1;
+            padding: 0.4rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-select-all { background: var(--cbu-blue-100); color: var(--cbu-blue-700); }
+        .btn-select-all:hover { background: var(--cbu-blue-200); }
+        .btn-clear-all { background: var(--gray-100); color: var(--gray-600); }
+        .btn-clear-all:hover { background: var(--gray-200); }
+        .multi-select-options { max-height: 200px; overflow-y: auto; }
+        .multi-select-option {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 0.8rem;
+        }
+        .multi-select-option:hover { background: var(--gray-50); }
+        .multi-select-option.selected { background: var(--cbu-blue-100); }
+        .multi-select-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--cbu-blue-600);
+            cursor: pointer;
+        }
+        .multi-select-option .option-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .multi-select-option .option-count {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .btn {
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cbu-blue-600), var(--cbu-blue-700));
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 51, 102, 0.25);
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
+        .btn-secondary:hover { background: var(--gray-200); }
+        .active-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+        .active-filters:empty { display: none; }
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--cbu-blue-100), var(--cbu-gold-100));
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--cbu-blue-700);
+        }
+        .filter-tag button {
+            background: none;
+            border: none;
+            color: var(--cbu-blue-600);
+            cursor: pointer;
+            font-size: 0.9rem;
+            line-height: 1;
+            padding: 0;
+        }
+
+        /* Summary Cards */
+        .summary-cards { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        @media (max-width: 1600px) { .summary-cards { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 1200px) { .summary-cards { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 800px) { .summary-cards { grid-template-columns: repeat(2, 1fr); } }
+        .summary-card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1); }
+        .summary-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .summary-card.blue::before { background: linear-gradient(90deg, var(--cbu-blue-700), var(--cbu-blue-500)); }
+        .summary-card.gold::before { background: linear-gradient(90deg, var(--cbu-gold-600), var(--cbu-gold-400)); }
+        .summary-card.green::before { background: linear-gradient(90deg, #059669, var(--success-500)); }
+        .summary-card.cyan::before { background: linear-gradient(90deg, var(--cbu-blue-400), var(--cbu-blue-300)); }
+        .summary-card.purple::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+        .summary-card.orange::before { background: linear-gradient(90deg, #ea580c, #f97316); }
+        .summary-card.red::before { background: linear-gradient(90deg, #dc2626, #ef4444); }
+        .summary-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .summary-label { font-size: 0.75rem; color: var(--gray-500); font-weight: 500; margin-bottom: 0.25rem; }
+        .summary-value { font-size: 1.6rem; font-weight: 800; font-family: 'Space Mono', monospace; line-height: 1; }
+        .summary-card.blue .summary-value { color: var(--cbu-blue-700); }
+        .summary-card.gold .summary-value { color: var(--cbu-gold-600); }
+        .summary-card.green .summary-value { color: #059669; }
+        .summary-card.cyan .summary-value { color: var(--cbu-blue-500); }
+        .summary-card.purple .summary-value { color: #7c3aed; }
+        .summary-card.orange .summary-value { color: #ea580c; }
+        .summary-card.red .summary-value { color: #dc2626; }
+        .summary-sub { font-size: 0.7rem; color: var(--gray-400); margin-top: 0.25rem; }
+        .summary-change { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.25rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            margin-top: 0.35rem; 
+            padding: 0.2rem 0.5rem; 
+            border-radius: 12px; 
+        }
+        .summary-change.up { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669; }
+        .summary-change.down { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
+        .summary-change.neutral { background: var(--gray-100); color: var(--gray-600); }
+
+        /* Charts */
+        .charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
+        @media (max-width: 1400px) { .charts-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        .chart-card { background: white; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--gray-200); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); }
+        .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .chart-title { display: flex; align-items: center; gap: 0.5rem; }
+        .chart-title-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: linear-gradient(135deg, var(--cbu-blue-100), var(--cbu-gold-100)); }
+        .chart-title h3 { font-size: 0.9rem; font-weight: 700; color: var(--gray-800); }
+        .chart-container { position: relative; height: 260px; }
+
+        /* Tabs */
+        .tabs-wrapper { background: white; border-radius: 14px; padding: 0.35rem; margin-bottom: 1.25rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); border: 1px solid var(--gray-200); display: flex; gap: 0.2rem; flex-wrap: wrap; overflow-x: auto; }
+        .tab-btn { background: transparent; border: none; color: var(--gray-500); padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.8rem; transition: all 0.2s; display: flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+        .tab-btn:hover { color: var(--cbu-blue-600); background: var(--gray-50); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--cbu-blue-600), var(--cbu-blue-700)); color: white; box-shadow: 0 3px 10px rgba(0, 51, 102, 0.25); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Tables */
+        .table-card { background: white; border-radius: 16px; border: 1px solid var(--gray-200); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); overflow: hidden; }
+        .table-header { padding: 1rem 1.25rem; background: linear-gradient(135deg, var(--gray-50), white); border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
+        .table-header h3 { font-size: 1rem; font-weight: 700; color: var(--gray-800); display: flex; align-items: center; gap: 0.5rem; }
+        .table-header h3::before { content: ''; width: 3px; height: 18px; background: linear-gradient(180deg, var(--cbu-blue-500), var(--cbu-gold-500)); border-radius: 2px; }
+        .table-search { background: white; border: 2px solid var(--gray-200); color: var(--gray-700); padding: 0.5rem 0.75rem 0.5rem 2rem; border-radius: 8px; font-family: inherit; width: 220px; font-size: 0.8rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 8px center; }
+        .table-search:focus { outline: none; border-color: var(--cbu-blue-500); }
+        .table-info { font-size: 0.75rem; color: var(--gray-500); padding: 0.5rem 1.25rem; background: var(--gray-50); border-bottom: 1px solid var(--gray-100); }
+        .table-wrapper { max-height: 450px; overflow-y: auto; }
+        .table-wrapper::-webkit-scrollbar { width: 6px; }
+        .table-wrapper::-webkit-scrollbar-track { background: var(--gray-100); }
+        .table-wrapper::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: linear-gradient(135deg, var(--cbu-blue-700), var(--cbu-blue-800)); color: white; padding: 0.8rem 0.9rem; text-align: left; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 10; }
+        .data-table td { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--gray-100); font-size: 0.8rem; }
+        .data-table tbody tr { transition: all 0.15s; }
+        .data-table tbody tr:hover { background: linear-gradient(90deg, var(--cbu-blue-100), var(--cbu-gold-100)); }
+        .data-table tbody tr:nth-child(even) { background: var(--gray-50); }
+        .data-table tbody tr:nth-child(even):hover { background: linear-gradient(90deg, var(--cbu-blue-100), var(--cbu-gold-100)); }
+        .badge { display: inline-flex; align-items: center; gap: 0.2rem; padding: 0.25rem 0.6rem; border-radius: 15px; font-size: 0.68rem; font-weight: 600; }
+        .badge.up { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669; }
+        .badge.down { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
+        .badge.neutral { background: var(--gray-100); color: var(--gray-600); }
+        .rank { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; background: var(--gray-100); color: var(--gray-600); }
+        .rank.top-3 { background: linear-gradient(135deg, var(--cbu-gold-500), var(--cbu-gold-400)); color: white; }
+        .rank.top-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; transform: scale(1.1); }
+        .progress-bar { height: 5px; background: var(--gray-100); border-radius: 3px; overflow: hidden; margin-top: 0.35rem; }
+        .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--cbu-blue-600), var(--cbu-blue-400)); }
+        .two-columns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+        @media (max-width: 1000px) { .two-columns { grid-template-columns: 1fr; } }
+        .footer { text-align: center; padding: 1.5rem; color: var(--gray-500); font-size: 0.8rem; margin-top: 1.5rem; }
+        .footer-brand { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+        .footer-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--cbu-blue-600), var(--cbu-blue-700)); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <h2>📊 Мурожаатлар таҳлили Dashboard</h2>
+            <p>Excel файлни юкланг ва маълумотлар автоматик тарзда кўринади</p>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Excel файлни танланг ёки шу ерга ташланг</div>
+                <div class="upload-hint">.xlsx ёки .xls форматдаги файллар қўллаб-қувватланади</div>
+            </div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFile(this.files[0])">
+            <div class="file-info" id="fileInfo">
+                <div class="file-info-icon">✅</div>
+                <div class="file-info-text">
+                    <div class="file-info-name" id="fileName"></div>
+                    <div class="file-info-details" id="fileDetails"></div>
+                </div>
+                <button class="btn-change" onclick="document.getElementById('fileInput').click()">🔄 Алмаштириш</button>
+            </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Маълумотлар қайта ишланмоқда...</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content" id="dashboardContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-logo"><span>МБ</span></div>
+                    <div class="header-text">
+                        <h1>📊 Мурожаатлар таҳлили</h1>
+                        <p>Тошкент вилояти банкларига тушган мурожаатлар статистикаси</p>
+                    </div>
+                    <div class="header-stats">
+                        <div class="header-stat">
+                            <div class="header-stat-value" id="headerTotal">0</div>
+                            <div class="header-stat-label">Жами</div>
+                        </div>
+                        <div class="header-stat">
+                            <div class="header-stat-value" id="headerViloyat">0</div>
+                            <div class="header-stat-label">Вилоят банклари</div>
+                        </div>
+                        <div class="header-stat">
+                            <div class="header-stat-value" id="headerBoshqaruv">0</div>
+                            <div class="header-stat-label">Банк бошқарувлари</div>
+                        </div>
+                        <div class="header-stat">
+                            <div class="header-stat-value" id="headerBranches">0</div>
+                            <div class="header-stat-label">Филиаллар</div>
+                        </div>
+                        <div class="header-stat" style="background: rgba(220, 38, 38, 0.2); border-color: rgba(220, 38, 38, 0.3);">
+                            <div class="header-stat-value" id="headerDeadline">0</div>
+                            <div class="header-stat-label">Муддати бузилган</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Йил</label>
+                        <div class="multi-select" id="filterYear" data-key="year"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Квартал</label>
+                        <div class="multi-select" id="filterQuarter" data-key="quarter"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Ой</label>
+                        <div class="multi-select" id="filterMonth" data-key="month"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Бош банк</label>
+                        <div class="multi-select" id="filterBank" data-key="bank"></div>
+                    </div>
+                    <div class="filter-group wide">
+                        <label>Мурожаатни ўрганган банк филиали</label>
+                        <div class="multi-select" id="filterBranch" data-key="branch"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Туман/Шаҳар</label>
+                        <div class="multi-select" id="filterDistrict" data-key="district"></div>
+                    </div>
+                    <div class="filter-group wide">
+                        <label>Маҳалла</label>
+                        <div class="multi-select" id="filterMahalla" data-key="mahalla"></div>
+                    </div>
+                    <div class="filter-group wide">
+                        <label>Мурожаат тури</label>
+                        <div class="multi-select" id="filterType" data-key="type"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Ижро натижаси</label>
+                        <div class="multi-select" id="filterResult" data-key="result"></div>
+                    </div>
+                    <div class="filter-group wide">
+                        <label>Вилоят/Бошқарув томонидан ўрганилган</label>
+                        <div class="multi-select" id="filterExaminer" data-key="examiner"></div>
+                    </div>
+                    <div class="filter-group wide">
+                        <label>Тошкент вилоятига тегишлилиги</label>
+                        <div class="multi-select" id="filterRelated" data-key="related"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Муддати бузилган</label>
+                        <div class="multi-select" id="filterDeadline" data-key="deadline"></div>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" onclick="applyFilters()">🔍 Қидириш</button>
+                    <button class="btn btn-secondary" onclick="resetFilters()">🔄 Тозалаш</button>
+                </div>
+                <div class="active-filters" id="activeFilters"></div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card blue">
+                    <div class="summary-icon">📋</div>
+                    <div class="summary-label">Жами мурожаатлар</div>
+                    <div class="summary-value" id="kpiTotal">0</div>
+                    <div class="summary-sub" id="kpiTotalSub"></div>
+                </div>
+                <div class="summary-card gold">
+                    <div class="summary-icon">📅</div>
+                    <div class="summary-label" id="kpiYear1Label">2025 йил</div>
+                    <div class="summary-value" id="kpiYear1">0</div>
+                    <div class="summary-sub" id="kpiYear1Sub">Базавий йил</div>
+                </div>
+                <div class="summary-card cyan">
+                    <div class="summary-icon">📆</div>
+                    <div class="summary-label" id="kpiYear2Label">2026 йил</div>
+                    <div class="summary-value" id="kpiYear2">0</div>
+                    <div class="summary-change" id="kpiYear2Change"></div>
+                </div>
+                <div class="summary-card green">
+                    <div class="summary-icon">🏢</div>
+                    <div class="summary-label">Вилоят банклари томонидан ўрганилган</div>
+                    <div class="summary-value" id="kpiViloyat">0</div>
+                    <div class="summary-change" id="kpiViloyatChange"></div>
+                </div>
+                <div class="summary-card purple">
+                    <div class="summary-icon">🏛️</div>
+                    <div class="summary-label">Банк бошқарувлари томонидан ўрганилган</div>
+                    <div class="summary-value" id="kpiBoshqaruv">0</div>
+                    <div class="summary-change" id="kpiBoshqaruvChange"></div>
+                </div>
+                <div class="summary-card orange">
+                    <div class="summary-icon">📍</div>
+                    <div class="summary-label">Тошкент вилоятига тегишли эмас</div>
+                    <div class="summary-value" id="kpiNotRelated">0</div>
+                    <div class="summary-change" id="kpiNotRelatedChange"></div>
+                </div>
+                <div class="summary-card red">
+                    <div class="summary-icon">⏰</div>
+                    <div class="summary-label">Муддати бузиб ўтилган мурожаатлар</div>
+                    <div class="summary-value" id="kpiDeadlineViolated">0</div>
+                    <div class="summary-change" id="kpiDeadlineViolatedChange"></div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon">📊</div>
+                            <h3>Йиллик динамика</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="yearlyChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon">📈</div>
+                            <h3>Ойлик динамика</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon">🏦</div>
+                            <h3>Вилоят/Бошқарув томонидан ўрганилган</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="examinerChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon">🏛️</div>
+                            <h3>Топ 10 банклар</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="bankChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon">📋</div>
+                            <h3>Мурожаат турлари</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="typesChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon">👥</div>
+                            <h3>Топ 10 мурожаатчилар</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="topChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon">⏰</div>
+                            <h3>Муддати бузилган мурожаатлар</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="deadlineChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-wrapper">
+                <button class="tab-btn active" onclick="showTab('comparison', this)">📊 Таққослаш</button>
+                <button class="tab-btn" onclick="showTab('banks', this)">🏦 Банклар</button>
+                <button class="tab-btn" onclick="showTab('branches', this)">🏢 Филиаллар</button>
+                <button class="tab-btn" onclick="showTab('districts', this)">🗺️ Туманлар</button>
+                <button class="tab-btn" onclick="showTab('mahallas', this)">🏘️ Маҳаллалар</button>
+                <button class="tab-btn" onclick="showTab('types', this)">📋 Мурожаат турлари</button>
+                <button class="tab-btn" onclick="showTab('results', this)">✅ Ижро натижаси</button>
+                <button class="tab-btn" onclick="showTab('top', this)">👥 Топ мурожаатчилар</button>
+                <button class="tab-btn" onclick="showTab('monthly', this)">📅 Ойлик</button>
+                <button class="tab-btn" onclick="showTab('deadline', this)">⏰ Муддати бузилган</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div id="comparison" class="tab-content active">
+                <div class="two-columns">
+                    <div class="table-card">
+                        <div class="table-header"><h3>📅 Йиллик таққослаш</h3></div>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="yearlyCompareTable">
+                                <thead><tr><th>Йил</th><th>Жами</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-header"><h3>📊 Кварталлик таққослаш</h3></div>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="quarterlyCompareTable">
+                                <thead><tr><th>Квартал</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-card" style="margin-top: 1.25rem;">
+                    <div class="table-header"><h3>📈 Ойлик таққослаш (2025 vs 2026)</h3></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="monthlyCompareTable">
+                            <thead><tr><th>Ой</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="banks" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Бош банклар бўйича</h3>
+                        <input type="text" class="table-search" placeholder="Қидириш..." id="bankSearch" oninput="searchTable('banksTable', 1)">
+                    </div>
+                    <div class="table-info" id="banksInfo"></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="banksTable">
+                            <thead><tr><th>#</th><th>Банк</th><th>Жами</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="branches" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Филиаллар бўйича</h3>
+                        <input type="text" class="table-search" placeholder="Қидириш..." id="branchSearch" oninput="searchTable('branchesTable', 1)">
+                    </div>
+                    <div class="table-info" id="branchesInfo"></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="branchesTable">
+                            <thead><tr><th>#</th><th>Филиал</th><th>Жами</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="districts" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Туманлар бўйича</h3>
+                        <input type="text" class="table-search" placeholder="Қидириш..." id="districtSearch" oninput="searchTable('districtsTable', 1)">
+                    </div>
+                    <div class="table-info" id="districtsInfo"></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="districtsTable">
+                            <thead><tr><th>#</th><th>Туман/Шаҳар</th><th>Жами</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mahallas" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Маҳаллалар бўйича</h3>
+                        <input type="text" class="table-search" placeholder="Қидириш..." id="mahallaSearch" oninput="searchTable('mahallasTable', 1)">
+                    </div>
+                    <div class="table-info" id="mahallasInfo"></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="mahallasTable">
+                            <thead><tr><th>#</th><th>Маҳалла</th><th>Жами</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="types" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header"><h3>Мурожаат турлари бўйича</h3></div>
+                    <div class="table-info" id="typesInfo"></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="typesTable">
+                            <thead><tr><th>#</th><th>Мурожаат тури</th><th>Жами</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header"><h3>Ижро натижаси бўйича</h3></div>
+                    <div class="table-info" id="resultsInfo"></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="resultsTable">
+                            <thead><tr><th>#</th><th>Ижро натижаси</th><th>Жами</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Фоиз</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="top" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Топ мурожаатчилар</h3>
+                        <input type="text" class="table-search" placeholder="Қидириш..." id="topSearch" oninput="searchTable('topTable', 1)">
+                    </div>
+                    <div class="table-info" id="topInfo"></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="topTable">
+                            <thead><tr><th>#</th><th>Ф.И.О</th><th>Жами</th><th>2025</th><th>2026</th><th>Улуши</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="monthly" class="tab-content">
+                <div class="table-card">
+                    <div class="table-header"><h3>Ойлик статистика</h3></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="monthlyTable">
+                            <thead><tr><th>Ой</th><th>Жами</th><th>2025</th><th>2026</th><th>Ўзгариш</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="deadline" class="tab-content">
+                <div class="two-columns">
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3>⏰ Банклар бўйича муддати бузилган мурожаатлар</h3>
+                            <input type="text" class="table-search" placeholder="Қидириш..." id="deadlineBankSearch" oninput="searchTable('deadlineBanksTable', 1)">
+                        </div>
+                        <div class="table-info" id="deadlineBanksInfo"></div>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="deadlineBanksTable">
+                                <thead><tr><th>#</th><th>Банк</th><th>Жами</th><th>Муддати бузилган</th><th>Фоизи</th><th>2025</th><th>2026</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3>⏰ Филиаллар бўйича муддати бузилган мурожаатлар</h3>
+                            <input type="text" class="table-search" placeholder="Қидириш..." id="deadlineBranchSearch" oninput="searchTable('deadlineBranchesTable', 1)">
+                        </div>
+                        <div class="table-info" id="deadlineBranchesInfo"></div>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="deadlineBranchesTable">
+                                <thead><tr><th>#</th><th>Филиал</th><th>Жами</th><th>Муддати бузилган</th><th>Фоизи</th><th>2025</th><th>2026</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-card" style="margin-top: 1.25rem;">
+                    <div class="table-header"><h3>📅 Ойлар бўйича муддати бузилган мурожаатлар</h3></div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="deadlineMonthlyTable">
+                            <thead><tr><th>Ой</th><th>Жами мурожаатлар</th><th>Муддати бузилган</th><th>Фоизи</th><th>2025</th><th>2026</th><th>Ҳолат</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="footer-brand">
+                    <div class="footer-logo">МБ</div>
+                    <span style="font-weight: 600; color: var(--gray-700);">Марказий банк</span>
+                </div>
+                <p>Мурожаатлар таҳлили Dashboard</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let rawData = [];
+        let filteredData = [];
+        let charts = {};
+        let multiSelects = {};
+        const colors = { blue: '#003366', gold: '#c9a227', blue400: '#0066cc', gold400: '#d4b84a' };
+        
+        const COL = { BANK: 1, BRANCH: 2, DISTRICT: 3, MAHALLA: 4, YEAR: 5, MONTH: 6, FIO: 7, TYPE: 8, EXAMINER: 9, NOT_RELATED: 10, RESULT: 11, DEADLINE_VIOLATED: 12 };
+
+        const monthToQuarter = m => {
+            const ml = m.toLowerCase();
+            if (['январь', 'февраль', 'март'].some(x => ml.includes(x))) return 1;
+            if (['апрель', 'апрел', 'май', 'июнь'].some(x => ml.includes(x))) return 2;
+            if (['июль', 'август', 'сентябрь', 'сентябр'].some(x => ml.includes(x))) return 3;
+            if (['октябрь', 'ноябрь', 'декабрь'].some(x => ml.includes(x))) return 4;
+            return 0;
+        };
+
+        // MultiSelect Class
+        class MultiSelect {
+            constructor(container, options = []) {
+                this.container = container;
+                this.options = options;
+                this.selected = new Set();
+                this.key = container.dataset.key;
+                this.render();
+            }
+
+            render() {
+                this.container.innerHTML = `
+                    <button class="multi-select-btn" type="button">
+                        <span class="selected-text">Барчаси</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="multi-select-dropdown">
+                        <input type="text" class="multi-select-search" placeholder="🔍 Қидириш...">
+                        <div class="multi-select-actions">
+                            <button type="button" class="btn-select-all">✓ Барчасини танлаш</button>
+                            <button type="button" class="btn-clear-all">✕ Тозалаш</button>
+                        </div>
+                        <div class="multi-select-options"></div>
+                    </div>
+                `;
+
+                this.btn = this.container.querySelector('.multi-select-btn');
+                this.dropdown = this.container.querySelector('.multi-select-dropdown');
+                this.searchInput = this.container.querySelector('.multi-select-search');
+                this.optionsContainer = this.container.querySelector('.multi-select-options');
+
+                this.btn.addEventListener('click', () => this.toggle());
+                this.searchInput.addEventListener('input', () => this.filterOptions());
+                this.container.querySelector('.btn-select-all').addEventListener('click', () => this.selectAll());
+                this.container.querySelector('.btn-clear-all').addEventListener('click', () => this.clearAll());
+
+                document.addEventListener('click', (e) => {
+                    if (!this.container.contains(e.target)) this.close();
+                });
+
+                this.renderOptions();
+            }
+
+            setOptions(options) {
+                this.options = options;
+                this.selected.clear();
+                this.renderOptions();
+                this.updateButton();
+            }
+
+            renderOptions() {
+                this.optionsContainer.innerHTML = '';
+                
+                this.options.forEach((opt, index) => {
+                    const label = document.createElement('label');
+                    label.className = `multi-select-option ${this.selected.has(opt.value) ? 'selected' : ''}`;
+                    label.dataset.index = index;
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = this.selected.has(opt.value);
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'option-text';
+                    textSpan.textContent = opt.label;
+                    
+                    label.appendChild(checkbox);
+                    label.appendChild(textSpan);
+                    
+                    if (opt.count !== undefined) {
+                        const countSpan = document.createElement('span');
+                        countSpan.className = 'option-count';
+                        countSpan.textContent = opt.count.toLocaleString();
+                        label.appendChild(countSpan);
+                    }
+                    
+                    label.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.toggleOption(index);
+                    });
+                    
+                    this.optionsContainer.appendChild(label);
+                });
+            }
+
+            toggle() {
+                this.dropdown.classList.toggle('show');
+                this.btn.classList.toggle('active');
+                if (this.dropdown.classList.contains('show')) {
+                    this.searchInput.focus();
+                }
+            }
+
+            close() {
+                this.dropdown.classList.remove('show');
+                this.btn.classList.remove('active');
+            }
+
+            toggleOption(index) {
+                const value = this.options[index].value;
+                if (this.selected.has(value)) {
+                    this.selected.delete(value);
+                } else {
+                    this.selected.add(value);
+                }
+                this.renderOptions();
+                this.updateButton();
+                applyFilters();
+            }
+
+            selectAll() {
+                const visibleOptions = this.optionsContainer.querySelectorAll('.multi-select-option:not([style*="display: none"])');
+                visibleOptions.forEach(opt => {
+                    const index = parseInt(opt.dataset.index);
+                    this.selected.add(this.options[index].value);
+                });
+                this.renderOptions();
+                this.updateButton();
+                applyFilters();
+            }
+
+            clearAll() {
+                this.selected.clear();
+                this.renderOptions();
+                this.updateButton();
+                applyFilters();
+            }
+
+            filterOptions() {
+                const search = this.searchInput.value.toLowerCase();
+                this.optionsContainer.querySelectorAll('.multi-select-option').forEach(opt => {
+                    const text = opt.querySelector('.option-text').textContent.toLowerCase();
+                    opt.style.display = text.includes(search) ? '' : 'none';
+                });
+            }
+
+            updateButton() {
+                const count = this.selected.size;
+                const textEl = this.btn.querySelector('.selected-text');
+                
+                if (count === 0) {
+                    textEl.textContent = 'Барчаси';
+                    const countBadge = this.btn.querySelector('.selected-count');
+                    if (countBadge) countBadge.remove();
+                } else {
+                    const selectedLabels = this.options.filter(o => this.selected.has(o.value)).map(o => o.label);
+                    textEl.textContent = selectedLabels.slice(0, 2).join(', ') + (count > 2 ? '...' : '');
+                    
+                    let countBadge = this.btn.querySelector('.selected-count');
+                    if (!countBadge) {
+                        countBadge = document.createElement('span');
+                        countBadge.className = 'selected-count';
+                        this.btn.insertBefore(countBadge, this.btn.querySelector('.arrow'));
+                    }
+                    countBadge.textContent = count;
+                }
+            }
+
+            getSelected() {
+                return Array.from(this.selected);
+            }
+
+            reset() {
+                this.selected.clear();
+                this.renderOptions();
+                this.updateButton();
+            }
+        }
+
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+            
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('uploadArea').style.opacity = '0.3';
+            document.getElementById('uploadArea').style.pointerEvents = 'none';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    
+                    processData(jsonData);
+                    
+                    document.getElementById('fileName').textContent = file.name;
+                    document.getElementById('fileDetails').textContent = `${rawData.length.toLocaleString()} та ёзув топилди`;
+                    document.getElementById('fileInfo').classList.add('show');
+                    document.getElementById('uploadSection').classList.add('has-data');
+                    document.getElementById('uploadArea').classList.add('has-data');
+                    
+                } catch (err) {
+                    alert('Файлни ўқишда хатолик: ' + err.message);
+                    document.getElementById('uploadArea').style.opacity = '1';
+                    document.getElementById('uploadArea').style.pointerEvents = 'auto';
+                }
+                document.getElementById('loading').classList.remove('show');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processData(jsonData) {
+            let headerRow = 3;
+            for (let i = 0; i < Math.min(10, jsonData.length); i++) {
+                if (jsonData[i] && jsonData[i][0] === '№') { headerRow = i; break; }
+            }
+            
+            rawData = [];
+            for (let i = headerRow + 1; i < jsonData.length; i++) {
+                const row = jsonData[i];
+                if (!row || !row[0] || row[0] === '№') continue;
+                
+                const year = parseInt(row[COL.YEAR]);
+                if (isNaN(year) || year < 2000 || year > 2100) continue;
+                
+                // Check if deadline violated - can be number 1 or any non-empty text
+                const deadlineVal = row[COL.DEADLINE_VIOLATED];
+                const isDeadlineViolated = deadlineVal === 1 || (typeof deadlineVal === 'string' && deadlineVal.trim() !== '');
+                
+                rawData.push({
+                    bank: String(row[COL.BANK] || '').trim(),
+                    branch: String(row[COL.BRANCH] || '').trim(),
+                    district: String(row[COL.DISTRICT] || '').trim(),
+                    mahalla: String(row[COL.MAHALLA] || '').trim(),
+                    year: year,
+                    month: String(row[COL.MONTH] || '').trim(),
+                    fio: String(row[COL.FIO] || '').trim(),
+                    type: String(row[COL.TYPE] || '').trim(),
+                    examiner: parseInt(row[COL.EXAMINER]) || 0,
+                    notRelated: parseInt(row[COL.NOT_RELATED]) || 0,
+                    result: String(row[COL.RESULT] || '').trim(),
+                    deadlineViolated: isDeadlineViolated ? 1 : 0
+                });
+            }
+            
+            filteredData = [...rawData];
+            
+            initMultiSelects();
+            initCharts();
+            updateDashboard();
+            
+            document.getElementById('dashboardContent').classList.add('show');
+        }
+
+        function countBy(arr, key) {
+            return arr.reduce((acc, item) => { acc[item[key]] = (acc[item[key]] || 0) + 1; return acc; }, {});
+        }
+
+        function initMultiSelects() {
+            // Years
+            const years = [...new Set(rawData.map(r => r.year))].sort();
+            multiSelects.year = new MultiSelect(document.getElementById('filterYear'), 
+                years.map(y => ({ value: String(y), label: String(y), count: rawData.filter(r => r.year === y).length })));
+
+            // Quarters
+            multiSelects.quarter = new MultiSelect(document.getElementById('filterQuarter'), [
+                { value: '1', label: 'Q1 (Янв-Март)', count: rawData.filter(r => monthToQuarter(r.month) === 1).length },
+                { value: '2', label: 'Q2 (Апр-Июнь)', count: rawData.filter(r => monthToQuarter(r.month) === 2).length },
+                { value: '3', label: 'Q3 (Июль-Сент)', count: rawData.filter(r => monthToQuarter(r.month) === 3).length },
+                { value: '4', label: 'Q4 (Окт-Дек)', count: rawData.filter(r => monthToQuarter(r.month) === 4).length }
+            ]);
+
+            // Months
+            const months = countBy(rawData, 'month');
+            multiSelects.month = new MultiSelect(document.getElementById('filterMonth'),
+                Object.entries(months).filter(([m]) => m).sort((a, b) => b[1] - a[1]).map(([m, c]) => ({ value: m, label: m, count: c })));
+
+            // Banks
+            const banks = countBy(rawData, 'bank');
+            multiSelects.bank = new MultiSelect(document.getElementById('filterBank'),
+                Object.entries(banks).filter(([b]) => b).sort((a, b) => b[1] - a[1]).map(([b, c]) => ({ value: b, label: b, count: c })));
+
+            // Branches
+            const branches = countBy(rawData, 'branch');
+            multiSelects.branch = new MultiSelect(document.getElementById('filterBranch'),
+                Object.entries(branches).filter(([b]) => b).sort((a, b) => b[1] - a[1]).map(([b, c]) => ({ value: b, label: b.length > 50 ? b.substring(0, 50) + '...' : b, count: c })));
+
+            // Districts
+            const districts = countBy(rawData, 'district');
+            multiSelects.district = new MultiSelect(document.getElementById('filterDistrict'),
+                Object.entries(districts).filter(([d]) => d).sort((a, b) => b[1] - a[1]).map(([d, c]) => ({ value: d, label: d, count: c })));
+
+            // Mahallas
+            const mahallas = countBy(rawData, 'mahalla');
+            multiSelects.mahalla = new MultiSelect(document.getElementById('filterMahalla'),
+                Object.entries(mahallas).filter(([m]) => m).sort((a, b) => b[1] - a[1]).map(([m, c]) => ({ value: m, label: m.length > 50 ? m.substring(0, 50) + '...' : m, count: c })));
+
+            // Types
+            const types = countBy(rawData, 'type');
+            multiSelects.type = new MultiSelect(document.getElementById('filterType'),
+                Object.entries(types).filter(([t]) => t).sort((a, b) => b[1] - a[1]).map(([t, c]) => ({ value: t, label: t.length > 60 ? t.substring(0, 60) + '...' : t, count: c })));
+
+            // Results
+            const results = countBy(rawData, 'result');
+            multiSelects.result = new MultiSelect(document.getElementById('filterResult'),
+                Object.entries(results).filter(([r]) => r).sort((a, b) => b[1] - a[1]).map(([r, c]) => ({ value: r, label: r, count: c })));
+
+            // Examiner
+            const viloyatCount = rawData.filter(r => r.examiner === 1).length;
+            const boshqaruvCount = rawData.filter(r => r.examiner === 2).length;
+            multiSelects.examiner = new MultiSelect(document.getElementById('filterExaminer'), [
+                { value: '1', label: 'Вилоят банклари томонидан ўрганилган мурожаатлар', count: viloyatCount },
+                { value: '2', label: 'Банк бошқарувлари томонидан ўрганилган мурожаатлар', count: boshqaruvCount }
+            ]);
+
+            // Related
+            const relatedCount = rawData.filter(r => r.notRelated !== 1).length;
+            const notRelatedCount = rawData.filter(r => r.notRelated === 1).length;
+            multiSelects.related = new MultiSelect(document.getElementById('filterRelated'), [
+                { value: 'yes', label: 'Тошкент вилоятига тегишли бўлган мурожаатлар', count: relatedCount },
+                { value: 'no', label: 'Тошкент вилоятига тегишли бўлмаган мурожаатлар', count: notRelatedCount }
+            ]);
+
+            // Deadline violated
+            const deadlineOkCount = rawData.filter(r => r.deadlineViolated !== 1).length;
+            const deadlineViolatedCount = rawData.filter(r => r.deadlineViolated === 1).length;
+            multiSelects.deadline = new MultiSelect(document.getElementById('filterDeadline'), [
+                { value: 'no', label: 'Муддатида бажарилган', count: deadlineOkCount },
+                { value: 'yes', label: 'Муддати бузиб ўтилган', count: deadlineViolatedCount }
+            ]);
+        }
+
+        function applyFilters() {
+            const selectedYears = multiSelects.year.getSelected().map(Number);
+            const selectedQuarters = multiSelects.quarter.getSelected().map(Number);
+            const selectedMonths = multiSelects.month.getSelected();
+            const selectedBanks = multiSelects.bank.getSelected();
+            const selectedBranches = multiSelects.branch.getSelected();
+            const selectedDistricts = multiSelects.district.getSelected();
+            const selectedMahallas = multiSelects.mahalla.getSelected();
+            const selectedTypes = multiSelects.type.getSelected();
+            const selectedResults = multiSelects.result.getSelected();
+            const selectedExaminers = multiSelects.examiner.getSelected().map(Number);
+            const selectedRelated = multiSelects.related.getSelected();
+            const selectedDeadline = multiSelects.deadline.getSelected();
+
+            filteredData = rawData.filter(row => {
+                if (selectedYears.length && !selectedYears.includes(row.year)) return false;
+                if (selectedQuarters.length && !selectedQuarters.includes(monthToQuarter(row.month))) return false;
+                if (selectedMonths.length && !selectedMonths.includes(row.month)) return false;
+                if (selectedBanks.length && !selectedBanks.includes(row.bank)) return false;
+                if (selectedBranches.length && !selectedBranches.includes(row.branch)) return false;
+                if (selectedDistricts.length && !selectedDistricts.includes(row.district)) return false;
+                if (selectedMahallas.length && !selectedMahallas.includes(row.mahalla)) return false;
+                if (selectedTypes.length && !selectedTypes.includes(row.type)) return false;
+                if (selectedResults.length && !selectedResults.includes(row.result)) return false;
+                if (selectedExaminers.length && !selectedExaminers.includes(row.examiner)) return false;
+                if (selectedRelated.length) {
+                    const isRelated = row.notRelated !== 1;
+                    if (selectedRelated.includes('yes') && !selectedRelated.includes('no') && !isRelated) return false;
+                    if (selectedRelated.includes('no') && !selectedRelated.includes('yes') && isRelated) return false;
+                }
+                if (selectedDeadline.length) {
+                    const isViolated = row.deadlineViolated === 1;
+                    if (selectedDeadline.includes('yes') && !selectedDeadline.includes('no') && !isViolated) return false;
+                    if (selectedDeadline.includes('no') && !selectedDeadline.includes('yes') && isViolated) return false;
+                }
+                return true;
+            });
+
+            updateActiveFilterTags();
+            updateDashboard();
+        }
+
+        function updateActiveFilterTags() {
+            const container = document.getElementById('activeFilters');
+            container.innerHTML = '';
+            
+            const filterConfigs = [
+                { key: 'year', label: 'Йил', ms: multiSelects.year },
+                { key: 'quarter', label: 'Квартал', ms: multiSelects.quarter },
+                { key: 'month', label: 'Ой', ms: multiSelects.month },
+                { key: 'bank', label: 'Банк', ms: multiSelects.bank },
+                { key: 'branch', label: 'Филиал', ms: multiSelects.branch },
+                { key: 'district', label: 'Туман', ms: multiSelects.district },
+                { key: 'mahalla', label: 'Маҳалла', ms: multiSelects.mahalla },
+                { key: 'type', label: 'Тури', ms: multiSelects.type },
+                { key: 'result', label: 'Натижа', ms: multiSelects.result },
+                { key: 'examiner', label: 'Ўрганувчи', ms: multiSelects.examiner },
+                { key: 'related', label: 'Тегишлилик', ms: multiSelects.related },
+                { key: 'deadline', label: 'Муддат', ms: multiSelects.deadline }
+            ];
+
+            filterConfigs.forEach(({ key, label, ms }) => {
+                const selected = ms.getSelected();
+                if (selected.length > 0) {
+                    const tag = document.createElement('span');
+                    tag.className = 'filter-tag';
+                    const display = selected.length === 1 
+                        ? (selected[0].length > 20 ? selected[0].substring(0, 20) + '...' : selected[0])
+                        : `${selected.length} та танланган`;
+                    tag.innerHTML = `${label}: <strong>${display}</strong> <button onclick="clearMultiFilter('${key}')">&times;</button>`;
+                    container.appendChild(tag);
+                }
+            });
+        }
+
+        function clearMultiFilter(key) {
+            multiSelects[key].reset();
+            applyFilters();
+        }
+
+        function resetFilters() {
+            Object.values(multiSelects).forEach(ms => ms.reset());
+            applyFilters();
+        }
+
+        function updateDashboard() {
+            const total = filteredData.length;
+            const years = [...new Set(rawData.map(r => r.year))].sort();
+            const year1 = years[0] || 2025;
+            const year2 = years[1] || 2026;
+            
+            const countYear1 = filteredData.filter(r => r.year === year1).length;
+            const countYear2 = filteredData.filter(r => r.year === year2).length;
+            const countViloyat = filteredData.filter(r => r.examiner === 1).length;
+            const countBoshqaruv = filteredData.filter(r => r.examiner === 2).length;
+            const countNotRelated = filteredData.filter(r => r.notRelated === 1).length;
+            const countDeadlineViolated = filteredData.filter(r => r.deadlineViolated === 1).length;
+            const branchCount = new Set(filteredData.map(r => r.branch)).size;
+            
+            // Year-over-year calculations
+            const viloyatY1 = filteredData.filter(r => r.examiner === 1 && r.year === year1).length;
+            const viloyatY2 = filteredData.filter(r => r.examiner === 1 && r.year === year2).length;
+            const boshqaruvY1 = filteredData.filter(r => r.examiner === 2 && r.year === year1).length;
+            const boshqaruvY2 = filteredData.filter(r => r.examiner === 2 && r.year === year2).length;
+            const notRelatedY1 = filteredData.filter(r => r.notRelated === 1 && r.year === year1).length;
+            const notRelatedY2 = filteredData.filter(r => r.notRelated === 1 && r.year === year2).length;
+            const deadlineY1 = filteredData.filter(r => r.deadlineViolated === 1 && r.year === year1).length;
+            const deadlineY2 = filteredData.filter(r => r.deadlineViolated === 1 && r.year === year2).length;
+            
+            // Calculate differences
+            const yearDiff = countYear2 - countYear1;
+            const viloyatDiff = viloyatY2 - viloyatY1;
+            const boshqaruvDiff = boshqaruvY2 - boshqaruvY1;
+            const notRelatedDiff = notRelatedY2 - notRelatedY1;
+            const deadlineDiff = deadlineY2 - deadlineY1;
+            
+            // Update KPIs
+            document.getElementById('kpiTotal').textContent = total.toLocaleString();
+            document.getElementById('kpiTotalSub').textContent = filteredData.length === rawData.length ? 'Барча маълумотлар' : 'Фильтрланган';
+            document.getElementById('kpiYear1Label').textContent = `${year1} йил`;
+            document.getElementById('kpiYear2Label').textContent = `${year2} йил`;
+            document.getElementById('kpiYear1').textContent = countYear1.toLocaleString();
+            document.getElementById('kpiYear2').textContent = countYear2.toLocaleString();
+            document.getElementById('kpiViloyat').textContent = countViloyat.toLocaleString();
+            document.getElementById('kpiBoshqaruv').textContent = countBoshqaruv.toLocaleString();
+            document.getElementById('kpiNotRelated').textContent = countNotRelated.toLocaleString();
+            document.getElementById('kpiDeadlineViolated').textContent = countDeadlineViolated.toLocaleString();
+            
+            // Update change badges
+            updateChangeBadge('kpiYear2Change', yearDiff, countYear1);
+            updateChangeBadge('kpiViloyatChange', viloyatDiff, viloyatY1);
+            updateChangeBadge('kpiDeadlineViolatedChange', deadlineDiff, deadlineY1);
+            updateChangeBadge('kpiBoshqaruvChange', boshqaruvDiff, boshqaruvY1);
+            updateChangeBadge('kpiNotRelatedChange', notRelatedDiff, notRelatedY1);
+            
+            // Update header stats
+            document.getElementById('headerTotal').textContent = total.toLocaleString();
+            document.getElementById('headerViloyat').textContent = countViloyat.toLocaleString();
+            document.getElementById('headerBoshqaruv').textContent = countBoshqaruv.toLocaleString();
+            document.getElementById('headerBranches').textContent = branchCount;
+            document.getElementById('headerDeadline').textContent = countDeadlineViolated.toLocaleString();
+            
+            updateCharts();
+            updateTables();
+        }
+        
+        function updateChangeBadge(elementId, diff, baseValue) {
+            const el = document.getElementById(elementId);
+            const pct = baseValue > 0 ? ((diff / baseValue) * 100).toFixed(1) : (diff > 0 ? 100 : 0);
+            const sign = diff >= 0 ? '+' : '';
+            const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '=';
+            const cls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'neutral';
+            const text = diff > 0 ? 'ошди' : diff < 0 ? 'камайди' : 'ўзгармади';
+            el.className = `summary-change ${cls}`;
+            el.innerHTML = `${arrow} ${sign}${diff.toLocaleString()} (${sign}${pct}%) ${text}`;
+        }
+
+        // Month order for sorting
+        const monthOrderList = [
+            'январь', 'Январь', 'февраль', 'Февраль', 'март', 'Март', 
+            'апрель', 'Апрель', 'апрел', 'Апрел', 'май', 'Май', 
+            'июнь', 'Июнь', 'июль', 'Июль', 'август', 'Август', 
+            'сентябрь', 'Сентябрь', 'сентябр', 'Сентябр', 
+            'октябрь', 'Октябрь', 'ноябрь', 'Ноябрь', 'декабрь', 'Декабрь'
+        ];
+        
+        function getMonthIndex(month) {
+            const m = month.toLowerCase();
+            if (m.includes('январ')) return 0;
+            if (m.includes('феврал')) return 1;
+            if (m.includes('март')) return 2;
+            if (m.includes('апрел')) return 3;
+            if (m.includes('май')) return 4;
+            if (m.includes('июн')) return 5;
+            if (m.includes('июл')) return 6;
+            if (m.includes('август')) return 7;
+            if (m.includes('сентябр')) return 8;
+            if (m.includes('октябр')) return 9;
+            if (m.includes('ноябр')) return 10;
+            if (m.includes('декабр')) return 11;
+            return 12;
+        }
+
+        function initCharts() {
+            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+            
+            charts.yearly = new Chart(document.getElementById('yearlyChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#f3f4f6' } } } }
+            });
+            
+            charts.monthly = new Chart(document.getElementById('monthlyChart').getContext('2d'), {
+                type: 'line',
+                data: { 
+                    labels: [], 
+                    datasets: [
+                        { label: '2025', data: [], borderColor: colors.blue, backgroundColor: 'rgba(0,51,102,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
+                        { label: '2026', data: [], borderColor: colors.gold, backgroundColor: 'rgba(201,162,39,0.1)', fill: true, tension: 0.4, borderWidth: 2 }
+                    ] 
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', labels: { font: { size: 11, weight: '600' }, usePointStyle: true } } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: '#f3f4f6' } } } }
+            });
+            
+            charts.examiner = new Chart(document.getElementById('examinerChart').getContext('2d'), {
+                type: 'bar',
+                data: { 
+                    labels: ['Вилоят банклари', 'Банк бошқарувлари'], 
+                    datasets: [
+                        { label: '2025 йил', data: [0, 0], backgroundColor: colors.blue, borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 },
+                        { label: '2026 йил', data: [0, 0], backgroundColor: colors.gold, borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 }
+                    ] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, position: 'top', labels: { font: { size: 10, weight: '600' }, usePointStyle: true, padding: 15 } }
+                    }, 
+                    scales: { 
+                        x: { grid: { display: false } }, 
+                        y: { grid: { color: '#f3f4f6' }, beginAtZero: true } 
+                    } 
+                }
+            });
+            
+            charts.bank = new Chart(document.getElementById('bankChart').getContext('2d'), {
+                type: 'bar',
+                data: { 
+                    labels: ['Банк 1'], 
+                    datasets: [
+                        { label: '2025 йил', data: [0], backgroundColor: colors.blue, borderRadius: 4, barPercentage: 0.8 },
+                        { label: '2026 йил', data: [0], backgroundColor: colors.gold, borderRadius: 4, barPercentage: 0.8 }
+                    ] 
+                },
+                options: { 
+                    indexAxis: 'y', 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, position: 'top', labels: { font: { size: 10, weight: '600' }, usePointStyle: true, padding: 10 } }
+                    }, 
+                    scales: { 
+                        x: { grid: { color: '#f3f4f6' }, beginAtZero: true }, 
+                        y: { grid: { display: false }, ticks: { font: { size: 9 } } } 
+                    } 
+                }
+            });
+            
+            charts.types = new Chart(document.getElementById('typesChart').getContext('2d'), {
+                type: 'bar',
+                data: { 
+                    labels: ['Тур 1'], 
+                    datasets: [
+                        { label: '2025 йил', data: [0], backgroundColor: colors.blue, borderRadius: 4, barPercentage: 0.8 },
+                        { label: '2026 йил', data: [0], backgroundColor: colors.gold, borderRadius: 4, barPercentage: 0.8 }
+                    ] 
+                },
+                options: { 
+                    indexAxis: 'y', 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, position: 'top', labels: { font: { size: 10, weight: '600' }, usePointStyle: true, padding: 10 } }
+                    }, 
+                    scales: { 
+                        x: { grid: { color: '#f3f4f6' }, beginAtZero: true }, 
+                        y: { grid: { display: false }, ticks: { font: { size: 9 } } } 
+                    } 
+                }
+            });
+            
+            charts.top = new Chart(document.getElementById('topChart').getContext('2d'), {
+                type: 'bar',
+                data: { 
+                    labels: ['Fio 1'], 
+                    datasets: [
+                        { label: '2025 йил', data: [0], backgroundColor: '#7c3aed', borderRadius: 4, barPercentage: 0.8 },
+                        { label: '2026 йил', data: [0], backgroundColor: '#a78bfa', borderRadius: 4, barPercentage: 0.8 }
+                    ] 
+                },
+                options: { 
+                    indexAxis: 'y', 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, position: 'top', labels: { font: { size: 10, weight: '600' }, usePointStyle: true, padding: 10 } }
+                    }, 
+                    scales: { 
+                        x: { grid: { color: '#f3f4f6' }, beginAtZero: true }, 
+                        y: { grid: { display: false }, ticks: { font: { size: 9 } } } 
+                    } 
+                }
+            });
+            
+            charts.deadline = new Chart(document.getElementById('deadlineChart').getContext('2d'), {
+                type: 'bar',
+                data: { 
+                    labels: ['Муддатида', 'Муддати бузилган'], 
+                    datasets: [
+                        { label: '2025 йил', data: [0, 0], backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 },
+                        { label: '2026 йил', data: [0, 0], backgroundColor: '#dc2626', borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 }
+                    ] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, position: 'top', labels: { font: { size: 10, weight: '600' }, usePointStyle: true, padding: 15 } }
+                    }, 
+                    scales: { 
+                        x: { grid: { display: false } }, 
+                        y: { grid: { color: '#f3f4f6' }, beginAtZero: true } 
+                    } 
+                }
+            });
+        }
+
+        function updateCharts() {
+            const yearCounts = countBy(filteredData, 'year');
+            const yearLabels = Object.keys(yearCounts).sort();
+            charts.yearly.data.labels = yearLabels;
+            charts.yearly.data.datasets[0].data = yearLabels.map(y => yearCounts[y]);
+            charts.yearly.data.datasets[0].backgroundColor = yearLabels.map((_, i) => i % 2 === 0 ? colors.blue : colors.gold);
+            charts.yearly.update();
+            
+            // Monthly chart - sorted by month order, split by year
+            const years = [...new Set(rawData.map(r => r.year))].sort();
+            const year1 = years[0] || 2025;
+            const year2 = years[1] || 2026;
+            
+            // Get all unique months and sort them
+            const allMonths = [...new Set(rawData.map(r => r.month))].filter(m => m).sort((a, b) => getMonthIndex(a) - getMonthIndex(b));
+            
+            // Count by month for each year
+            const monthCountsY1 = {};
+            const monthCountsY2 = {};
+            filteredData.forEach(r => {
+                if (!r.month) return;
+                if (r.year === year1) monthCountsY1[r.month] = (monthCountsY1[r.month] || 0) + 1;
+                if (r.year === year2) monthCountsY2[r.month] = (monthCountsY2[r.month] || 0) + 1;
+            });
+            
+            charts.monthly.data.labels = allMonths;
+            charts.monthly.data.datasets[0].label = `${year1} йил`;
+            charts.monthly.data.datasets[0].data = allMonths.map(m => monthCountsY1[m] || 0);
+            charts.monthly.data.datasets[1].label = `${year2} йил`;
+            charts.monthly.data.datasets[1].data = allMonths.map(m => monthCountsY2[m] || 0);
+            charts.monthly.update();
+            
+            // Examiner chart - by year
+            const viloyatY1 = filteredData.filter(r => r.examiner === 1 && r.year === year1).length;
+            const viloyatY2 = filteredData.filter(r => r.examiner === 1 && r.year === year2).length;
+            const boshqaruvY1 = filteredData.filter(r => r.examiner === 2 && r.year === year1).length;
+            const boshqaruvY2 = filteredData.filter(r => r.examiner === 2 && r.year === year2).length;
+            charts.examiner.data.labels = ['Вилоят банклари', 'Банк бошқарувлари'];
+            charts.examiner.data.datasets[0].label = `${year1} йил`;
+            charts.examiner.data.datasets[0].data = [viloyatY1, boshqaruvY1];
+            charts.examiner.data.datasets[1].label = `${year2} йил`;
+            charts.examiner.data.datasets[1].data = [viloyatY2, boshqaruvY2];
+            charts.examiner.update();
+            
+            // Banks chart - by year
+            const bankDataByYear = {};
+            filteredData.forEach(r => {
+                if (!r.bank) return;
+                if (!bankDataByYear[r.bank]) bankDataByYear[r.bank] = { y1: 0, y2: 0, total: 0 };
+                bankDataByYear[r.bank].total++;
+                if (r.year === year1) bankDataByYear[r.bank].y1++;
+                if (r.year === year2) bankDataByYear[r.bank].y2++;
+            });
+            const topBanks = Object.entries(bankDataByYear).sort((a, b) => b[1].total - a[1].total).slice(0, 10);
+            charts.bank.data.labels = topBanks.map(([n]) => n.length > 18 ? n.substring(0, 18) + '...' : n);
+            charts.bank.data.datasets[0].label = `${year1} йил`;
+            charts.bank.data.datasets[0].data = topBanks.map(([, d]) => d.y1);
+            charts.bank.data.datasets[1].label = `${year2} йил`;
+            charts.bank.data.datasets[1].data = topBanks.map(([, d]) => d.y2);
+            charts.bank.update();
+            
+            // Types chart - by year
+            const typeDataByYear = {};
+            filteredData.forEach(r => {
+                if (!r.type) return;
+                if (!typeDataByYear[r.type]) typeDataByYear[r.type] = { y1: 0, y2: 0, total: 0 };
+                typeDataByYear[r.type].total++;
+                if (r.year === year1) typeDataByYear[r.type].y1++;
+                if (r.year === year2) typeDataByYear[r.type].y2++;
+            });
+            const topTypes = Object.entries(typeDataByYear).sort((a, b) => b[1].total - a[1].total).slice(0, 8);
+            charts.types.data.labels = topTypes.map(([t]) => t.length > 22 ? t.substring(0, 22) + '...' : t);
+            charts.types.data.datasets[0].label = `${year1} йил`;
+            charts.types.data.datasets[0].data = topTypes.map(([, d]) => d.y1);
+            charts.types.data.datasets[1].label = `${year2} йил`;
+            charts.types.data.datasets[1].data = topTypes.map(([, d]) => d.y2);
+            charts.types.update();
+            
+            // Top complainants chart - by year
+            const fioDataByYear = {};
+            filteredData.forEach(r => {
+                if (!r.fio) return;
+                if (!fioDataByYear[r.fio]) fioDataByYear[r.fio] = { y1: 0, y2: 0, total: 0 };
+                fioDataByYear[r.fio].total++;
+                if (r.year === year1) fioDataByYear[r.fio].y1++;
+                if (r.year === year2) fioDataByYear[r.fio].y2++;
+            });
+            const topFios = Object.entries(fioDataByYear).sort((a, b) => b[1].total - a[1].total).slice(0, 10);
+            charts.top.data.labels = topFios.map(([n]) => n.length > 18 ? n.substring(0, 18) + '...' : n);
+            charts.top.data.datasets[0].label = `${year1} йил`;
+            charts.top.data.datasets[0].data = topFios.map(([, d]) => d.y1);
+            charts.top.data.datasets[1].label = `${year2} йил`;
+            charts.top.data.datasets[1].data = topFios.map(([, d]) => d.y2);
+            charts.top.update();
+            
+            // Deadline chart - by year
+            const deadlineOkY1 = filteredData.filter(r => r.deadlineViolated !== 1 && r.year === year1).length;
+            const deadlineOkY2 = filteredData.filter(r => r.deadlineViolated !== 1 && r.year === year2).length;
+            const deadlineViolatedY1 = filteredData.filter(r => r.deadlineViolated === 1 && r.year === year1).length;
+            const deadlineViolatedY2 = filteredData.filter(r => r.deadlineViolated === 1 && r.year === year2).length;
+            charts.deadline.data.labels = ['Муддатида бажарилган', 'Муддати бузилган'];
+            charts.deadline.data.datasets[0].label = `${year1} йил`;
+            charts.deadline.data.datasets[0].data = [deadlineOkY1, deadlineViolatedY1];
+            charts.deadline.data.datasets[0].backgroundColor = [colors.blue, colors.blue];
+            charts.deadline.data.datasets[1].label = `${year2} йил`;
+            charts.deadline.data.datasets[1].data = [deadlineOkY2, deadlineViolatedY2];
+            charts.deadline.data.datasets[1].backgroundColor = [colors.gold, colors.gold];
+            charts.deadline.update();
+        }
+
+        function updateComparisonTables() {
+            const years = [...new Set(rawData.map(r => r.year))].sort();
+            const year1 = years[0] || 2025;
+            const year2 = years[1] || 2026;
+            
+            // Yearly comparison
+            const yearlyTb = document.querySelector('#yearlyCompareTable tbody');
+            yearlyTb.innerHTML = '';
+            
+            const count1 = filteredData.filter(r => r.year === year1).length;
+            const count2 = filteredData.filter(r => r.year === year2).length;
+            const yearDiff = count2 - count1;
+            const yearPct = count1 > 0 ? ((yearDiff / count1) * 100).toFixed(1) : (count2 > 0 ? 100 : 0);
+            
+            yearlyTb.innerHTML = `
+                <tr>
+                    <td><strong>${year1}</strong></td>
+                    <td>${count1.toLocaleString()}</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td><span class="badge neutral">Базавий йил</span></td>
+                </tr>
+                <tr>
+                    <td><strong>${year2}</strong></td>
+                    <td>${count2.toLocaleString()}</td>
+                    <td><strong style="color: ${yearDiff >= 0 ? '#059669' : '#dc2626'}">${yearDiff >= 0 ? '+' : ''}${yearDiff.toLocaleString()}</strong></td>
+                    <td>${yearDiff >= 0 ? '+' : ''}${yearPct}%</td>
+                    <td><span class="badge ${yearDiff > 0 ? 'up' : yearDiff < 0 ? 'down' : 'neutral'}">${yearDiff > 0 ? '↑ ошди' : yearDiff < 0 ? '↓ камайди' : '= ўзгармади'}</span></td>
+                </tr>
+                <tr style="background: linear-gradient(90deg, var(--cbu-blue-100), var(--cbu-gold-100));">
+                    <td><strong>Фарқ</strong></td>
+                    <td><strong>${(count2 - count1 >= 0 ? '+' : '') + (count2 - count1).toLocaleString()}</strong></td>
+                    <td colspan="3"><strong>${yearDiff >= 0 ? '📈' : '📉'} ${Math.abs(yearDiff).toLocaleString()} та мурожаат ${yearDiff >= 0 ? 'кўпайган' : 'камайган'}</strong></td>
+                </tr>
+            `;
+            
+            // Quarterly comparison
+            const quarterlyTb = document.querySelector('#quarterlyCompareTable tbody');
+            quarterlyTb.innerHTML = '';
+            
+            const quarters = ['Q1 (Янв-Март)', 'Q2 (Апр-Июнь)', 'Q3 (Июль-Сент)', 'Q4 (Окт-Дек)'];
+            let totalQ1 = 0, totalQ2 = 0;
+            
+            quarters.forEach((qName, i) => {
+                const qNum = i + 1;
+                const q1 = filteredData.filter(r => r.year === year1 && monthToQuarter(r.month) === qNum).length;
+                const q2 = filteredData.filter(r => r.year === year2 && monthToQuarter(r.month) === qNum).length;
+                totalQ1 += q1;
+                totalQ2 += q2;
+                const diff = q2 - q1;
+                const pct = q1 > 0 ? ((diff / q1) * 100).toFixed(1) : (q2 > 0 ? 100 : 0);
+                
+                quarterlyTb.innerHTML += `
+                    <tr>
+                        <td><strong>${qName}</strong></td>
+                        <td>${q1.toLocaleString()}</td>
+                        <td>${q2.toLocaleString()}</td>
+                        <td><strong style="color: ${diff >= 0 ? '#059669' : '#dc2626'}">${diff >= 0 ? '+' : ''}${diff.toLocaleString()}</strong></td>
+                        <td>${diff >= 0 ? '+' : ''}${pct}%</td>
+                        <td><span class="badge ${diff > 0 ? 'up' : diff < 0 ? 'down' : 'neutral'}">${diff > 0 ? '↑ ошди' : diff < 0 ? '↓ камайди' : '='}</span></td>
+                    </tr>
+                `;
+            });
+            
+            // Add total row for quarterly
+            const totalDiff = totalQ2 - totalQ1;
+            const totalPct = totalQ1 > 0 ? ((totalDiff / totalQ1) * 100).toFixed(1) : 0;
+            quarterlyTb.innerHTML += `
+                <tr style="background: linear-gradient(90deg, var(--cbu-blue-100), var(--cbu-gold-100)); font-weight: 700;">
+                    <td>ЖАМИ</td>
+                    <td>${totalQ1.toLocaleString()}</td>
+                    <td>${totalQ2.toLocaleString()}</td>
+                    <td style="color: ${totalDiff >= 0 ? '#059669' : '#dc2626'}">${totalDiff >= 0 ? '+' : ''}${totalDiff.toLocaleString()}</td>
+                    <td>${totalDiff >= 0 ? '+' : ''}${totalPct}%</td>
+                    <td><span class="badge ${totalDiff > 0 ? 'up' : totalDiff < 0 ? 'down' : 'neutral'}">${totalDiff > 0 ? '↑ ошди' : totalDiff < 0 ? '↓ камайди' : '='}</span></td>
+                </tr>
+            `;
+            
+            // Monthly comparison
+            const monthlyCompareTb = document.querySelector('#monthlyCompareTable tbody');
+            monthlyCompareTb.innerHTML = '';
+            
+            const monthOrder = ['январь', 'Февраль', 'февраль', 'март', 'Апрел', 'апрель', 'Май', 'май', 'Июнь', 'июнь', 'Июль', 'июль', 'Август', 'август', 'Сентябр', 'сентябрь', 'Октябрь', 'октябрь', 'Ноябрь', 'ноябрь', 'Декабрь', 'декабрь'];
+            const months = [...new Set(rawData.map(r => r.month))].filter(m => m);
+            
+            // Sort months
+            const sortedMonths = months.sort((a, b) => {
+                const aIndex = monthOrder.findIndex(m => a.toLowerCase().includes(m.toLowerCase()));
+                const bIndex = monthOrder.findIndex(m => b.toLowerCase().includes(m.toLowerCase()));
+                return aIndex - bIndex;
+            });
+            
+            let totalM1 = 0, totalM2 = 0;
+            
+            sortedMonths.forEach(month => {
+                const m1 = filteredData.filter(r => r.year === year1 && r.month === month).length;
+                const m2 = filteredData.filter(r => r.year === year2 && r.month === month).length;
+                totalM1 += m1;
+                totalM2 += m2;
+                const diff = m2 - m1;
+                const pct = m1 > 0 ? ((diff / m1) * 100).toFixed(1) : (m2 > 0 ? 100 : 0);
+                
+                monthlyCompareTb.innerHTML += `
+                    <tr>
+                        <td><strong>${month}</strong></td>
+                        <td>${m1.toLocaleString()}</td>
+                        <td>${m2.toLocaleString()}</td>
+                        <td><strong style="color: ${diff >= 0 ? '#059669' : '#dc2626'}">${diff >= 0 ? '+' : ''}${diff.toLocaleString()}</strong></td>
+                        <td>${diff >= 0 ? '+' : ''}${pct}%</td>
+                        <td><span class="badge ${diff > 0 ? 'up' : diff < 0 ? 'down' : 'neutral'}">${diff > 0 ? '↑ ошди' : diff < 0 ? '↓ камайди' : '='}</span></td>
+                    </tr>
+                `;
+            });
+            
+            // Add total row for monthly
+            const totalMDiff = totalM2 - totalM1;
+            const totalMPct = totalM1 > 0 ? ((totalMDiff / totalM1) * 100).toFixed(1) : 0;
+            monthlyCompareTb.innerHTML += `
+                <tr style="background: linear-gradient(90deg, var(--cbu-blue-100), var(--cbu-gold-100)); font-weight: 700;">
+                    <td>ЖАМИ</td>
+                    <td>${totalM1.toLocaleString()}</td>
+                    <td>${totalM2.toLocaleString()}</td>
+                    <td style="color: ${totalMDiff >= 0 ? '#059669' : '#dc2626'}">${totalMDiff >= 0 ? '+' : ''}${totalMDiff.toLocaleString()}</td>
+                    <td>${totalMDiff >= 0 ? '+' : ''}${totalMPct}%</td>
+                    <td><span class="badge ${totalMDiff > 0 ? 'up' : totalMDiff < 0 ? 'down' : 'neutral'}">${totalMDiff > 0 ? '↑ ошди' : totalMDiff < 0 ? '↓ камайди' : '='}</span></td>
+                </tr>
+            `;
+        }
+
+        function updateTables() {
+            const total = filteredData.length;
+            
+            // Comparison tables
+            updateComparisonTables();
+            
+            updateTable('banksTable', 'banksInfo', countBy(filteredData, 'bank'), total, 'банк', 'bank');
+            updateTable('branchesTable', 'branchesInfo', countBy(filteredData, 'branch'), total, 'филиал', 'branch');
+            updateTable('districtsTable', 'districtsInfo', countBy(filteredData, 'district'), total, 'туман', 'district');
+            updateTable('mahallasTable', 'mahallasInfo', countBy(filteredData, 'mahalla'), total, 'маҳалла', 'mahalla');
+            updateTable('typesTable', 'typesInfo', countBy(filteredData, 'type'), total, 'тур', 'type');
+            updateTable('resultsTable', 'resultsInfo', countBy(filteredData, 'result'), total, 'натижа', 'result');
+            
+            const years = [...new Set(rawData.map(r => r.year))].sort();
+            const year1 = years[0] || 2025;
+            const year2 = years[1] || 2026;
+            
+            // Top complainants with year breakdown
+            const fioData = {};
+            filteredData.forEach(r => {
+                if (!r.fio) return;
+                if (!fioData[r.fio]) fioData[r.fio] = { total: 0, y1: 0, y2: 0 };
+                fioData[r.fio].total++;
+                if (r.year === year1) fioData[r.fio].y1++;
+                if (r.year === year2) fioData[r.fio].y2++;
+            });
+            
+            const topFios = Object.entries(fioData).sort((a, b) => b[1].total - a[1].total).slice(0, 50);
+            const topTb = document.querySelector('#topTable tbody');
+            topTb.innerHTML = '';
+            const maxFio = topFios[0] ? topFios[0][1].total : 1;
+            topFios.forEach(([name, data], i) => {
+                const share = ((data.total / total) * 100).toFixed(2);
+                const width = (data.total / maxFio) * 100;
+                const rc = i === 0 ? 'top-1' : i < 3 ? 'top-3' : '';
+                topTb.innerHTML += `
+                    <tr>
+                        <td><span class="rank ${rc}">${i+1}</span></td>
+                        <td>${name}</td>
+                        <td><strong>${data.total}</strong><div class="progress-bar"><div class="progress-fill" style="width:${width}%"></div></div></td>
+                        <td>${data.y1}</td>
+                        <td>${data.y2}</td>
+                        <td>${share}%</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('topInfo').textContent = `Топ ${topFios.length} мурожаатчи`;
+            
+            // Monthly with year breakdown
+            const monthData = {};
+            filteredData.forEach(r => {
+                if (!r.month) return;
+                if (!monthData[r.month]) monthData[r.month] = { total: 0, y1: 0, y2: 0 };
+                monthData[r.month].total++;
+                if (r.year === year1) monthData[r.month].y1++;
+                if (r.year === year2) monthData[r.month].y2++;
+            });
+            
+            const monthOrder = ['январь', 'февраль', 'март', 'апрель', 'апрел', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'сентябр', 'октябрь', 'ноябрь', 'декабрь'];
+            const sortedMonths = Object.keys(monthData).sort((a, b) => {
+                const aIdx = monthOrder.findIndex(m => a.toLowerCase().includes(m));
+                const bIdx = monthOrder.findIndex(m => b.toLowerCase().includes(m));
+                return aIdx - bIdx;
+            });
+            
+            const monthTb = document.querySelector('#monthlyTable tbody');
+            monthTb.innerHTML = '';
+            sortedMonths.forEach(month => {
+                const data = monthData[month];
+                const diff = data.y2 - data.y1;
+                monthTb.innerHTML += `
+                    <tr>
+                        <td><strong>${month}</strong></td>
+                        <td><strong>${data.total.toLocaleString()}</strong></td>
+                        <td>${data.y1.toLocaleString()}</td>
+                        <td>${data.y2.toLocaleString()}</td>
+                        <td><strong style="color: ${diff >= 0 ? '#059669' : '#dc2626'}">${diff >= 0 ? '+' : ''}${diff.toLocaleString()}</strong></td>
+                        <td><span class="badge ${diff > 0 ? 'up' : diff < 0 ? 'down' : 'neutral'}">${diff > 0 ? '↑ ошди' : diff < 0 ? '↓ камайди' : '='}</span></td>
+                    </tr>
+                `;
+            });
+            
+            // Deadline violated tables
+            updateDeadlineTables(year1, year2);
+        }
+        
+        function updateDeadlineTables(year1, year2) {
+            // Banks deadline table
+            const bankDeadlineData = {};
+            filteredData.forEach(r => {
+                if (!r.bank) return;
+                if (!bankDeadlineData[r.bank]) bankDeadlineData[r.bank] = { total: 0, violated: 0, y1: 0, y2: 0 };
+                bankDeadlineData[r.bank].total++;
+                if (r.deadlineViolated === 1) {
+                    bankDeadlineData[r.bank].violated++;
+                    if (r.year === year1) bankDeadlineData[r.bank].y1++;
+                    if (r.year === year2) bankDeadlineData[r.bank].y2++;
+                }
+            });
+            
+            const bankEntries = Object.entries(bankDeadlineData)
+                .map(([name, data]) => ({ name, ...data }))
+                .sort((a, b) => b.violated - a.violated);
+            
+            const deadlineBanksTb = document.querySelector('#deadlineBanksTable tbody');
+            deadlineBanksTb.innerHTML = '';
+            bankEntries.forEach(({ name, total, violated, y1, y2 }, i) => {
+                const pct = total > 0 ? ((violated / total) * 100).toFixed(1) : 0;
+                const rc = i === 0 ? 'top-1' : i < 3 ? 'top-3' : '';
+                deadlineBanksTb.innerHTML += `
+                    <tr>
+                        <td><span class="rank ${rc}">${i + 1}</span></td>
+                        <td>${name}</td>
+                        <td>${total.toLocaleString()}</td>
+                        <td><strong style="color: ${violated > 0 ? '#dc2626' : '#059669'}">${violated.toLocaleString()}</strong></td>
+                        <td><span class="badge ${violated > 0 ? 'down' : 'up'}">${pct}%</span></td>
+                        <td>${y1}</td>
+                        <td>${y2}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('deadlineBanksInfo').textContent = `Жами: ${bankEntries.length} та банк, ${bankEntries.reduce((s, e) => s + e.violated, 0)} та муддати бузилган`;
+            
+            // Branches deadline table
+            const branchDeadlineData = {};
+            filteredData.forEach(r => {
+                if (!r.branch) return;
+                if (!branchDeadlineData[r.branch]) branchDeadlineData[r.branch] = { total: 0, violated: 0, y1: 0, y2: 0 };
+                branchDeadlineData[r.branch].total++;
+                if (r.deadlineViolated === 1) {
+                    branchDeadlineData[r.branch].violated++;
+                    if (r.year === year1) branchDeadlineData[r.branch].y1++;
+                    if (r.year === year2) branchDeadlineData[r.branch].y2++;
+                }
+            });
+            
+            const branchEntries = Object.entries(branchDeadlineData)
+                .map(([name, data]) => ({ name, ...data }))
+                .filter(e => e.violated > 0)
+                .sort((a, b) => b.violated - a.violated);
+            
+            const deadlineBranchesTb = document.querySelector('#deadlineBranchesTable tbody');
+            deadlineBranchesTb.innerHTML = '';
+            branchEntries.forEach(({ name, total, violated, y1, y2 }, i) => {
+                const pct = total > 0 ? ((violated / total) * 100).toFixed(1) : 0;
+                const rc = i === 0 ? 'top-1' : i < 3 ? 'top-3' : '';
+                const shortName = name.length > 40 ? name.substring(0, 40) + '...' : name;
+                deadlineBranchesTb.innerHTML += `
+                    <tr>
+                        <td><span class="rank ${rc}">${i + 1}</span></td>
+                        <td title="${name}">${shortName}</td>
+                        <td>${total.toLocaleString()}</td>
+                        <td><strong style="color: ${violated > 0 ? '#dc2626' : '#059669'}">${violated.toLocaleString()}</strong></td>
+                        <td><span class="badge ${violated > 0 ? 'down' : 'up'}">${pct}%</span></td>
+                        <td>${y1}</td>
+                        <td>${y2}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('deadlineBranchesInfo').textContent = `Жами: ${branchEntries.length} та филиал, ${branchEntries.reduce((s, e) => s + e.violated, 0)} та муддати бузилган`;
+            
+            // Monthly deadline table
+            const monthDeadlineData = {};
+            filteredData.forEach(r => {
+                if (!r.month) return;
+                if (!monthDeadlineData[r.month]) monthDeadlineData[r.month] = { total: 0, violated: 0, y1: 0, y2: 0 };
+                monthDeadlineData[r.month].total++;
+                if (r.deadlineViolated === 1) {
+                    monthDeadlineData[r.month].violated++;
+                    if (r.year === year1) monthDeadlineData[r.month].y1++;
+                    if (r.year === year2) monthDeadlineData[r.month].y2++;
+                }
+            });
+            
+            const monthOrder = ['январь', 'февраль', 'март', 'апрель', 'апрел', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'сентябр', 'октябрь', 'ноябрь', 'декабрь'];
+            const sortedDeadlineMonths = Object.keys(monthDeadlineData).sort((a, b) => {
+                const aIdx = monthOrder.findIndex(m => a.toLowerCase().includes(m));
+                const bIdx = monthOrder.findIndex(m => b.toLowerCase().includes(m));
+                return aIdx - bIdx;
+            });
+            
+            const deadlineMonthlyTb = document.querySelector('#deadlineMonthlyTable tbody');
+            deadlineMonthlyTb.innerHTML = '';
+            sortedDeadlineMonths.forEach(month => {
+                const data = monthDeadlineData[month];
+                const pct = data.total > 0 ? ((data.violated / data.total) * 100).toFixed(1) : 0;
+                const diff = data.y2 - data.y1;
+                deadlineMonthlyTb.innerHTML += `
+                    <tr>
+                        <td><strong>${month}</strong></td>
+                        <td>${data.total.toLocaleString()}</td>
+                        <td><strong style="color: ${data.violated > 0 ? '#dc2626' : '#059669'}">${data.violated.toLocaleString()}</strong></td>
+                        <td><span class="badge ${data.violated > 0 ? 'down' : 'up'}">${pct}%</span></td>
+                        <td>${data.y1}</td>
+                        <td>${data.y2}</td>
+                        <td><span class="badge ${diff > 0 ? 'down' : diff < 0 ? 'up' : 'neutral'}">${diff > 0 ? '↑ кўпайди' : diff < 0 ? '↓ камайди' : '='}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateTable(tableId, infoId, dataObj, total, label, key) {
+            const years = [...new Set(rawData.map(r => r.year))].sort();
+            const year1 = years[0] || 2025;
+            const year2 = years[1] || 2026;
+            
+            // Group by key and calculate year totals
+            const entries = [];
+            const uniqueKeys = [...new Set(filteredData.map(r => r[key]))].filter(k => k);
+            
+            uniqueKeys.forEach(name => {
+                const items = filteredData.filter(r => r[key] === name);
+                const total = items.length;
+                const count1 = items.filter(r => r.year === year1).length;
+                const count2 = items.filter(r => r.year === year2).length;
+                entries.push({ name, total, count1, count2 });
+            });
+            
+            // Sort by total descending
+            entries.sort((a, b) => b.total - a.total);
+            
+            const tb = document.querySelector(`#${tableId} tbody`);
+            tb.innerHTML = '';
+            
+            entries.forEach(({ name, total: itemTotal, count1, count2 }, i) => {
+                const diff = count2 - count1;
+                const pct = count1 > 0 ? ((diff / count1) * 100).toFixed(1) : (count2 > 0 ? 100 : 0);
+                const rc = i === 0 ? 'top-1' : i < 3 ? 'top-3' : '';
+                
+                tb.innerHTML += `
+                    <tr>
+                        <td><span class="rank ${rc}">${i + 1}</span></td>
+                        <td>${name}</td>
+                        <td><strong>${itemTotal.toLocaleString()}</strong></td>
+                        <td>${count1.toLocaleString()}</td>
+                        <td>${count2.toLocaleString()}</td>
+                        <td><strong style="color: ${diff >= 0 ? '#059669' : '#dc2626'}">${diff >= 0 ? '+' : ''}${diff.toLocaleString()}</strong></td>
+                        <td>${diff >= 0 ? '+' : ''}${pct}%</td>
+                        <td><span class="badge ${diff > 0 ? 'up' : diff < 0 ? 'down' : 'neutral'}">${diff > 0 ? '↑ ошди' : diff < 0 ? '↓ камайди' : '= ўзгармади'}</span></td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById(infoId).textContent = `Жами: ${entries.length} та ${label}`;
+        }
+
+        function showTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function searchTable(tableId, colIndex) {
+            const searchId = tableId.replace('Table', 'Search');
+            const term = document.getElementById(searchId).value.toLowerCase();
+            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
+                const text = row.children[colIndex].textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        }
+
+        // AUTO-LOAD: Avtomatik ma'lumot yuklash
+        window.addEventListener('DOMContentLoaded', function() {
+            fetch('data.json')
+                .then(response => response.json())
+                .then(jsonData => {
+                    processData(jsonData);
+                    document.getElementById('fileName').textContent = 'Avtomatik yuklandi';
+                    document.getElementById('fileDetails').textContent = rawData.length.toLocaleString() + ' ta yozuv';
+                    document.getElementById('fileInfo').classList.add('show');
+                    document.getElementById('uploadSection').classList.add('has-data');
+                    document.getElementById('uploadArea').classList.add('has-data');
+                    document.getElementById('uploadSection').style.display = 'none';
+                })
+                .catch(err => {
+                    console.log('JSON yuklanmadi, Excel yuklash kerak:', err);
+                });
+        });
+    </script>
+</body>
+</html>

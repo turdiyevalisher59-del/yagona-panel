@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<meta name="theme-color" content="#06060E">
+<meta name="format-detection" content="telephone=no">
+<title>Admin — Markaziy Bank Toshkent viloyati</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="cyber">
+<div class="bg-mesh">
+  <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+    <defs><filter id="blur"><feGaussianBlur stdDeviation="100"/></filter></defs>
+    <circle cx="180" cy="220" r="360" fill="var(--glow-1)" opacity=".05" filter="url(#blur)">
+      <animate attributeName="cx" values="180;420;180" dur="24s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="780" cy="720" r="300" fill="var(--glow-2)" opacity=".04" filter="url(#blur)">
+      <animate attributeName="cx" values="780;560;780" dur="27s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+</div>
+<div class="bg-pattern"></div>
+<div class="bg-noise"></div>
+
+<div class="shell">
+  <!-- ═══ LOGIN EKRANI ═══ -->
+  <div id="loginScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--card-s);border:1px solid var(--brd);border-radius:var(--radius-lg);padding:36px;width:min(440px,95vw);box-shadow:0 14px 50px rgba(0,0,0,.4);animation:cardUp .5s cubic-bezier(.16,1,.3,1)">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="width:72px;height:72px;border-radius:var(--radius);background:var(--g1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2 style="font-family:var(--ffd);font-size:24px;color:var(--t0);margin:0">Boshqaruv paneli</h2>
+        <p style="font-size:12px;color:var(--t2);margin-top:8px">O'zbekiston Respublikasi Markaziy banki<br>Toshkent viloyati bosh boshqarmasi</p>
+      </div>
+      <div class="fg"><label class="fl">Login</label><input class="fi" id="loginInp" placeholder="Login kiriting" autocomplete="username" autofocus></div>
+      <div class="fg"><label class="fl">Parol</label>
+        <div style="position:relative">
+          <input class="fi" id="passInp" type="password" placeholder="Parol kiriting" autocomplete="current-password" style="padding-right:40px">
+          <button type="button" onclick="togglePassVis()" id="passToggle" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);padding:4px;display:flex;align-items:center" title="Parolni ko'rsatish/yashirish">
+            <svg id="eyeOff" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" x2="23" y1="1" y2="23"/></svg>
+            <svg id="eyeOn" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="loginErr" style="display:none;color:var(--err);font-size:12px;font-weight:700;text-align:center;padding:10px;margin:8px 0;background:rgba(251,113,133,.06);border-radius:var(--radius);border:1px solid rgba(251,113,133,.1)">❌ Login yoki parol noto'g'ri</div>
+      <button class="btn btn-p" onclick="doLogin()" style="width:100%;justify-content:center;margin-top:12px;padding:12px 20px;font-size:14px">🔓 Kirish</button>
+      <div style="text-align:center;margin-top:20px">
+        <a href="index.html" style="color:var(--ac);font-size:12px;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          Dashboardga qaytish
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ADMIN PANEL (login dan keyin) ═══ -->
+  <div id="adminPanel" style="display:none">
+    <!-- Top bar -->
+    <header style="position:sticky;top:0;z-index:100;background:var(--top-bg);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--brd2);padding:0 22px;height:58px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:var(--radius);background:var(--g1);display:flex;align-items:center;justify-content:center;color:#fff">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div>
+          <h3 style="font-family:var(--ffd);font-size:15px;color:var(--t0);margin:0;line-height:1.2">Boshqaruv paneli</h3>
+          <div style="font-size:10px;color:var(--t2);font-weight:600">Sozlamalar va tuzilma</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <!-- Tema tanlash -->
+        <div class="tsw">
+          <button class="tp" data-t="cyber" onclick="setTheme('cyber')" title="Cyber"></button>
+          <button class="tp" data-t="aurora" onclick="setTheme('aurora')" title="Aurora"></button>
+          <button class="tp" data-t="teal" onclick="setTheme('teal')" title="Teal"></button>
+          <button class="tp" data-t="sakura" onclick="setTheme('sakura')" title="Sakura"></button>
+        </div>
+        <a href="index.html" class="btn btn-s btn-sm" style="text-decoration:none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          Dashboard
+        </a>
+        <button class="btn btn-sm" style="background:rgba(251,113,133,.08);color:var(--err);border:1px solid rgba(251,113,133,.12)" onclick="doLogout()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+          Chiqish
+        </button>
+      </div>
+    </header>
+
+    <!-- Tablar -->
+    <div style="padding:0 22px;overflow-x:auto;border-bottom:1px solid var(--brd2);-webkit-overflow-scrolling:touch">
+      <div class="adm-tabs" style="padding:0">
+        <button class="adm-tab on" data-tab="leaders" onclick="admTab('leaders')">👤 Rahbarlar</button>
+        <button class="adm-tab" data-tab="transfer" onclick="admTab('transfer')">🔄 Ko'chirish</button>
+        <button class="adm-tab" data-tab="depts" onclick="admTab('depts')">🏢 Bo'limlar</button>
+        <button class="adm-tab" data-tab="dashs" onclick="admTab('dashs')">📊 Dashboardlar</button>
+        <button class="adm-tab" data-tab="files" onclick="admTab('files')">📁 Papkalar</button>
+        <button class="adm-tab" data-tab="upload" onclick="admTab('upload')">⬆️ Yuklash</button>
+        <button class="adm-tab" data-tab="cfg" onclick="admTab('cfg')">⚙️ Sozlamalar</button>
+      </div>
+    </div>
+
+    <!-- Kontent -->
+    <div class="adm-bd" id="admBd" style="padding:22px;max-width:960px;margin:0 auto;min-height:calc(100vh - 120px)"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ═══ ADMIN PAGE — Alohida sahifa ═══ */
+
+/* ── Shared data model (index.html bilan umumiy) ── */
+
+/* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
+var INIT={leaders:[
+{id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
+  {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"S.T.Abdullayev",bossRole:"Shu'ba boshlig'i",dashboards:[
+    {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
+    {id:"db2",name:"Sirli mijoz tahlili",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/sirli_mijoz_final.html"}]},
+  {id:"d2",name:"Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi",boss:"D.K.Rahimova",bossRole:"Boshqarma boshlig'i",dashboards:[]},
+  {id:"d3",name:"Ijro apparati",boss:"M.N.Toshmatov",bossRole:"Apparati boshlig'i",dashboards:[
+    {id:"db3",name:"Ijro nazorati",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/index.html",xl:"J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/\u043c\u0443\u0440\u043e\u0436\u0430\u0430\u0442\u043b\u0430\u0440 \u0439\u0438\u043b\u043b\u0438\u043a.xlsx"},
+    {id:"db4",name:"Murojatlar dashboard",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/murojatlar_dashboard.html",xl:"J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/\u043c\u0443\u0440\u043e\u0436\u0430\u0430\u0442\u043b\u0430\u0440 \u0439\u0438\u043b\u043b\u0438\u043a.xlsx"}]},
+  {id:"d4",name:"Narxlar va iqtisodiy kutilmalarni o'rganish bo'limi",boss:"F.A.Xasanov",bossRole:"Bo'lim boshlig'i",dashboards:[]}]},
+{id:"nuraliyev",name:"B.F.Nuraliyev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"BN",ci:1,departments:[
+  {id:"d5",name:"Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi",boss:"R.S.Karimov",bossRole:"Bo'lim boshlig'i",dashboards:[
+    {id:"db5",name:"Valyuta monitoringi",type:"html",path:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/index.html"},
+    {id:"db6",name:"Eksport-Import valyuta",type:"html",path:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/export import/valyuta_dashboard.html",xl:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/export import/1 \u0441\u043b\u0430\u0439\u0434 \u0443\u0447\u0443\u043d 19.12 (2).xls"},
+    {id:"db7",name:"Valyuta XPU",type:"html",path:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/Valyuta XPU/valyuta_hpu.html",xl:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/Valyuta XPU/\u0436\u0430\u043c\u0438 2024-25 \u0438\u0448\u043b\u0430\u0448\u0433\u0430 \u0432\u0430\u0448.xlsx"}]},
+  {id:"d6",name:"Kredit tashkilotlarini inspeksiya qilish boshqarmasi",boss:"A.B.Sultonov",bossRole:"Boshqarma boshlig'i",dashboards:[]},
+  {id:"d7",name:"Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi",boss:"N.O.Mirzayev",bossRole:"Bo'lim boshlig'i",dashboards:[
+    {id:"db8",name:"NPL Risk Rating",type:"html",path:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/NPL_Risk_Rating_100.html"},
+    {id:"db9",name:"NPL Risk tizimi",type:"html",path:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/npl_risk_system_v11_full_edit.html"},
+    {id:"db10",name:"NPL sayt versiya",type:"html",path:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/saytga yuklash/npl_tizimi.html"}]}]},
+{id:"irgashev",name:"I.R.Irgashev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"II",ci:2,departments:[
+  {id:"d8",name:"Hududlarni ijtimoiy-iqtisodiy rivojlantirish borasida tijorat banklari faoliyatini monitoring qilish bo'limi",boss:"L.M.Qodirov",bossRole:"Bo'lim boshlig'i",dashboards:[
+    {id:"db11",name:"Parkentsoy tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Hududlarni ijtimoiy-iqtisodiy rivojlantirish borasida tijorat banklari faoliyatini monitoring qilish bo'limi/parkentsoy/parkentsoy_voice.html"}]},
+  {id:"d9",name:"Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi",boss:"Sh.U.Nazarov",bossRole:"Bo'lim boshlig'i",dashboards:[
+    {id:"db12",name:"Tadbirkorlik monitoringi",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/index.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/eng_ohiri_dasturlar_2_lotin.xlsx"},
+    {id:"db13",name:"Banklar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_tahlili.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/+++\u0411\u0430\u043d\u043a\u043b\u0430\u0440_2025_\u0439_\u0420\u0435\u0439\u0442\u0438\u043d\u0433_\u0411\u0430\u043d\u043a\u043b\u0430\u0440_\u0443\u0447\u0443\u043d_01122025_\u0439 (3).xlsx"},
+    {id:"db14",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v17_mahalla_count.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/++++\u044d\u043d\u0433 \u043e\u0445\u0438\u0440\u0438 \u0434\u0430\u0441\u0442\u0443\u0440\u043b\u0430\u0440 (2).xlsx"}]}]},
+{id:"jurayev",name:"A.A.Jurayev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"AJ",ci:3,departments:[
+  {id:"d10",name:"Naqd pul muomalasini tashkil etish boshqarmasi",boss:"G.H.Tursunov",bossRole:"Boshqarma boshlig'i",dashboards:[]},
+  {id:"d11",name:"To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi",boss:"V.A.Ismoilov",bossRole:"Bo'lim boshlig'i",dashboards:[]}]}],
+meetings:[
+  {id:"m1",day:3,month:"Fev",time:"10:00",title:"Valyuta nazorati yig'ilishi",who:"B.F.Nuraliyev, Valyuta bo'limi",urgency:"urgent"},
+  {id:"m2",day:5,month:"Fev",time:"14:30",title:"NPL monitoring tahlili",who:"Moliyaviy tahlil guruhi",urgency:"normal"},
+  {id:"m3",day:7,month:"Fev",time:"09:00",title:"Haftalik operativ yig'ilish",who:"Barcha rahbarlar",urgency:"urgent"},
+  {id:"m4",day:10,month:"Fev",time:"11:00",title:"Tadbirkorlik dasturi natijalar",who:"I.R.Irgashev, Bo'lim boshliqlari",urgency:"normal"},
+  {id:"m5",day:12,month:"Fev",time:"15:00",title:"Moliyaviy savodxonlik hisoboti",who:"J.X.Fayzullaxo'jayev",urgency:"done"},
+  {id:"m6",day:14,month:"Fev",time:"10:30",title:"IT infratuzilma yangilanishi",who:"A.A.Jurayev, IT bo'limi",urgency:"normal"}]};
+var D=load(),_curDb={lid:'',did:'',dbid:''};
+function $(id){return document.getElementById(id)}
+
+/* ═══ ADMIN UCHUN STUB O'ZGARUVCHILAR (cfg tab crash oldini olish) ═══ */
+var AZ_REGION=localStorage.getItem('azRegion')||'eastus';
+var azSpeechCfg=null;
+function vSpeak(t){/* Admin da ovoz yo'q — faqat toast */try{toast('Ovoz faqat dashboard da ishlaydi','nf')}catch(e){}}
+
+/* ═══ LOGIN TIZIMI — ENG BIRINCHI ═══ */
+var ADM_LOGIN='MBtoshvil';
+var ADM_PASS='CBU_toshvil';
+
+function doLogin(){
+  var login=($('loginInp')||{}).value||'';
+  var pass=($('passInp')||{}).value||'';
+  if(login===ADM_LOGIN&&pass===ADM_PASS){
+    sessionStorage.setItem('admAuth','1');
+    $('loginScreen').style.display='none';
+    $('adminPanel').style.display='block';
+    try{admTab('leaders')}catch(e){}
+    try{lucide.createIcons()}catch(e){}
+    try{toast('✅ Tizimga kirdingiz','ok')}catch(e){}
+  }else{
+    var err=$('loginErr');if(err)err.style.display='block';
+    try{
+      var box=$('loginScreen').querySelector('div > div');
+      box.style.animation='none';box.offsetHeight;box.style.animation='shake .4s ease';
+    }catch(e){}
+  }
+}
+function doLogout(){
+  sessionStorage.removeItem('admAuth');
+  $('adminPanel').style.display='none';
+  $('loginScreen').style.display='flex';
+  var li=$('loginInp');if(li)li.value='';
+  var pi=$('passInp');if(pi)pi.value='';
+  var err=$('loginErr');if(err)err.style.display='none';
+}
+function togglePassVis(){
+  var inp=$('passInp');
+  var off=$('eyeOff');
+  var on=$('eyeOn');
+  if(!inp)return;
+  if(inp.type==='password'){
+    inp.type='text';
+    if(off)off.style.display='none';if(on)on.style.display='';
+  }else{
+    inp.type='password';
+    if(off)off.style.display='';if(on)on.style.display='none';
+  }
+}
+/* Admin stub funksiyalari */
+function openAdm(){try{admTab('leaders')}catch(e){}}
+function closeAdm(){}
+/* ═══ LOGIN TIZIMI TUGADI ═══ */
+function load(){
+  var d;
+  try{var s=localStorage.getItem('cbNE');if(s)d=JSON.parse(s)}catch(e){}
+  if(!d)d=JSON.parse(JSON.stringify(INIT));
+  /* ═══ MIGRATSIYA: boss maydonini eski dataga qo'shish ═══ */
+  if(d.leaders&&INIT.leaders){
+    for(var i=0;i<d.leaders.length;i++){
+      var dl=d.leaders[i],il=INIT.leaders.find(function(x){return x.id===dl.id});
+      if(!il||!dl.departments)continue;
+      for(var j=0;j<dl.departments.length;j++){
+        var dd=dl.departments[j];
+        if(!dd.boss){
+          var id2=il.departments.find(function(x){return x.id===dd.id});
+          if(id2&&id2.boss)dd.boss=id2.boss;
+        }
+        if(!dd.bossRole){
+          var id3=il.departments.find(function(x){return x.id===dd.id});
+          if(id3&&id3.bossRole)dd.bossRole=id3.bossRole;
+        }
+      }
+    }
+  }
+  /* Kontaktlar migratsiyasi */
+  if(!d._contacts)d._contacts=null;
+  return d;
+}
+function save(){D._v=(D._v||0)+1;try{localStorage.setItem('cbNE',JSON.stringify(D))}catch(e){};cloudPush()}
+
+/* ═══ BULUT SINXRONIZATSIYA — npoint.io ═══ */
+var CLOUD_URL='/api/cloud';
+function _getCloudUrl(){return CLOUD_URL||localStorage.getItem('cloudUrl')||''}
+async function cloudPull(){
+  var url=_getCloudUrl();if(!url)return null;
+  try{var r=await fetch(url+'?t='+Date.now());if(!r.ok)return null;var d=await r.json();if(d&&d.leaders&&d.leaders.length>0)return d}catch(e){console.warn('Cloud pull:',e)}
+  return null;
+}
+async function cloudPush(){
+  var url=_getCloudUrl();if(!url)return;
+  try{await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(D)});
+    var ind=$('cloudInd');if(ind){ind.textContent='☁ Sinxronlandi';ind.style.color='#22c55e';setTimeout(function(){ind.textContent='☁ Bulut ulanган';ind.style.color='var(--t2)'},2000)}
+    console.log('☁ Cloud push OK v'+D._v);
+  }catch(e){console.warn('Cloud push:',e);var ind=$('cloudInd');if(ind){ind.textContent='⚠ Xato';ind.style.color='var(--err)'}}
+}
+function fL(id){return D.leaders.find(function(l){return l.id===id})}
+function fDp(lid,did){var l=fL(lid);return l?l.departments.find(function(d){return d.id===did}):null}
+function fDb(lid,did,dbid){var d=fDp(lid,did);return d?d.dashboards.find(function(b){return b.id===dbid}):null}
+function cD(l){return l.departments.length}
+function cDb(l){return l.departments.reduce(function(s,d){return s+d.dashboards.length},0)}
+function cXl(l){return l.departments.reduce(function(s,d){return s+d.dashboards.filter(function(b){return b.xl}).length},0)}
+
+/* ── THEME — har tema uchun glow ranglari dinamik yangilanadi ── */
+function setTheme(t){
+  document.body.setAttribute('data-theme',t);
+  document.querySelectorAll('.tp').forEach(function(p){p.classList.toggle('on',p.dataset.t===t)});
+  var colors={cyber:['#FF2E97','#00F0FF','#A855F7'],aurora:['#6366F1','#06B6D4','#F43F5E'],teal:['#00E5FF','#00BCD4','#7C4DFF'],sakura:['#F472B6','#E879F9','#C084FC']};
+  var c=colors[t]||colors.cyber;
+  ['mb1','mb2','mb3'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.setAttribute('fill',c[i])});
+  try{localStorage.setItem('cbNT',t)}catch(e){}}
+function makePts(){var c=$('particles');c.innerHTML='';for(var i=0;i<12;i++){var d=document.createElement('div');d.className='pt';d.style.left=Math.random()*100+'%';d.style.width=d.style.height=(1.5+Math.random()*3)+'px';d.style.animationDuration=(20+Math.random()*18)+'s';d.style.animationDelay=(-Math.random()*22)+'s';c.appendChild(d)}}
+function animN(el,target){var cur=0,step=Math.max(1,Math.ceil(target/20));var iv=setInterval(function(){cur=Math.min(cur+step,target);el.textContent=cur;if(cur>=target)clearInterval(iv)},30)}
+
+/* ── NAVIGATION ── */
+var _curView='home';
+function go(v,p){p=p||{};_curView=v;document.querySelectorAll('.view').forEach(function(x){x.classList.remove('on')});document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});
+  if(v==='home'){$('vHome').classList.add('on');$('navH').classList.add('on');renderHome();setCr([{l:'Bosh sahifa',v:'home'}])}
+  else if(v==='meetings'){$('vMeet').classList.add('on');$('navM').classList.add('on');renderMeetings2();setCr([{l:'Bosh sahifa',v:'home'},{l:'Uchrashuvlar',cur:1}])}
+  else if(v==='contacts'){$('vContacts').classList.add('on');$('navC').classList.add('on');renderContacts();setCr([{l:'Bosh sahifa',v:'home'},{l:'Kontaktlar',cur:1}])}
+  else if(v==='leader'){$('vLeader').classList.add('on');renderLeader(p.lid);var le=fL(p.lid);setCr([{l:'Bosh sahifa',v:'home'},{l:le?le.name:'',cur:1}])}
+  else if(v==='dept'){$('vDept').classList.add('on');renderDept(p.lid,p.did);var l2=fL(p.lid),dp=fDp(p.lid,p.did);setCr([{l:'Bosh sahifa',v:'home'},{l:l2?l2.name:'',v:'leader',p:{lid:p.lid}},{l:dp?dp.name.slice(0,26)+'…':'',cur:1}])}
+  else if(v==='dashboard'){$('vDash').classList.add('on');renderDash(p.lid,p.did,p.dbid);var l3=fL(p.lid),dp3=fDp(p.lid,p.did),db=fDb(p.lid,p.did,p.dbid);setCr([{l:'Bosh sahifa',v:'home'},{l:l3?l3.name:'',v:'leader',p:{lid:p.lid}},{l:dp3?dp3.name.slice(0,18)+'…':'',v:'dept',p:{lid:p.lid,did:p.did}},{l:db?db.name:'',cur:1}])}
+  lucide.createIcons()}
+function setCr(items){var c=$('crumbs');c.innerHTML=items.map(function(it,i){var sep=i?'<span class="crumb-sep">›</span>':'';if(it.cur)return sep+'<span class="crumb crumb-cur">'+it.l+'</span>';return sep+'<span class="crumb" data-ci="'+i+'">'+it.l+'</span>'}).join('');c.querySelectorAll('.crumb:not(.crumb-cur)').forEach(function(el){var i=+el.dataset.ci,it=items[i];if(it)el.onclick=function(){go(it.v,it.p||{})}})}
+
+/* ── RENDER HOME — gradient ranglarni har temaga moslash ── */
+function renderHome(){
+  var grads=['var(--g1)','var(--g2)','var(--g3)','var(--g4)'];
+  $('hSub').textContent=D.leaders.length+' ta rahbar · '+D.leaders.reduce(function(s,l){return s+cDb(l)},0)+' dashboard';
+  $('leadersGrid').innerHTML=D.leaders.map(function(l,i){
+    var tags=l.departments.slice(0,3).map(function(d){return '<span class="ltag">'+d.name.split(/[\s,]+/).slice(0,2).join(' ')+'</span>'}).join('');
+    return '<div class="lc" style="--i:'+i+'" onclick="go(\'leader\',{lid:\''+l.id+'\'})"><div class="lc-bar" style="background:'+grads[i%4]+'"></div><div class="lc-body"><div class="lc-head"><div class="lc-ava" style="background:'+grads[i%4]+'">'+l.ini+'</div><div><div class="lc-name">'+l.name+'</div><div class="lc-role">'+l.role+'</div></div></div><div class="lc-stats"><div class="st"><div class="st-n" data-t="'+cD(l)+'">0</div><div class="st-l">Bo\'lim</div></div><div class="st"><div class="st-n" data-t="'+cDb(l)+'">0</div><div class="st-l">Dashboard</div></div><div class="st"><div class="st-n" data-t="'+cXl(l)+'">0</div><div class="st-l">Excel</div></div></div><div class="lc-tags">'+tags+'</div></div></div>'}).join('');
+  setTimeout(function(){document.querySelectorAll('.st-n').forEach(function(el){animN(el,+el.dataset.t||0)})},400);
+  renderMeetings()}
+
+/* ── MEETINGS — tahrirlash / o'chirish ── */
+function meetHTML(m){if(!m||!m.length)return '<div style="text-align:center;padding:22px;color:var(--t2)">Uchrashuvlar yo\'q</div>';return m.map(function(m){return '<div class="mc"><div class="mc-time"><div class="mc-d">'+m.day+'</div><div class="mc-m">'+m.month+'</div><div class="mc-hr">'+m.time+'</div></div><div class="mc-info"><div class="mc-title">'+m.title+'</div><div class="mc-who"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'+m.who+'</div><span class="mbdg '+m.urgency+'">'+(m.urgency==='urgent'?'Muhim':m.urgency==='done'?'Bajarildi':'Oddiy')+'</span>'+(m.location?'<div style="font-size:9px;color:var(--t2);margin-top:2px"><i data-lucide="map-pin" style="width:9px;height:9px;display:inline"></i> '+m.location+'</div>':'')+'<div class="mc-acts"><button class="me" onclick="event.stopPropagation();editMeet(\''+m.id+'\')"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>Tahrir</button><button class="me" style="background:linear-gradient(135deg,#0088cc,#00aced);color:#fff;border-color:#0088cc" onclick="event.stopPropagation();sendTgMeet(\''+m.id+'\')">✈ TG</button><button class="md" onclick="event.stopPropagation();delMeet(\''+m.id+'\')"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>O\'ch</button></div></div></div>'}).join('')}
+function renderMeetings(){$('meetGrid').innerHTML=meetHTML(D.meetings?D.meetings.slice(0,4):[])}
+function renderMeetings2(){$('meetGrid2').innerHTML=meetHTML(D.meetings||[])}
+function _refreshMeet(){renderMeetings();if($('vMeet').classList.contains('on'))renderMeetings2();lucide.createIcons()}
+
+/* ═══ UCHRASHUV TAHRIR MODALI ═══ */
+function openMeetModal(m){
+  var isNew=!m;
+  m=m||{id:'m_'+Date.now(),day:1,month:'Fev',time:'10:00',title:'',who:'',urgency:'normal',location:'',note:''};
+  var overlay=document.createElement('div');overlay.className='meetModal';
+  overlay.innerHTML='<div class="meetModal-box">'
+    +'<h3><i data-lucide="calendar-clock" style="width:18px;height:18px"></i> '+(isNew?'Yangi uchrashuv':'Uchrashuvni tahrirlash')+'</h3>'
+    +'<div class="mf-row">'
+    +'<div class="mf-full"><label>Uchrashuv nomi</label><input id="mfTitle" value="'+(m.title||'').replace(/"/g,'&quot;')+'"></div>'
+    +'</div>'
+    +'<div class="mf-row">'
+    +'<div><label>Kun</label><input id="mfDay" type="number" min="1" max="31" value="'+(m.day||1)+'"></div>'
+    +'<div><label>Oy</label><select id="mfMonth"><option value="Yan"'+(m.month==='Yan'?' selected':'')+'>Yanvar</option><option value="Fev"'+(m.month==='Fev'?' selected':'')+'>Fevral</option><option value="Mar"'+(m.month==='Mar'?' selected':'')+'>Mart</option><option value="Apr"'+(m.month==='Apr'?' selected':'')+'>Aprel</option><option value="May"'+(m.month==='May'?' selected':'')+'>May</option><option value="Iyn"'+(m.month==='Iyn'?' selected':'')+'>Iyun</option><option value="Iyl"'+(m.month==='Iyl'?' selected':'')+'>Iyul</option><option value="Avg"'+(m.month==='Avg'?' selected':'')+'>Avgust</option><option value="Sen"'+(m.month==='Sen'?' selected':'')+'>Sentyabr</option><option value="Okt"'+(m.month==='Okt'?' selected':'')+'>Oktyabr</option><option value="Noy"'+(m.month==='Noy'?' selected':'')+'>Noyabr</option><option value="Dek"'+(m.month==='Dek'?' selected':'')+'>Dekabr</option></select></div>'
+    +'</div>'
+    +'<div class="mf-row">'
+    +'<div><label>Vaqt</label><input id="mfTime" type="time" value="'+(m.time||'10:00')+'"></div>'
+    +'<div><label>Holat</label><select id="mfUrg"><option value="normal"'+(m.urgency==='normal'?' selected':'')+'>Oddiy</option><option value="urgent"'+(m.urgency==='urgent'?' selected':'')+'>Muhim</option><option value="done"'+(m.urgency==='done'?' selected':'')+'>Bajarildi</option></select></div>'
+    +'</div>'
+    +'<div class="mf-row">'
+    +'<div class="mf-full"><label>Qatnashchilar</label><input id="mfWho" value="'+(m.who||'').replace(/"/g,'&quot;')+'"></div>'
+    +'</div>'
+    +'<div class="mf-row">'
+    +'<div class="mf-full"><label>Joyi</label><input id="mfLoc" value="'+(m.location||'').replace(/"/g,'&quot;')+'" placeholder="Masalan: 3-qavat, yig\'ilish zali"></div>'
+    +'</div>'
+    +'<div class="mf-row">'
+    +'<div class="mf-full"><label>Izoh</label><textarea id="mfNote" placeholder="Qo\'shimcha ma\'lumot...">'+(m.note||'')+'</textarea></div>'
+    +'</div>'
+    +'<div class="mf-acts">'
+    +'<button class="mf-cancel" onclick="this.closest(\'.meetModal\').remove()">Bekor</button>'
+    +'<button class="mf-tg" onclick="sendTgFromModal(\''+m.id+'\')">✈ Telegram</button>'
+    +'<button class="mf-save" id="mfSaveBtn">'+(isNew?"Qo'shish":'Saqlash')+'</button>'
+    +'</div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove()});
+  lucide.createIcons();
+  /* Saqlash */
+  $('mfSaveBtn').onclick=function(){
+    var t=$('mfTitle').value.trim();if(!t){toast('Nom kiriting','nf');return}
+    m.title=t;m.day=+$('mfDay').value||1;m.month=$('mfMonth').value;
+    m.time=$('mfTime').value||'10:00';m.urgency=$('mfUrg').value;
+    m.who=$('mfWho').value;m.location=$('mfLoc').value;m.note=$('mfNote').value;
+    if(isNew){if(!D.meetings)D.meetings=[];D.meetings.push(m)}
+    save();_refreshMeet();overlay.remove();toast(isNew?"Qo'shildi!":'Yangilandi','ok');
+  };
+}
+window.editMeet=function(id){if(!D.meetings)return;var m=D.meetings.find(function(x){return x.id===id});if(m)openMeetModal(m)};
+function addMeet(){openMeetModal(null)}
+window.delMeet=function(id){if(!confirm("O'chirasizmi?"))return;D.meetings=D.meetings.filter(function(x){return x.id!==id});save();_refreshMeet();toast("O'chirildi",'nf')};
+
+/* ═══ TELEGRAM ESLATMA ═══ */
+window.setTgLink=function(){
+  var cur=D._tgLink||'';
+  var link=prompt('Telegram guruh havolasini kiriting:\n\nMasalan:\nhttps://t.me/guruh_nomi\nhttps://t.me/+AbCdEf123\n\nBot API uchun:\nhttps://api.telegram.org/botTOKEN/sendMessage?chat_id=CHAT_ID',cur);
+  if(link===null)return;D._tgLink=link.trim();save();toast(link?'Telegram havola saqlandi':'Telegram havola o\'chirildi','ok');
+};
+window.sendTgMeet=function(id){
+  if(!D.meetings)return;var m=D.meetings.find(function(x){return x.id===id});if(!m)return;
+  var text='📅 *UCHRASHUV ESLATMASI*\n\n'
+    +'📌 *'+m.title+'*\n'
+    +'🗓 '+m.day+' '+m.month+', ⏰ '+m.time+'\n'
+    +'👥 '+m.who+'\n'
+    +(m.location?'📍 '+m.location+'\n':'')
+    +(m.note?'💬 '+m.note+'\n':'')
+    +'\n⚡ Holat: '+(m.urgency==='urgent'?'🔴 Muhim':m.urgency==='done'?'✅ Bajarildi':'🔵 Oddiy');
+  if(D._tgLink&&D._tgLink.startsWith('https://api.telegram.org')){
+    /* Bot API */
+    var url=D._tgLink;
+    if(url.indexOf('sendMessage')>=0){
+      var sep=url.indexOf('?')>=0?'&':'?';
+      url+=sep+'text='+encodeURIComponent(text)+'&parse_mode=Markdown';
+      fetch(url).then(function(r){return r.json()}).then(function(d){
+        if(d.ok)toast('✈ Telegram ga yuborildi!','ok');else toast('Xato: '+d.description,'nf');
+      }).catch(function(){toast('Tarmoq xatosi','nf')});
+      return;
+    }
+  }
+  /* Oddiy Telegram share */
+  var shareUrl='https://t.me/share/url?url='+encodeURIComponent(m.title)+'&text='+encodeURIComponent(text);
+  window.open(shareUrl,'_blank');
+};
+window.sendTgFromModal=function(id){
+  /* Modal dan saqlash, keyin yuborish */
+  var t=$('mfTitle');if(t&&t.value.trim()){
+    $('mfSaveBtn').click();
+    setTimeout(function(){sendTgMeet(id)},300);
+  }else{sendTgMeet(id)}
+};
+
+/* ═══ KONTAKTLAR PANELI ═══ */
+var dfltContacts=[
+  {id:'c1',name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",phone:'+998901234567',ci:0},
+  {id:'c2',name:"B.F.Nuraliyev",role:"O'rinbosar",phone:'+998901234568',ci:1},
+  {id:'c3',name:"I.R.Irgashev",role:"O'rinbosar",phone:'+998901234569',ci:2},
+  {id:'c4',name:"A.A.Jurayev",role:"O'rinbosar",phone:'+998901234570',ci:3},
+  {id:'c5',name:"S.T.Abdullayev",role:"Bank xizmatlari shu'basi boshlig'i",phone:'+998901234571',ci:0},
+  {id:'c6',name:"M.N.Toshmatov",role:"Ijro apparati boshlig'i",phone:'+998901234572',ci:1},
+  {id:'c7',name:"R.S.Karimov",role:"Valyuta nazorati bo'limi boshlig'i",phone:'+998901234573',ci:2},
+  {id:'c8',name:"N.O.Mirzayev",role:"Moliyaviy tahlil bo'limi boshlig'i",phone:'+998901234574',ci:3},
+  {id:'c9',name:"L.M.Qodirov",role:"Hududlar monitoringi bo'limi boshlig'i",phone:'+998901234575',ci:0},
+  {id:'c10',name:"Sh.U.Nazarov",role:"Tadbirkorlik bo'limi boshlig'i",phone:'+998901234576',ci:1},
+  {id:'c11',name:"G.H.Tursunov",role:"Naqd pul boshqarmasi boshlig'i",phone:'+998901234577',ci:2},
+  {id:'c12',name:"V.A.Ismoilov",role:"IT bo'limi boshlig'i",phone:'+998901234578',ci:3}
+];
+function getContacts(){if(!D._contacts||!D._contacts.length)D._contacts=dfltContacts;return D._contacts}
+var _cColors=['var(--ac)','#f472b6','#38bdf8','#a78bfa','#fb923c','#34d399'];
+function renderContacts(){
+  var contacts=getContacts();
+  $('cntGrid').innerHTML=contacts.map(function(c){
+    var ini=c.name.split(/[\s.]+/).filter(function(w){return w.length>1}).map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();
+    var clr=_cColors[c.ci%_cColors.length]||'var(--ac)';
+    return '<div class="cnt-card" onclick="callContact(\''+c.id+'\')">'
+      +'<div class="cnt-ava" style="background:'+clr+'">'+ini+'</div>'
+      +'<div class="cnt-info"><div class="cnt-name">'+c.name+'</div><div class="cnt-role">'+c.role+'</div><div class="cnt-phone">📞 '+c.phone+'</div></div>'
+      +'<button class="cnt-call" onclick="event.stopPropagation();callContact(\''+c.id+'\')" title="Qo\'ng\'iroq"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button>'
+      +'<button class="cnt-call" style="background:var(--ac);margin-left:-6px" onclick="event.stopPropagation();editContact(\''+c.id+'\')" title="Tahrir"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>'
+      +'</div>';
+  }).join('');
+}
+window.callContact=function(id){
+  var contacts=getContacts();var c=contacts.find(function(x){return x.id===id});
+  if(!c)return;window.open('tel:'+c.phone.replace(/\s/g,''));
+};
+window.editContact=function(id){
+  var contacts=getContacts();var c=contacts.find(function(x){return x.id===id});
+  if(!c)return;
+  var n=prompt('Ism:',c.name);if(!n||!n.trim())return;
+  var r=prompt('Lavozimi:',c.role);
+  var p=prompt('Telefon raqami:',c.phone);
+  c.name=n.trim();c.role=r||c.role;c.phone=p||c.phone;
+  save();renderContacts();toast('Yangilandi','ok');
+};
+window.addContact=function(){
+  var n=prompt('Ism:');if(!n||!n.trim())return;
+  var r=prompt('Lavozimi:','');
+  var p=prompt('Telefon raqami:','+998');
+  var contacts=getContacts();
+  contacts.push({id:'c_'+Date.now(),name:n.trim(),role:r||'',phone:p||'',ci:contacts.length%6});
+  save();renderContacts();toast("Qo'shildi!",'ok');
+};
+
+/* ── RENDER LEADER / DEPT / DASHBOARD ── */
+function renderLeader(lid){var l=fL(lid);if(!l)return;$('lTitle').textContent=l.name;$('lSub').textContent=l.role+' — '+cD(l)+' bo\'lim, '+cDb(l)+' dashboard';var ic=['landmark','building-2','briefcase','bar-chart-big','search','file-text','wallet','graduation-cap'],cls=['c1','c2','c3','c1','c2','c3'];$('deptGrid').innerHTML=l.departments.map(function(d,i){var n=d.dashboards.length;var bossHtml=d.boss?'<div style="margin-top:6px;font-size:11px;color:var(--ac);display:flex;align-items:center;gap:4px"><i data-lucide="user-circle" style="width:13px;height:13px"></i> <b>'+d.boss+'</b>'+(d.bossRole?' <span style="color:var(--t2);font-weight:400">— '+d.bossRole+'</span>':'')+'</div>':'';return '<div class="dc" style="--i:'+i+'" onclick="go(\'dept\',{lid:\''+lid+'\',did:\''+d.id+'\'})"><div class="dc-ico '+cls[i%cls.length]+'"><i data-lucide="'+ic[i%ic.length]+'"></i></div><h4>'+d.name+'</h4>'+bossHtml+'<div style="margin-top:8px">'+(n?'<span class="badge badge-ok">✓ '+n+' dashboard</span>':'<span class="badge badge-mt">Bo\'sh</span>')+'</div></div>'}).join('')}
+function renderDept(lid,did){var l=fL(lid),d=fDp(lid,did);if(!l||!d)return;$('dTitle').textContent=d.name;$('dSub').textContent=l.name+(d.boss?' • '+d.boss+(d.bossRole?' — '+d.bossRole:''):'');$('deptBk').onclick=function(){go('leader',{lid:lid})};var gr=$('dashGrid'),em=$('dEmpty');if(!d.dashboards.length){gr.innerHTML='<div class="dc" style="--i:0;border:2px dashed var(--brd2);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:120px" onclick="openAddDash(\''+lid+'\',\''+did+'\')"><div style="text-align:center;color:var(--t2)"><div style="font-size:28px;margin-bottom:6px">➕</div><div style="font-size:12px;font-weight:600">Yangi dashboard</div></div></div>';em.style.display='none';lucide.createIcons();return}em.style.display='none';gr.innerHTML=d.dashboards.map(function(db,i){var badges=[];if(db.type==='url')badges.push('<span class="badge badge-html">🔗 URL</span>');else if(db.type==='excel')badges.push('<span class="badge badge-xl">📊 Excel</span>');else badges.push('<span class="badge badge-html">HTML</span>');if(db.xl)badges.push('<span class="badge badge-xl">+Excel</span>');return '<div class="dc" style="--i:'+i+'" onclick="go(\'dashboard\',{lid:\''+lid+'\',did:\''+did+'\',dbid:\''+db.id+'\'})"><div class="dc-ico '+(db.type==='excel'?'c2':'c1')+'"><i data-lucide="'+(db.type==='excel'?'table':'layout-dashboard')+'"></i></div><h4>'+db.name+'</h4><div class="meta" style="margin-top:8px">'+badges.join('')+'</div></div>'}).join('')+'<div class="dc" style="--i:'+d.dashboards.length+';border:2px dashed var(--brd2);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:120px" onclick="openAddDash(\''+lid+'\',\''+did+'\')"><div style="text-align:center;color:var(--t2)"><div style="font-size:28px;margin-bottom:6px">➕</div><div style="font-size:12px;font-weight:600">Yangi dashboard</div></div></div>'}
+/* ══════════════════════════════════════════════════════════
+   Dashboard YUKLASH TIZIMI v4 — MULTI-TRY + SMART ENCODING
+   file:// protokolida yo'l nomlari muammo bo'ladi:
+   - Apostrof: yo'nalishi → yo%27nalishi
+   - Bo'shliq: export import → export%20import  
+   - Kirill: мурожаатлар → %D0%BC%D1%83%D1%80...
+   Har bir usul uchun 5 ta yo'l varianti sinab ko'riladi
+   ══════════════════════════════════════════════════════════ */
+
+/* Yo'lning 5 xil kodlash variantlarini yaratish */
+function pathVariants(origPath){
+  if(!origPath)return [];
+  /* blob: va http URL lar to'g'ridan-to'g'ri */
+  if(origPath.startsWith('http')||origPath.startsWith('blob:')||origPath.startsWith('data:'))return [origPath];
+  var variants=[origPath]; /* 1: asl yo'l */
+  /* 2: har segment alohida encode */
+  var enc2=origPath.split('/').map(function(s){return encodeURIComponent(s)}).join('/');
+  if(enc2!==origPath)variants.push(enc2);
+  /* 3: faqat bo'shliq → %20 */
+  var enc3=origPath.replace(/ /g,'%20');
+  if(enc3!==origPath&&variants.indexOf(enc3)<0)variants.push(enc3);
+  /* 4: bo'shliq + apostrof */
+  var enc4=origPath.replace(/ /g,'%20').replace(/'/g,'%27');
+  if(variants.indexOf(enc4)<0)variants.push(enc4);
+  /* 5: segment-wise bo'shliq+apostrof+kirill */
+  var enc5=origPath.split('/').map(function(s){
+    return s.replace(/ /g,'%20').replace(/'/g,'%27').replace(/[^\x00-\x7F]/g,function(c){
+      return encodeURIComponent(c);
+    });
+  }).join('/');
+  if(variants.indexOf(enc5)<0)variants.push(enc5);
+  return variants;
+}
+
+/* XHR o'qish — text yoki arraybuffer */
+function xhrLoad(path, type){
+  return new Promise(function(resolve,reject){
+    var xhr=new XMLHttpRequest();
+    xhr.open('GET',path,true);
+    xhr.responseType=type||'text';
+    xhr.timeout=8000;
+    xhr.onload=function(){
+      if(xhr.status===0||xhr.status===200){
+        if(type==='arraybuffer'){
+          if(xhr.response&&xhr.response.byteLength>0)resolve(xhr.response);
+          else reject(new Error('Bo\'sh arraybuffer'));
+        }else{
+          resolve(xhr.responseText);
+        }
+      }else reject(new Error('HTTP '+xhr.status));
+    };
+    xhr.onerror=function(){reject(new Error('XHR xato'))};
+    xhr.ontimeout=function(){reject(new Error('Timeout'))};
+    xhr.send();
+  });
+}
+
+/* 5 ta yo'l variant bilan XHR sinash */
+async function smartLoad(origPath, type){
+  var paths=pathVariants(origPath);
+  for(var i=0;i<paths.length;i++){
+    try{
+      var result=await xhrLoad(paths[i],type);
+      return result;
+    }catch(e){/* keyingisini sinash */}
+  }
+  /* Hammasi ishlamadi — fetch sinash */
+  for(var j=0;j<paths.length;j++){
+    try{
+      var r=await fetch(paths[j]);
+      if(!r.ok)continue;
+      if(type==='arraybuffer')return await r.arrayBuffer();
+      return await r.text();
+    }catch(e){/* keyingisi */}
+  }
+  throw new Error('Fayl topilmadi: '+origPath);
+}
+
+/* HTML kontentga <base> tag qo'shish */
+function addBaseTag(html,filePath){
+  var dir=filePath.substring(0,filePath.lastIndexOf('/')+1);
+  if(!dir)return html;
+  if(html.match(/<head[^>]*>/i)){
+    return html.replace(/<head([^>]*)>/i,'<head$1>\n<base href="'+dir+'">');
+  }
+  if(html.match(/<html[^>]*>/i)){
+    return html.replace(/<html([^>]*)>/i,'<html$1>\n<head><base href="'+dir+'"></head>');
+  }
+  return '<base href="'+dir+'">\n'+html;
+}
+
+/* ═══ EXCEL → HTML EMBED (v16c) ═══
+   Base64 ni TO'G'RIDAN-TO'G'RI HTML ichiga joylaydi.
+   postMessage yo'q, cross-origin muammo yo'q, tez ishlaydi.
+   
+   Uint8Array (838KB) → base64 string (1.1MB) → HTML ichidagi
+   <script> blokda o'zgaruvchi sifatida saqlanadi.
+   Iframe yuklangach, XLSX kutadi, keyin inject qiladi.
+   ═══════════════════════════════════════════════════════════ */
+function embedExcelInHtml(html,xlData,xlName){
+  if(!xlData||!html)return html;
+  if(html.indexOf('__XLEMBED__')>=0)return html;
+
+  /* Uint8Array → base64 (chunked — stack overflow oldini olish) */
+  var raw='',cs=8192;
+  for(var i=0;i<xlData.length;i+=cs){
+    var end=Math.min(i+cs,xlData.length);
+    var s='';for(var j=i;j<end;j++)s+=String.fromCharCode(xlData[j]);
+    raw+=s;
+  }
+  var b64=btoa(raw);
+  var nm=(xlName||'data.xlsx').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+  var sc='\n<scr'+'ipt>\n'
+  +'/* __XLEMBED__ */\n'
+  +'(function(){\n'
+  +'var _D=false,_B="'+b64+'";\n'
+  +'var _N="'+nm+'";\n'
+  +'function dec(){var r=atob(_B),a=new Uint8Array(r.length);for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a}\n'
+  +'function go(){\n'
+  +'  if(_D)return;_D=true;\n'
+  +'  var arr=dec();\n'
+  +'  var mt=_N.match(/\\.xls$/i)?"application/vnd.ms-excel":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";\n'
+  +'  var file;\n'
+  +'  try{file=new File([arr],_N,{type:mt})}catch(e){file=new Blob([arr],{type:mt});file.name=_N}\n'
+  +'  if(typeof handleFile==="function"){try{handleFile(file);return}catch(e){}}\n'
+  +'  if(typeof handleFileUpload==="function"){try{handleFileUpload({target:{files:[file]}});return}catch(e){}}\n'
+  +'  if(typeof processExcelFile==="function"&&typeof XLSX!=="undefined"){try{processExcelFile(XLSX.read(arr,{type:"array"}),_N);return}catch(e){}}\n'
+  +'  var fi=document.getElementById("fileInput");\n'
+  +'  if(fi){try{var dt=new DataTransfer();dt.items.add(file);fi.files=dt.files;fi.dispatchEvent(new Event("change",{bubbles:true}));return}catch(e){}}\n'
+  +'  var all=document.querySelectorAll("input[type=file]");\n'
+  +'  for(var i=0;i<all.length;i++){try{var d=new DataTransfer();d.items.add(file);all[i].files=d.files;all[i].dispatchEvent(new Event("change",{bubbles:true}));return}catch(e){}}\n'
+  +'  _D=false;\n'
+  +'}\n'
+  +'function wait(){if(typeof XLSX!=="undefined"){go()}else{setTimeout(wait,300)}}\n'
+  +'setTimeout(wait,800);\n'
+  +'})();\n'
+  +'</scr'+'ipt>\n';
+
+  if(html.indexOf('</body>')>=0)return html.replace('</body>',sc+'</body>');
+  if(html.indexOf('</html>')>=0)return html.replace('</html>',sc+'</html>');
+  return html+sc;
+}
+
+async function renderDash(lid,did,dbid){
+  var db=fDb(lid,did,dbid);if(!db)return;
+  _curDb={lid:lid,did:did,dbid:dbid};
+  $('dbTit').textContent=db.name;
+  $('dashBk').onclick=function(){go('dept',{lid:lid,did:did})};
+  var fr=$('dbFrame'),xv=$('xlView'),ve=$('vErr'),ed=$('dbEdit');
+  ve.style.display='none';ed.classList.remove('on');
+  fr.style.display='none';xv.style.display='none';
+  fr.removeAttribute('srcdoc');fr.removeAttribute('src');
+  $('deNm').value=db.name||'';$('deTy').value=db.type||'html';
+  $('dePth').value=db.path||'';$('deXl').value=db.xl||'';
+
+  /* Tab tugmalari */
+  var tabs=$('dbTabs');
+  if(db.xl&&db.type!=='excel'){
+    tabs.innerHTML='<button class="vb vb-ac" id="tabHtml" onclick="switchDbTab(\'html\')"><i data-lucide="layout-dashboard" style="width:12px;height:12px"></i> HTML</button><button class="vb" id="tabXl" onclick="switchDbTab(\'excel\')"><i data-lucide="table" style="width:12px;height:12px"></i> Excel</button>';
+    tabs.style.display='flex';
+  }else{tabs.innerHTML='';tabs.style.display='none'}
+
+  /* ═══ 1-QADAM: EXCEL MA'LUMOTLARINI OLDINDAN TAYYORLASH ═══ */
+  var xlData=null,xlName='data.xlsx';
+  var xlPath=db.xl||(db.type==='excel'?db.path:null);
+  if(xlPath){
+    xlName=xlPath.split('/').pop()||'data.xlsx';
+    /* 1a: Sessiya kesh */
+    if(db._xlCache){xlData=db._xlCache}
+    /* 1b: Global kesh (ZIP/papka) */
+    else if(_FCready){
+      var xlC=fromCache(xlPath);
+      if(xlC&&xlC.type==='binary'){xlData=xlC.data;db._xlCache=xlData}
+    }
+    /* 1c: SmartLoad (XHR/fetch) */
+    if(!xlData){
+      try{
+        var ab=await smartLoad(xlPath,'arraybuffer');
+        xlData=new Uint8Array(ab);db._xlCache=xlData;
+      }catch(e){/* keyin fallback */}
+    }
+  }
+
+  /* ═══ 2-QADAM: DASHBOARD TURINI KO'RSATISH ═══ */
+  if(db.type==='url'){
+    fr.style.display='';fr.src=db.path;
+  }else if(db.type==='excel'){
+    xv.style.display='';
+    if(xlData){renderXlData(xlData,xv)}
+    else{await loadXl(xlPath,xv)}
+  }else{
+    /* ═══ HTML DASHBOARD ═══ */
+    fr.style.display='';
+    var htmlContent=null;
+
+    /* HTML kontentni olish */
+    if(db._htmlCache){
+      htmlContent=db._htmlCache;
+    }else if(_FCready){
+      var cached=fromCache(db.path);
+      if(cached&&cached.type==='text')htmlContent=cached.data;
+    }
+    if(!htmlContent){
+      try{htmlContent=await smartLoad(db.path,'text')}catch(e){}
+    }
+
+    if(htmlContent&&htmlContent.trim().length>10){
+      var finalHtml=addBaseTag(htmlContent,db.path);
+      if(xlData)finalHtml=embedExcelInHtml(finalHtml,xlData,xlName);
+      fr.srcdoc=finalHtml;
+    }else{
+      fr.src=db.path;
+      fr.onload=function(){
+        try{
+          var doc=fr.contentDocument;if(!doc||!doc.body)return;
+          var pre=doc.querySelector('pre');
+          var bt=doc.body.textContent||'';
+          if((pre&&pre.textContent.trim().startsWith('<!'))
+            ||(bt.trim().startsWith('<!DOCTYPE')||bt.trim().startsWith('<html'))){
+            fr.onload=null;
+            var rawH=addBaseTag(pre?pre.textContent:bt,db.path);
+            if(xlData)rawH=embedExcelInHtml(rawH,xlData,xlName);
+            fr.srcdoc=rawH;
+          }
+        }catch(e){}
+      };
+    }
+
+    /* ═══ PARENT EXCEL TAB ═══ */
+    if(xlData&&db.xl){
+      renderXlData(xlData,xv);
+    }else if(db.xl){
+      await loadXl(db.xl,xv);
+    }
+  }
+  lucide.createIcons();
+}
+
+/* Tab almashish */
+window.switchDbTab=function(tab){
+  var fr=$('dbFrame'),xv=$('xlView'),th=$('tabHtml'),tx=$('tabXl');
+  if(tab==='html'){
+    fr.style.display='';xv.style.display='none';
+    if(th)th.classList.add('vb-ac');if(tx)tx.classList.remove('vb-ac');
+  }else{
+    fr.style.display='none';xv.style.display='';
+    if(th)th.classList.remove('vb-ac');if(tx)tx.classList.add('vb-ac');
+    var db=fDb(_curDb.lid,_curDb.did,_curDb.dbid);
+    if(db&&db._xlCache){
+      renderXlData(db._xlCache,xv);
+    }else if(db&&db.xl&&(!xv.innerHTML||xv.innerHTML.includes('Yuklanmoqda'))){
+      loadXl(db.xl,xv);
+    }
+  }
+};
+
+/* ═══ EXCEL YUKLASH — kesh → smartLoad → fallback ═══ */
+async function loadXl(path,ct){
+  ct.innerHTML='<div style="text-align:center;padding:36px;color:var(--t2)"><div style="font-size:28px;margin-bottom:8px">📊</div>Excel yuklanmoqda...</div>';
+
+  /* 1: GLOBAL KESHDAN (_FC — ZIP/papkadan) */
+  if(_FCready){
+    var cached=fromCache(path);
+    if(cached&&cached.type==='binary'){
+      renderXlData(cached.data,ct);
+      var db=fDb(_curDb.lid,_curDb.did,_curDb.dbid);
+      if(db)db._xlCache=cached.data;
+      return;
+    }
+  }
+
+  /* 2: smartLoad — XHR + fetch bilan 5x variant */
+  try{
+    var ab=await smartLoad(path,'arraybuffer');
+    var data=new Uint8Array(ab);
+    renderXlData(data,ct);
+    var db2=fDb(_curDb.lid,_curDb.did,_curDb.dbid);
+    if(db2)db2._xlCache=data;
+  }catch(e){
+    /* 3: Hech narsa ishlamadi — fayl tanlash tugmalari */
+    ct.innerHTML='<div class="empty" style="padding:30px"><h3>📊 Excel faylni yuklang</h3>'
+      +'<p style="color:var(--t2);font-size:12px;margin:8px 0">Avtomatik yuklanmadi.</p>'
+      +'<p style="color:var(--t2);font-size:11px;margin-bottom:4px">💡 <b>Maslahat:</b> Bosh sahifada "📦 ZIP tanlash" tugmasini bosib, loyiha ZIP faylini yuklang — keyin barcha Excel fayllar avtomatik ishlaydi.</p>'
+      +'<p style="font-size:10px;color:var(--t3);margin-bottom:16px;word-break:break-all">'+path+'</p>'
+      +'<button class="btn btn-p" onclick="pickExcel(this.closest(\'.xlv\'))" style="margin-right:8px">📁 Excel tanlash</button>'
+      +'<button class="btn btn-s" onclick="pickExcelZip(this.closest(\'.xlv\'))">📦 ZIP dan</button></div>';
+  }
+}
+function renderXlData(ab,ct){
+  var wb=XLSX.read(ab,{type:'array'});
+  var h='<div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap">';
+  wb.SheetNames.forEach(function(n,i){h+='<button class="btn btn-sm '+(i?'btn-s':'btn-p')+'" onclick="showSh(this,'+i+')">'+n+'</button>'});
+  h+='</div>';
+  wb.SheetNames.forEach(function(n,i){h+='<div class="shc" style="'+(i?'display:none':'')+'">'+XLSX.utils.sheet_to_html(wb.Sheets[n])+'</div>'});
+  ct.innerHTML=h;
+}
+/* Excel faylni qo'lda tanlash */
+window.pickExcel=function(container){
+  var inp=document.createElement('input');inp.type='file';
+  inp.accept='.xlsx,.xls';
+  inp.onchange=function(){
+    if(!inp.files||!inp.files[0])return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var data=new Uint8Array(e.target.result);
+      renderXlData(data,container);
+      /* Keshga saqlash */
+      var db=fDb(_curDb.lid,_curDb.did,_curDb.dbid);
+      if(db)db._xlCache=data;
+      toast(inp.files[0].name+' yuklandi!','ok');
+    };
+    reader.readAsArrayBuffer(inp.files[0]);
+  };
+  inp.click();
+};
+/* ZIP dan Excel tanlash */
+window.pickExcelZip=function(container){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.zip';
+  inp.onchange=async function(){
+    if(!inp.files||!inp.files[0])return;
+    try{
+      var ab=await inp.files[0].arrayBuffer();
+      var entries=await readZipEntries(ab);
+      var matched=entries.filter(function(e){return e.name.match(/\.(xlsx|xls)$/i)});
+      if(!matched.length){toast('ZIP da Excel topilmadi','er');return}
+      if(matched.length===1){
+        var blob=await matched[0].getData();
+        var buf=await blob.arrayBuffer();
+        var data=new Uint8Array(buf);
+        renderXlData(data,container);
+        var db=fDb(_curDb.lid,_curDb.did,_curDb.dbid);if(db)db._xlCache=data;
+        toast(matched[0].name.split('/').pop()+' yuklandi!','ok');
+        return;
+      }
+      /* Ko'p fayl — tanlash */
+      var html='<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center" id="xlZpOv">'
+        +'<div style="background:var(--card-s);border-radius:var(--radius-lg);padding:20px;max-width:500px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:var(--shadow-h)">'
+        +'<div style="font-family:var(--ffd);font-size:16px;font-weight:800;color:var(--t0);margin-bottom:14px">📦 '+matched.length+' ta Excel</div>';
+      matched.forEach(function(e,i){
+        html+='<div class="ali" style="margin-bottom:4px;cursor:pointer" onclick="xlZpPick('+i+')">'
+          +'<div style="display:flex;align-items:center;gap:8px"><span>📊</span><div class="ali-nm" style="font-size:12px">'+e.name.split('/').pop()+'</div></div></div>';
+      });
+      html+='<button class="btn btn-s btn-sm" onclick="$(\'xlZpOv\').remove()" style="margin-top:10px">Yopish</button></div></div>';
+      document.body.insertAdjacentHTML('beforeend',html);
+      window._xlZpEntries=matched;window._xlZpContainer=container;
+    }catch(e){toast('ZIP xato','er')}
+  };
+  inp.click();
+};
+window.xlZpPick=async function(idx){
+  var e=window._xlZpEntries[idx];if(!e)return;
+  try{
+    var blob=await e.getData();
+    var buf=await blob.arrayBuffer();
+    var data=new Uint8Array(buf);
+    renderXlData(data,window._xlZpContainer);
+    var db=fDb(_curDb.lid,_curDb.did,_curDb.dbid);if(db)db._xlCache=data;
+    toast(e.name.split('/').pop()+' yuklandi!','ok');
+  }catch(err){toast('Xato','er')}
+  var ov=$('xlZpOv');if(ov)ov.remove();
+};
+/* HTML faylni qo'lda tanlash */
+window.pickHtml=function(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.html,.htm';
+  inp.onchange=function(){
+    if(!inp.files||!inp.files[0])return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var fr=$('dbFrame');fr.removeAttribute('src');
+      fr.srcdoc=e.target.result;fr.style.display='';
+      $('vErr').style.display='none';
+      var db=fDb(_curDb.lid,_curDb.did,_curDb.dbid);
+      if(db)db._htmlCache=e.target.result;
+      toast(inp.files[0].name+' yuklandi!','ok');
+    };
+    reader.readAsText(inp.files[0]);
+  };
+  inp.click();
+};
+
+window.showSh=function(b,i){b.closest('.xlv').querySelectorAll('.shc').forEach(function(e,j){e.style.display=j===i?'':'none'});b.parentElement.querySelectorAll('.btn').forEach(function(e,j){e.className='btn btn-sm '+(j===i?'btn-p':'btn-s')})};
+/* ── FAYL TANLASH FUNKSIYALARI ── */
+/* Sessiya xotirasi — fayllarni vaqtincha saqlash (sahifa ochiq bo'lganda) */
+var _sessionFiles={};
+
+/* Faylni sessiyaga saqlash va darhol ko'rsatish */
+function storeAndShow(file, type){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var key='_file_'+Date.now();
+    if(type==='excel'){
+      /* Excel — binary saqlash */
+      _sessionFiles[key]={type:'excel',data:new Uint8Array(e.target.result),name:file.name};
+      $('deXl').value=file.name;
+      $('deXl').dataset.sessionKey=key;
+      /* Darhol ko'rsatish */
+      var xv=$('xlView');xv.style.display='';
+      renderXlData(_sessionFiles[key].data,xv);
+      toast(file.name+' yuklandi!','ok');
+    }else{
+      /* HTML — text saqlash va srcdoc bilan ko'rsatish */
+      _sessionFiles[key]={type:'html',data:e.target.result,name:file.name};
+      $('dePth').value=file.name;
+      $('dePth').dataset.sessionKey=key;
+      /* Darhol iframe da ko'rsatish */
+      var fr=$('dbFrame');
+      fr.removeAttribute('src');
+      fr.srcdoc=e.target.result;
+      fr.style.display='';
+      $('vErr').style.display='none';
+      toast(file.name+' yuklandi!','ok');
+    }
+  };
+  if(type==='excel')reader.readAsArrayBuffer(file);
+  else reader.readAsText(file);
+}
+
+/* 📄 Oddiy fayl tanlash */
+window.browseFile=function(type){
+  var inp=document.createElement('input');inp.type='file';
+  inp.accept=type==='excel'?'.xlsx,.xls':'.html,.htm';
+  inp.onchange=function(){
+    if(!inp.files||!inp.files[0])return;
+    storeAndShow(inp.files[0],type);
+  };
+  inp.click();
+};
+
+/* 📁 Papkadan tanlash — webkitdirectory */
+window.browseFolder=function(type){
+  var inp=document.createElement('input');inp.type='file';
+  inp.setAttribute('webkitdirectory','');inp.setAttribute('directory','');
+  inp.onchange=function(){
+    if(!inp.files||!inp.files.length)return;
+    var files=Array.from(inp.files);
+    var exts=type==='excel'?['.xlsx','.xls']:['.html','.htm'];
+    var matched=files.filter(function(f){return exts.some(function(e){return f.name.toLowerCase().endsWith(e)})});
+    if(!matched.length){toast('Mos fayl topilmadi','er');return}
+    if(matched.length===1){
+      storeAndShow(matched[0],type);
+      return;
+    }
+    /* Ko'p fayl — ro'yxatdan tanlash */
+    var html='<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center" id="fpOv">'
+      +'<div style="background:var(--card-s);border-radius:var(--radius-lg);padding:20px;max-width:500px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:var(--shadow-h)">'
+      +'<div style="font-family:var(--ffd);font-size:16px;font-weight:800;color:var(--t0);margin-bottom:4px">📁 Faylni tanlang</div>'
+      +'<div style="font-size:11px;color:var(--t2);margin-bottom:14px">'+matched.length+' ta '+type+' fayl topildi</div>';
+    matched.forEach(function(f,i){
+      html+='<div class="ali" style="margin-bottom:4px;cursor:pointer" onclick="fpSelect('+i+',\''+type+'\')">'
+        +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">'
+        +'<span style="font-size:14px">'+(type==='excel'?'📊':'🌐')+'</span>'
+        +'<div style="min-width:0"><div class="ali-nm" style="font-size:12px">'+f.name+'</div>'
+        +'<div class="ali-mt" style="font-size:9px">'+f.webkitRelativePath+'</div></div></div></div>';
+    });
+    html+='<button class="btn btn-s btn-sm" onclick="$(\'fpOv\').remove()" style="margin-top:10px">Yopish</button></div></div>';
+    document.body.insertAdjacentHTML('beforeend',html);
+    window._fpFiles=matched;
+  };
+  inp.click();
+};
+window.fpSelect=function(idx,type){
+  var f=window._fpFiles[idx];if(!f)return;
+  storeAndShow(f,type);
+  var ov=$('fpOv');if(ov)ov.remove();
+};
+
+/* 📦 ZIP ichidan fayl tanlash */
+window.browseZip=function(type){
+  var inp=document.createElement('input');inp.type='file';
+  inp.accept='.zip';
+  inp.onchange=async function(){
+    if(!inp.files||!inp.files[0])return;
+    toast('ZIP ochilmoqda...','nf');
+    try{
+      var ab=await inp.files[0].arrayBuffer();
+      var entries=await readZipEntries(ab);
+      var exts=type==='excel'?['.xlsx','.xls']:['.html','.htm'];
+      var matched=entries.filter(function(e){return exts.some(function(x){return e.name.toLowerCase().endsWith(x)})});
+      if(!matched.length){toast('ZIP da mos fayl topilmadi','er');return}
+      var html='<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center" id="zpOv">'
+        +'<div style="background:var(--card-s);border-radius:var(--radius-lg);padding:20px;max-width:560px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:var(--shadow-h)">'
+        +'<div style="font-family:var(--ffd);font-size:16px;font-weight:800;color:var(--t0);margin-bottom:4px">📦 ZIP: '+inp.files[0].name+'</div>'
+        +'<div style="font-size:11px;color:var(--t2);margin-bottom:14px">'+matched.length+' ta '+type+' fayl topildi</div>';
+      matched.forEach(function(e,i){
+        var nm=e.name.split('/').pop();
+        var dir=e.name.substring(0,e.name.lastIndexOf('/'));
+        html+='<div class="ali" style="margin-bottom:4px;cursor:pointer" onclick="zpSelect('+i+',\''+type+'\')">'
+          +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">'
+          +'<span style="font-size:14px">'+(type==='excel'?'📊':'🌐')+'</span>'
+          +'<div style="min-width:0"><div class="ali-nm" style="font-size:12px">'+nm+'</div>'
+          +'<div class="ali-mt" style="font-size:9px;word-break:break-all">'+dir+'</div></div></div></div>';
+      });
+      html+='<button class="btn btn-s btn-sm" onclick="$(\'zpOv\').remove()" style="margin-top:10px">Yopish</button></div></div>';
+      document.body.insertAdjacentHTML('beforeend',html);
+      window._zpEntries=matched;
+    }catch(e){toast('ZIP xato: '+e.message,'er')}
+  };
+  inp.click();
+};
+window.zpSelect=async function(idx,type){
+  var e=window._zpEntries[idx];if(!e)return;
+  try{
+    var blob=await e.getData();
+    /* ZIP dan olingan fayl — blob ni File ga o'zgartirish */
+    var fname=e.name.split('/').pop();
+    var file=new File([blob],fname);
+    storeAndShow(file,type);
+  }catch(err){toast('Xato: '+err.message,'er')}
+  var ov=$('zpOv');if(ov)ov.remove();
+};
+
+/* ZIP o'qish — JSZip ishlatmasdan oddiy unzip */
+async function readZipEntries(arrayBuffer){
+  var view=new DataView(arrayBuffer);var entries=[];
+  /* ZIP End of Central Directory topish */
+  var eocdOff=-1;
+  for(var i=arrayBuffer.byteLength-22;i>=0;i--){
+    if(view.getUint32(i,true)===0x06054b50){eocdOff=i;break}
+  }
+  if(eocdOff<0)throw new Error('ZIP emas');
+  var cdOff=view.getUint32(eocdOff+16,true);
+  var cdCount=view.getUint16(eocdOff+8,true);
+  var off=cdOff;
+  for(var i=0;i<cdCount;i++){
+    if(view.getUint32(off,true)!==0x02014b50)break;
+    var method=view.getUint16(off+10,true);
+    var compSize=view.getUint32(off+20,true);
+    var uncompSize=view.getUint32(off+24,true);
+    var nameLen=view.getUint16(off+28,true);
+    var extraLen=view.getUint16(off+30,true);
+    var commentLen=view.getUint16(off+32,true);
+    var localOff=view.getUint32(off+42,true);
+    var nameBytes=new Uint8Array(arrayBuffer,off+46,nameLen);
+    var name=new TextDecoder('utf-8').decode(nameBytes);
+    if(!name.endsWith('/')){
+      entries.push({name:name,method:method,compSize:compSize,uncompSize:uncompSize,localOff:localOff,
+        getData:function(){
+          var e=this;
+          return new Promise(function(resolve,reject){
+            try{
+              var lv=new DataView(arrayBuffer);
+              var lNameLen=lv.getUint16(e.localOff+26,true);
+              var lExtraLen=lv.getUint16(e.localOff+28,true);
+              var dataStart=e.localOff+30+lNameLen+lExtraLen;
+              var raw=new Uint8Array(arrayBuffer,dataStart,e.compSize);
+              if(e.method===0){
+                resolve(new Blob([raw]));
+              }else if(e.method===8){
+                var ds=new DecompressionStream('deflate-raw');
+                var writer=ds.writable.getWriter();
+                writer.write(raw);writer.close();
+                new Response(ds.readable).blob().then(resolve).catch(reject);
+              }else{reject(new Error('Unsupported method: '+e.method))}
+            }catch(err){reject(err)}
+          });
+        }.bind({localOff:localOff,compSize:compSize,uncompSize:uncompSize,method:method})
+      });
+    }
+    off+=46+nameLen+extraLen+commentLen;
+  }
+  return entries;
+}
+
+function toggleDbEdit(){$('dbEdit').classList.toggle('on');lucide.createIcons()}
+function saveDbEdit(){
+  var db=fDb(_curDb.lid,_curDb.did,_curDb.dbid);if(!db){toast('Xato','er');return}
+  var nm=$('deNm').value.trim(),ty=$('deTy').value,pth=$('dePth').value.trim(),xl=$('deXl').value.trim();
+  if(nm)db.name=nm;db.type=ty;
+
+  /* Sessiyadan yuklangan fayl bormi tekshirish */
+  var pthKey=$('dePth').dataset.sessionKey;
+  var xlKey=$('deXl').dataset.sessionKey;
+
+  if(pthKey&&_sessionFiles[pthKey]){
+    /* HTML fayl sessiyadan — kontentni keshga saqlash */
+    db._htmlCache=_sessionFiles[pthKey].data;
+    db.path=pth; /* Fayl nomini saqlash */
+  }else if(pth){
+    db.path=pth;
+  }
+
+  if(xlKey&&_sessionFiles[xlKey]){
+    /* Excel fayl sessiyadan — binary keshga */
+    db._xlCache=_sessionFiles[xlKey].data;
+    db.xl=xl;
+  }else if(xl){
+    db.xl=xl;
+  }else{delete db.xl}
+
+  save();$('dbTit').textContent=db.name;toast('Saqlandi!','ok');
+  renderDash(_curDb.lid,_curDb.did,_curDb.dbid);
+}
+function delCurDb(){if(!confirm("O'chirasizmi?"))return;var dp=fDp(_curDb.lid,_curDb.did);if(!dp)return;dp.dashboards=dp.dashboards.filter(function(b){return b.id!==_curDb.dbid});save();go('dept',{lid:_curDb.lid,did:_curDb.did});toast("O'chirildi",'nf')}
+function refreshDB(){renderDash(_curDb.lid,_curDb.did,_curDb.dbid);toast('Yangilandi','ok')}
+function goFS(){var v=document.querySelector('.viewer');document.fullscreenElement?document.exitFullscreen():v.requestFullscreen().catch(function(){})}
+
+
+/* ── CLOCK / WEATHER / NEWS ── */
+function tick(){var n=new Date();var cl=$('tcClock');if(cl)cl.textContent=[n.getHours(),n.getMinutes(),n.getSeconds()].map(function(x){return String(x).padStart(2,'0')}).join(':');var mn=['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];var dt=$('tcDate');if(dt)dt.textContent=n.getDate()+' '+mn[n.getMonth()]}
+setInterval(tick,1000);tick();
+/* ── OB-HAVO: Open-Meteo API — real vaqtda Toshkent ob-havosi ── */
+async function loadW(){
+  /* Weathercode → emoji + o'zbekcha tavsif */
+  var wc={0:['☀️','Ochiq osmon'],1:['🌤','Asosan ochiq'],2:['⛅','Qisman bulutli'],3:['☁️','Bulutli'],
+    45:['🌫️','Tuman'],48:['🌫️','Muzli tuman'],51:['🌧️','Engil yomg\'ir'],53:['🌧️','Yomg\'ir'],55:['🌧️','Kuchli yomg\'ir'],
+    61:['🌧️','Yomg\'ir'],63:['🌧️','O\'rtacha yomg\'ir'],65:['🌧️','Kuchli yomg\'ir'],
+    71:['❄️','Engil qor'],73:['❄️','Qor'],75:['❄️','Kuchli qor'],77:['❄️','Qor donachalari'],
+    80:['🌦️','Yomg\'ir'],81:['🌦️','Yomg\'ir'],82:['🌦️','Kuchli yomg\'ir'],
+    85:['🌨️','Qor'],86:['🌨️','Kuchli qor'],95:['⛈️','Momaqaldiroq'],96:['⛈️','Do\'l'],99:['⛈️','Kuchli do\'l']};
+  function wInfo(code){return wc[code]||['⛅','Noma\'lum']}
+  try{
+    /* Open-Meteo: bepul, kalitsiz, CORS yoq — Toshkent koordinatalari */
+    var url='https://api.open-meteo.com/v1/forecast?latitude=41.31&longitude=69.28&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Asia%2FTashkent&forecast_days=7';
+    var r=await fetch(url);var d=await r.json();
+    var cur=d.current, daily=d.daily;
+    var w=wInfo(cur.weather_code);
+    $('wTemp').textContent=Math.round(cur.temperature_2m)+'°C';
+    $('wIco').textContent=w[0];
+    /* Haftalik prognoz — 7 kunlik mini ko'rinish */
+    var kunlar=['Yak','Dush','Sesh','Chor','Pay','Jum','Shan'];
+    var week='';
+    if(daily&&daily.time){
+      week='<div class="w-forecast" style="display:flex;gap:6px;margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px">';
+      for(var i=0;i<Math.min(7,daily.time.length);i++){
+        var dt=new Date(daily.time[i]);
+        var dw=wInfo(daily.weather_code[i]);
+        week+='<div style="text-align:center;padding:3px 5px;background:var(--pill-bg);border-radius:var(--radius);border:1px solid var(--pill-brd);min-width:42px;font-size:9px">'
+          +'<div style="font-weight:800;color:var(--t2)">'+kunlar[dt.getDay()]+'</div>'
+          +'<div style="font-size:14px">'+dw[0]+'</div>'
+          +'<div style="color:var(--t0);font-weight:700">'+Math.round(daily.temperature_2m_max[i])+'°</div>'
+          +'<div style="color:var(--t3)">'+Math.round(daily.temperature_2m_min[i])+'°</div>'
+          +'</div>';
+      }
+      week+='</div>';
+    }
+    $('wDet').innerHTML='<div>'+w[1]+'</div>'
+      +'<div>Namlik: '+cur.relative_humidity_2m+'% · Shamol: '+Math.round(cur.wind_speed_10m)+' km/h</div>'
+      +week
+      +'<div style="margin-top:4px;font-size:9px;color:var(--t3)">Open-Meteo API · yangilandi: '+new Date().toLocaleTimeString('uz',{hour:'2-digit',minute:'2-digit'})+'</div>';
+  }catch(e){
+    /* Fallback — agar internet yo'q bo'lsa */
+    $('wTemp').textContent='11°C';$('wIco').textContent='⛅';
+    $('wDet').innerHTML='<div>Qisman bulutli</div><div>Namlik: 52% · Shamol: 3 km/h</div><div style="font-size:9px;color:var(--t3)">Oflayn rejim</div>';
+  }
+}
+try{loadW()}catch(e){} setInterval(function(){try{loadW()}catch(e){}},1800000); /* Har 30 daqiqada */
+
+/* ── YANGILIKLAR: bankers.uz va kun.uz ALOHIDA widgetlar ── */
+
+/* Bitta widget uchun yangilik render qilish */
+function renderNewsList(nl,news,timeId){
+  if(!news||!news.length){
+    nl.innerHTML='<div style="text-align:center;padding:10px;color:var(--t3);font-size:10px">Yangilik topilmadi</div>';
+    return;
+  }
+  nl.innerHTML=news.slice(0,15).map(function(n){
+    return '<div class="n-item"><span class="n-time">'+(n.t||'\u2022')+'</span><span class="n-txt">'+n.x+'</span></div>';
+  }).join('');
+  var el=$(timeId);if(el)el.textContent='\u27f3 '+new Date().toLocaleTimeString('uz',{hour:'2-digit',minute:'2-digit'});
+}
+
+/* Bitta manbadan RSS/HTML orqali yangilik olish */
+async function fetchNewsSrc(rssUrl,fallbackUrl,srcTag,limit){
+  var proxyUrls=[
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(rssUrl),
+    'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(rssUrl)
+  ];
+  var html=null;
+  for(var p=0;p<proxyUrls.length;p++){
+    try{var r=await fetch(proxyUrls[p],{signal:AbortSignal.timeout(8000)});if(r.ok){html=await r.text();if(html&&html.length>200)break;html=null}}catch(e){continue}
+  }
+  var news=[];
+  if(html&&(html.includes('<item')||html.includes('<entry'))){
+    var parser=new DOMParser();var doc=parser.parseFromString(html,'text/xml');
+    var items=doc.querySelectorAll('item, entry');
+    items.forEach(function(it,i){
+      if(i>=limit)return;
+      var title=(it.querySelector('title')||{}).textContent||'';
+      var pubDate=(it.querySelector('pubDate, published, updated')||{}).textContent||'';
+      var dt='';
+      if(pubDate){try{var d=new Date(pubDate);dt=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')}catch(e){}}
+      if(title.trim())news.push({t:dt,x:title.trim(),s:srcTag});
+    });
+    if(news.length>0)return news;
+  }
+  if((!html||html.length<200)&&fallbackUrl){
+    for(var p=0;p<proxyUrls.length;p++){
+      try{
+        var url2=proxyUrls[p].split('url=')[0]+'url='+encodeURIComponent(fallbackUrl);
+        if(proxyUrls[p].includes('codetabs'))url2=proxyUrls[p].split('quest=')[0]+'quest='+encodeURIComponent(fallbackUrl);
+        var r2=await fetch(url2,{signal:AbortSignal.timeout(8000)});
+        if(r2.ok){html=await r2.text();if(html&&html.length>500)break;html=null}
+      }catch(e){continue}
+    }
+  }
+  if(html&&html.length>500){
+    var dp=new DOMParser();var dd=dp.parseFromString(html,'text/html');
+    var links=dd.querySelectorAll('a[href*="/news/"],a[href*="/post/"]');
+    var seen={};
+    links.forEach(function(a){
+      if(news.length>=limit)return;
+      var txt=a.textContent.trim().replace(/\s+/g,' ');
+      if(txt.length>15&&txt.length<300&&!seen[txt]){seen[txt]=1;
+        var dm='';var pm=a.closest('[class]');
+        if(pm){var timeEl=pm.querySelector('time,[datetime]');if(timeEl){try{var td=new Date(timeEl.getAttribute('datetime')||timeEl.textContent);dm=String(td.getDate()).padStart(2,'0')+'.'+String(td.getMonth()+1).padStart(2,'0')}catch(e){}}}
+        news.push({t:dm,x:txt,s:srcTag});
+      }
+    });
+  }
+  return news;
+}
+
+/* bankers.uz yuklash */
+async function loadNB(){
+  var nl=$('nListB');
+  if(!nl)return;
+  nl.innerHTML='<div style="text-align:center;padding:10px;color:var(--t2);font-size:10px">\u23f3 bankers.uz...</div>';
+  try{
+    var news=await fetchNewsSrc('https://bankers.uz/rss','https://bankers.uz/','B',15);
+    if(news&&news.length>0){renderNewsList(nl,news,'nTimeB');return}
+    throw new Error('no data');
+  }catch(e){
+    nl.innerHTML=[
+{t:'30.01',x:"Banklarning depozit bazasi 2025-yilda 35,2% ga o\u2018sdi \u2014 417,3 trln so\u2018m"},
+{t:'29.01',x:"Sharof Sharipov TBC Digital Bosh moliya direktori etib tayinlandi"},
+{t:'28.01',x:"Markaziy bank 2026-yil yakunida inflyatsiya 6,5% prognoz qilmoqda"},
+{t:'28.01',x:"Asia Alliance Bank biometrik bankomatlarni ishga tushiradi"},
+{t:'27.01',x:"Yangi Bank omonatchilariga BRB orqali kompensatsiya 28-yanvardan"},
+{t:'22.01',x:"MB kechiktirilgan kredit to\u2018lovlari uchun penyalarni qayta ko\u2018rib chiqishni taklif qildi"},
+{t:'17.01',x:"2026-yilda banklar MHXSga o\u2018tadi, 2027-da Bazel III"},
+{t:'15.01',x:"Yangi Bank litsenziyasi chaqirib olindi \u2014 banklar soni 34 taga tushdi"},
+{t:'15.01',x:"2025-yilda banklarning sof foydasi 2,2 barobarga ortdi"},
+{t:'05.01',x:"Ipak Yo\u2018li Bank Green Generation loyihasini boshladi"},
+{t:'03.01',x:"2025-yil yakunida rasmiy inflyatsiya 9,8% \u2014 MB hisoboti"}
+].map(function(n){return '<div class="n-item"><span class="n-time">'+n.t+'</span><span class="n-txt">'+n.x+'</span></div>'}).join('');
+    nl.innerHTML+='<div style="text-align:center;padding:4px;font-size:8px;color:var(--t3)">\u26a1 Oflayn</div>';
+  }
+}
+
+/* kun.uz yuklash — maxsus parser */
+async function loadNK(){
+  var nl=$('nListK');
+  if(!nl)return;
+  nl.innerHTML='<div style="text-align:center;padding:10px;color:var(--t2);font-size:10px">\u23f3 kun.uz...</div>';
+  try{
+    /* kun.uz uchun bir nechta RSS URL'ni sinab ko'rish */
+    var rssUrls=[
+      'https://kun.uz/uz/rss',
+      'https://kun.uz/rss',
+      'https://kun.uz/uz/rss/news',
+      'https://kun.uz/rss/news'
+    ];
+    var proxyBases=[
+      'https://api.allorigins.win/raw?url=',
+      'https://api.codetabs.com/v1/proxy?quest='
+    ];
+    var news=[];
+
+    /* 1-usul: RSS feed orqali */
+    for(var r=0;r<rssUrls.length&&!news.length;r++){
+      for(var p=0;p<proxyBases.length&&!news.length;p++){
+        try{
+          var resp=await fetch(proxyBases[p]+encodeURIComponent(rssUrls[r]),{signal:AbortSignal.timeout(8000)});
+          if(!resp.ok)continue;
+          var html=await resp.text();
+          if(!html||html.length<200)continue;
+          if(html.includes('<item')||html.includes('<entry')){
+            var parser=new DOMParser();var doc=parser.parseFromString(html,'text/xml');
+            var items=doc.querySelectorAll('item, entry');
+            items.forEach(function(it,i){
+              if(i>=15)return;
+              var title=(it.querySelector('title')||{}).textContent||'';
+              var pubDate=(it.querySelector('pubDate, published, updated')||{}).textContent||'';
+              var dt='';
+              if(pubDate){try{var d=new Date(pubDate);dt=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')}catch(e){}}
+              /* Kategoriya nomlarini filtrlash — haqiqiy yangilik 25+ belgi */
+              if(title.trim()&&title.trim().length>25)news.push({t:dt,x:title.trim(),s:'K'});
+            });
+          }
+        }catch(e){continue}
+      }
+    }
+    if(news.length>0){renderNewsList(nl,news,'nTimeK');return}
+
+    /* 2-usul: kun.uz sahifasini parse qilish */
+    var pageUrls=['https://kun.uz/uz','https://kun.uz/uz/news/list','https://kun.uz'];
+    var pageHtml=null;
+    for(var u=0;u<pageUrls.length&&!pageHtml;u++){
+      for(var p=0;p<proxyBases.length&&!pageHtml;p++){
+        try{
+          var resp2=await fetch(proxyBases[p]+encodeURIComponent(pageUrls[u]),{signal:AbortSignal.timeout(8000)});
+          if(resp2.ok){var h=await resp2.text();if(h&&h.length>1000)pageHtml=h}
+        }catch(e){continue}
+      }
+    }
+    if(pageHtml){
+      var dp=new DOMParser();var dd=dp.parseFromString(pageHtml,'text/html');
+      /* kun.uz yangilik selektorlari — turli strukturalar */
+      var selectors=[
+        'article a','a[href*="/news/"]','a[href*="/uz/"]',
+        '.news-list a','h2 a','h3 a','.title a',
+        '[class*="news"] a','[class*="article"] a'
+      ];
+      var seen={},news2=[];
+      selectors.forEach(function(sel){
+        if(news2.length>=15)return;
+        try{
+          var els=dd.querySelectorAll(sel);
+          els.forEach(function(a){
+            if(news2.length>=15)return;
+            var txt=a.textContent.trim().replace(/\s+/g,' ');
+            var href=a.getAttribute('href')||'';
+            /* Filtrlash: 25+ belgi, dublikat emas, kategoriya emas */
+            var skipWords=['xabarlar','hikoyalar','tanlovi','maqolalar','fotogalereya','video','barcha','barchasi','ko\'proq','batafsil','tag','category'];
+            var isCategory=false;
+            skipWords.forEach(function(sw){if(txt.toLowerCase().includes(sw)&&txt.length<40)isCategory=true});
+            if(txt.length>25&&txt.length<300&&!seen[txt]&&!isCategory){
+              seen[txt]=1;
+              var dm='';
+              var pm=a.closest('[class]');
+              if(pm){var timeEl=pm.querySelector('time,[datetime]');if(timeEl){try{var td=new Date(timeEl.getAttribute('datetime')||timeEl.textContent);dm=String(td.getDate()).padStart(2,'0')+'.'+String(td.getMonth()+1).padStart(2,'0')}catch(e){}}}
+              news2.push({t:dm,x:txt,s:'K'});
+            }
+          });
+        }catch(e){}
+      });
+      if(news2.length>0){renderNewsList(nl,news2,'nTimeK');return}
+    }
+    throw new Error('no data');
+  }catch(e){
+    nl.innerHTML=[
+{t:'01.02',x:"O\u2018zbekiston Prezidenti yangi farmonlar imzoladi \u2014 kun.uz"},
+{t:'31.01',x:"Yevrokomissiya Rossiyani yuqori xavfli davlatlar ro\u2018yxatiga kiritdi"},
+{t:'30.01',x:"Toshkentda harorat minus 5 gradusga tushishi kutilmoqda"},
+{t:'28.01',x:"O\u2018zbekiston 2026-yilda YAIMni 6,2 foizga oshirishni rejalashtirmoqda"},
+{t:'27.01',x:"Toshkentda yangi metro yo\u2018nalishi ochildi \u2014 Sergeli tarmog\u2018i"},
+{t:'25.01',x:"Prezident yangi imtiyozli ipoteka dasturini e\u2018lon qildi"},
+{t:'22.01',x:"O\u2018zbekistonda yangi soliq islohotlari tayyorlanmoqda \u2014 moliya vazirligi"},
+{t:'20.01',x:"IT sektori eksporti birinchi marta 1 milliard dollardan oshdi"},
+{t:'18.01',x:"Samarqandda xalqaro turizm forumi bo\u2018lib o\u2018tadi \u2014 200 dan ortiq mehmon"},
+{t:'15.01',x:"2025-yilda aholining real daromadlari 12 foizga o\u2018sdi \u2014 statistika"}
+].map(function(n){return '<div class="n-item"><span class="n-time">'+n.t+'</span><span class="n-txt">'+n.x+'</span></div>'}).join('');
+    nl.innerHTML+='<div style="text-align:center;padding:4px;font-size:8px;color:var(--t3)">\u26a1 Oflayn</div>';
+  }
+}
+
+/* Ikkalasini birga yuklash */
+function loadN(){loadNB();loadNK()}
+try{loadN()}catch(e){} setInterval(function(){try{loadN()}catch(e){}},600000); /* Har 10 daqiqada */
+
+
+
+
+/* ── Tema boshqarish ── */
+function setTheme(t){
+  document.body.setAttribute('data-theme',t);
+  localStorage.setItem('cbNT',t);
+  document.querySelectorAll('.tp').forEach(function(b){b.classList.toggle('tp-on',b.dataset.t===t)});
+}
+
+/* ── Admin panelda renderHome stub (admTab'da ishlatiladi) ── */
+function renderHome(){}
+
+/* ── Admin tab functions ── */
+function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t.classList.toggle('on',t.dataset.tab===tab)});var b=$('admBd');
+  if(tab==='leaders')b.innerHTML='<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:12px">Rahbarlar</div>'+D.leaders.map(function(l){return '<div class="ali"><div><div class="ali-nm">'+l.name+'</div><div class="ali-mt">'+l.role+'</div></div><div class="ali-acts"><button class="btn btn-sm btn-s" onclick="editLN(\''+l.id+'\')"><i data-lucide="pencil" style="width:11px;height:11px"></i></button></div></div>'}).join('');
+  else if(tab==='transfer'){var ad=[];D.leaders.forEach(function(l){l.departments.forEach(function(d){ad.push({lid:l.id,ln:l.name,did:d.id,dn:d.name})})});b.innerHTML='<div class="fg"><label class="fl">Bo\'lim</label><select class="fs" id="trD"><option>Tanlang</option>'+ad.map(function(d){return '<option value="'+d.lid+'__'+d.did+'">'+d.dn+'</option>'}).join('')+'</select></div><div style="text-align:center;font-size:24px;color:var(--ac);margin:8px 0">↓</div><div class="fg"><label class="fl">Yangi rahbar</label><select class="fs" id="trT">'+D.leaders.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>'}).join('')+'</select></div><button class="btn btn-p" onclick="doTr()">Ko\'chirish</button>'}
+  else if(tab==='depts'){b.innerHTML='<div class="fg"><label class="fl">Rahbar</label><select class="fs" id="ndL">'+D.leaders.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>'}).join('')+'</select></div><div class="fg"><label class="fl">Nomi</label><input class="fi" id="ndN" placeholder="Bo\'lim nomi"></div><div class="fg"><label class="fl">Bo\'lim boshlig\'i</label><input class="fi" id="ndBoss" placeholder="F.I.Sh"></div><div class="fg"><label class="fl">Lavozimi</label><input class="fi" id="ndBossRole" placeholder="Bo\'lim boshlig\'i"></div><button class="btn btn-p" onclick="addDp()">Qo\'shish</button><hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'+D.leaders.map(function(l){return '<div style="font-family:var(--ffd);font-size:13px;font-weight:800;color:var(--ac);margin:12px 0 6px">'+l.name+'</div>'+l.departments.map(function(d){return '<div class="ali"><div><div class="ali-nm">'+d.name+'</div><div class="ali-mt">'+(d.boss?'<span style="color:var(--ac)">👤 '+d.boss+(d.bossRole?' — '+d.bossRole:'')+'</span>':'<span style="color:var(--t3)">Boshliq tayinlanmagan</span>')+'</div></div><div class="ali-acts"><button class="btn btn-sm btn-s" onclick="editBoss(\''+l.id+'\',\''+d.id+'\')" title="Boshliq"><i data-lucide="user-circle" style="width:11px;height:11px"></i></button><button class="btn btn-sm btn-s" onclick="renDp(\''+l.id+'\',\''+d.id+'\')" title="Nom"><i data-lucide="pencil" style="width:11px;height:11px"></i></button><button class="btn btn-sm btn-d" onclick="delDp(\''+l.id+'\',\''+d.id+'\')"><i data-lucide="trash-2" style="width:11px;height:11px"></i></button></div></div>'}).join('')}).join('')}
+  else if(tab==='dashs'){var all=[];D.leaders.forEach(function(l){l.departments.forEach(function(d){d.dashboards.forEach(function(db){all.push({lid:l.id,did:d.id,dn:d.name,db:db})})})});b.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0)">Dashboardlar</div><button class="btn btn-p btn-sm" onclick="closeAdm();openAddDash()"><i data-lucide="plus-circle" style="width:12px;height:12px"></i> Yangi</button></div>'+(all.length?all.map(function(it){return '<div class="ali" style="flex-wrap:wrap"><div style="flex:1;min-width:150px"><div class="ali-nm">'+it.db.name+'</div><div class="ali-mt">'+it.dn+'</div></div><div class="ali-acts"><button class="btn btn-sm btn-s" onclick="renDb(\''+it.lid+'\',\''+it.did+'\',\''+it.db.id+'\')">Nom</button><button class="btn btn-sm btn-s" onclick="edPath(\''+it.lid+'\',\''+it.did+'\',\''+it.db.id+'\')">Yo\'l</button><button class="btn btn-sm btn-d" onclick="delDb(\''+it.lid+'\',\''+it.did+'\',\''+it.db.id+'\')"><i data-lucide="trash-2" style="width:11px;height:11px"></i></button></div></div>'}).join(''):'<p style="color:var(--t2)">Yo\'q</p>')}
+  else if(tab==='upload'){var ad2=[];D.leaders.forEach(function(l){l.departments.forEach(function(d){ad2.push({lid:l.id,did:d.id,label:l.name+' → '+d.name})})});b.innerHTML='<div class="fg"><label class="fl">Bo\'lim</label><select class="fs" id="uDp">'+ad2.map(function(d){return '<option value="'+d.lid+'__'+d.did+'">'+d.label+'</option>'}).join('')+'</select></div><div class="fg"><label class="fl">Nomi</label><input class="fi" id="uN" placeholder="Dashboard nomi"></div><div class="fg"><label class="fl">Turi</label><select class="fs" id="uTy" onchange="$(\'uUrl\').style.display=this.value===\'url\'?\'\':\'none\';$(\'uFg\').style.display=this.value===\'url\'?\'none\':\'\'"><option value="html">HTML</option><option value="excel">Excel</option><option value="url">URL</option></select></div><div class="fg" id="uUrl" style="display:none"><label class="fl">URL</label><input class="fi" id="uUr" placeholder="https://..."></div><div class="fg" id="uFg"><label class="fl">Fayl</label><div class="upzone" onclick="$(\'uFi\').click()"><input type="file" id="uFi" accept=".html,.xlsx,.xls" onchange="$(\'uFn\').textContent=this.files[0]?\'✓ \'+this.files[0].name:\'\'"><div style="font-size:28px;margin-bottom:5px">📁</div><div>Faylni tanlang</div></div><div id="uFn" style="font-size:10px;color:var(--ac);margin-top:4px"></div></div><div class="fg"><label class="fl">Excel (ixtiyoriy)</label><div class="upzone" onclick="$(\'uXi\').click()" style="padding:16px"><input type="file" id="uXi" accept=".xlsx,.xls" onchange="$(\'uXn\').textContent=this.files[0]?\'✓ \'+this.files[0].name:\'\'">📊</div><div id="uXn" style="font-size:10px;color:var(--ok);margin-top:4px"></div></div><button class="btn btn-p" onclick="doUp()">Saqlash</button>'}
+  else if(tab==='files'){
+    /* PAPKA BRAUZERI — fayllarni ko'rish, tanlash, yo'l nusxalash */
+    var root=[];
+    D.leaders.forEach(function(l){
+      var lDir={name:l.name.split('.').pop().split(' ')[0]+" yo'nalishi",type:'dir',lid:l.id,children:[]};
+      l.departments.forEach(function(d){
+        var dDir={name:d.name,type:'dir',lid:l.id,did:d.id,children:[]};
+        d.dashboards.forEach(function(db){
+          /* HTML fayl */
+          if(db.path)dDir.children.push({name:db.path.split('/').pop(),type:db.type==='excel'?'xlsx':'html',path:db.path,dbName:db.name,dbId:db.id,lid:l.id,did:d.id});
+          /* Excel fayl */
+          if(db.xl)dDir.children.push({name:db.xl.split('/').pop(),type:'xlsx',path:db.xl,dbName:db.name+' (Excel)',dbId:db.id,lid:l.id,did:d.id});
+        });
+        lDir.children.push(dDir);
+      });
+      root.push(lDir);
+    });
+    function renderBrowser(items,depth){
+      return items.map(function(it){
+        var pad=depth*18;
+        if(it.type==='dir'){
+          var cnt=it.children?it.children.reduce(function(s,c){return s+(c.type==='dir'?(c.children?c.children.length:0):1)},0):0;
+          return '<div class="fb-dir" style="padding-left:'+pad+'px">'
+            +'<div class="ali" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'\':\'none\';this.querySelector(\'.fb-arrow\').classList.toggle(\'fb-open\')" style="cursor:pointer">'
+            +'<div style="display:flex;align-items:center;gap:8px"><span class="fb-arrow">▶</span><span style="font-size:16px">📁</span><div><div class="ali-nm">'+it.name+'</div><div class="ali-mt">'+cnt+' fayl</div></div></div></div>'
+            +'<div style="display:none">'+renderBrowser(it.children||[],depth+1)+'</div></div>';
+        }else{
+          var ico=it.type==='xlsx'?'📊':it.type==='html'?'🌐':'📄';
+          var sz=it.path?it.path.length+'B':'';
+          return '<div class="ali" style="margin-left:'+pad+'px;margin-bottom:3px">'
+            +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0"><span style="font-size:14px">'+ico+'</span>'
+            +'<div style="min-width:0"><div class="ali-nm" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+it.name+'</div>'
+            +'<div class="ali-mt" style="font-size:9px">'+it.dbName+' · <code style="font-size:8px;color:var(--ac);cursor:pointer" onclick="navigator.clipboard.writeText(\''+it.path.replace(/'/g,"\\'")+ '\');toast(\'Nusxalandi!\',\'ok\')" title="Nusxalash">'+it.path.slice(0,50)+(it.path.length>50?'…':'')+'</code></div></div></div>'
+            +'<div class="ali-acts"><button class="btn btn-sm btn-p" onclick="closeAdm();go(\'dashboard\',{lid:\''+it.lid+'\',did:\''+it.did+'\',dbid:\''+it.dbId+'\'})">Ochish</button>'
+            +'<button class="btn btn-sm btn-s" onclick="edPath(\''+it.lid+'\',\''+it.did+'\',\''+it.dbId+'\')">Yo\'l</button></div></div>';
+        }
+      }).join('');
+    }
+    b.innerHTML='<style>.fb-arrow{display:inline-block;transition:transform .2s;font-size:8px;color:var(--t3)}.fb-open{transform:rotate(90deg)}.fb-dir{margin-bottom:2px}</style>'
+      +'<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:4px">📁 Papka brauzeri</div>'
+      +'<div style="font-size:11px;color:var(--t2);margin-bottom:14px">Barcha fayllar va yo\'llarni ko\'ring. Yo\'lni bosib nusxalang, "Ochish" bilan dashboardni oching.</div>'
+      +'<div class="fg"><label class="fl">Fayl qidirish</label><input class="fi" id="fbSearch" placeholder="Fayl nomi..." oninput="fbFilter(this.value)"></div>'
+      +'<div id="fbTree">'+renderBrowser(root,0)+'</div>'
+      +'<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--brd2)">'
+      +'<div style="font-size:10px;color:var(--t3);margin-bottom:6px">Yangi fayl qo\'shish (drag & drop yoki tanlash):</div>'
+      +'<div class="upzone" onclick="$(\'fbFileInput\').click()" style="padding:14px"><input type="file" id="fbFileInput" accept=".html,.xlsx,.xls" multiple onchange="fbAddFiles(this)"><div>📁 HTML yoki Excel fayllarni tanlang</div></div></div>';
+  }
+  else if(tab==='cfg'){
+    var cUrl=_getCloudUrl();
+    b.innerHTML='<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--ac);margin-bottom:4px">☁ Bulut sinxronizatsiya</div>'
+    +'<div style="font-size:11px;color:var(--t2);margin-bottom:14px">Ma\'lumotlar bulutda saqlanadi — barcha foydalanuvchilar ko\'radi</div>'
+    +'<div id="cloudInd" style="font-size:12px;font-weight:700;margin-bottom:10px;color:'+(cUrl?'#22c55e':'var(--t3)')+'">'+(!cUrl?'⚪ Bulut ulanmagan':'☁ Bulut ulangan')+'</div>'
+    +'<div class="fg"><label class="fl">npoint.io URL</label><input class="fi" id="cloudUrlInp" value="'+(cUrl||'')+'" placeholder="https://api.npoint.io/xxxxxxxxx" style="font-size:12px"></div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'
+    +'<button class="btn btn-p btn-sm" onclick="saveCloudUrl()">💾 Saqlash</button>'
+    +'<button class="btn btn-s btn-sm" onclick="testCloud()">🔍 Test</button>'
+    +'<button class="btn btn-s btn-sm" onclick="pushAllToCloud()">⬆ Hamma ma\'lumotni yuklash</button>'
+    +'</div>'
+    +'<div style="background:var(--card-s);border:1px solid var(--brd2);border-radius:var(--radius);padding:12px;margin-bottom:14px">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--t0);margin-bottom:6px">📋 Sozlash qadamlari:</div>'
+    +'<div style="font-size:10px;color:var(--t2);line-height:1.6">'
+    +'1. <a href="https://www.npoint.io/" target="_blank" style="color:var(--ac);text-decoration:underline">npoint.io</a> ga o\'ting<br>'
+    +'2. "Create JSON Bin" bosing → <code>{}</code> yozing → "Save" bosing<br>'
+    +'3. Hosil bo\'lgan API URL ni nusxalang (masalan: https://api.npoint.io/abc123)<br>'
+    +'4. Yuqoridagi maydonga joylang va "Saqlash" bosing<br>'
+    +'5. "Hamma ma\'lumotni yuklash" bosing — tamom! ✅'
+    +'</div></div>'
+    +'<hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'
+    +'<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--ac);margin-bottom:4px">\uD83E\uDD16 Suniy intellekt</div>'
+    +'<div style="font-size:11px;color:var(--t2);margin-bottom:10px">Claude AI — ovozli assistent uchun aqlli javoblar</div>'
+    +'<div class="fg"><label class="fl">Anthropic API kalit</label><input class="fi" id="aiKeyInp" type="password" value="'+((localStorage.getItem('aiApiKey')||'')?'••••••••••':'')+'" placeholder="sk-ant-api03-..." style="font-size:12px"></div>'
+    +'<div style="display:flex;gap:6px;margin-bottom:8px">'
+    +'<button class="btn btn-p btn-sm" onclick="saveAiKey()">💾 Saqlash</button>'
+    +'</div>'
+    +'<div style="background:var(--card-s);border:1px solid var(--brd2);border-radius:var(--radius);padding:12px;margin-bottom:14px">'
+    +'<div style="font-size:10px;color:var(--t2);line-height:1.6">'
+    +'API kalit: <a href="https://console.anthropic.com/" target="_blank" style="color:var(--ac)">console.anthropic.com</a> dan oling<br>'
+    +'Yoki Netlify env: <code>ANTHROPIC_API_KEY</code> qo\'shing'
+    +'</div></div>'
+    +'<hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'
+    +'<div style="font-family:var(--ffd);font-size:15px;font-weight:800;color:var(--ac);margin-bottom:12px">🎙 Azure Speech</div><div class="fg"><label class="fl">Azure Region</label><select class="fs" id="azReg" onchange="localStorage.setItem(\'azRegion\',this.value);AZ_REGION=this.value;azSpeechCfg=null;toast(\'Region yangilandi\',\'ok\')"><option value="eastus"'+(AZ_REGION==='eastus'?' selected':'')+'>East US</option><option value="westus"'+(AZ_REGION==='westus'?' selected':'')+'>West US</option><option value="westeurope"'+(AZ_REGION==='westeurope'?' selected':'')+'>West Europe</option><option value="southeastasia"'+(AZ_REGION==='southeastasia'?' selected':'')+'>Southeast Asia</option><option value="centralindia"'+(AZ_REGION==='centralindia'?' selected':'')+'>Central India</option><option value="eastasia"'+(AZ_REGION==='eastasia'?' selected':'')+'>East Asia</option><option value="northeurope"'+(AZ_REGION==='northeurope'?' selected':'')+'>North Europe</option><option value="uksouth"'+(AZ_REGION==='uksouth'?' selected':'')+'>UK South</option></select></div><div class="fg"><label class="fl">TTS Ovoz</label><select class="fs" id="azVoice" onchange="localStorage.setItem(\'azVoice\',this.value);azSpeechCfg=null;toast(\'Ovoz yangilandi\',\'ok\')"><option value="uz-UZ-MadinaNeural"'+((localStorage.getItem('azVoice')||'uz-UZ-MadinaNeural')==='uz-UZ-MadinaNeural'?' selected':'')+'>Madina (ayol)</option><option value="uz-UZ-SardorNeural"'+((localStorage.getItem('azVoice')||'')==='uz-UZ-SardorNeural'?' selected':'')+'>Sardor (erkak)</option></select></div><div class="fg"><label class="fl">Test</label><button class="btn btn-p btn-sm" onclick="vSpeak(\'Assalomu alaykum! Azure ovozli yordamchi ishlayapti.\')">🔊 Ovozni sinash</button></div>'
+    +'<hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)"><div class="fg"><label class="fl">Qaytarish</label><button class="btn btn-d" onclick="resetAll()">Asl holatga</button></div><hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)"><div class="fg"><label class="fl">Eksport</label><button class="btn btn-s" onclick="expJ()">JSON</button></div><div class="fg"><label class="fl">Import</label><input type="file" accept=".json" onchange="impJ(this)" style="font-size:12px;color:var(--t1)"></div>'}
+  lucide.createIcons()}
+window.editLN=function(id){var l=fL(id);if(!l)return;var n=prompt("Nom:",l.name);if(n&&n.trim()){l.name=n.trim();save();admTab('leaders');toast('OK','ok')}};
+window.doTr=function(){var ds=$('trD').value,tid=$('trT').value;if(!ds||!tid||!ds.includes('__')){toast("Tanlang",'er');return}var p=ds.split('__'),fl=p[0],did=p[1];if(fl===tid){toast("Xuddi shu",'er');return}var from=fL(fl),to=fL(tid);var idx=from.departments.findIndex(function(d){return d.id===did});if(idx===-1)return;to.departments.push(from.departments.splice(idx,1)[0]);save();admTab('transfer');toast("OK",'ok')};
+window.addDp=function(){var lid=$('ndL').value,n=$('ndN').value.trim(),boss=$('ndBoss')?$('ndBoss').value.trim():'',bossRole=$('ndBossRole')?$('ndBossRole').value.trim():'';if(!n){toast("Nom!",'er');return}fL(lid).departments.push({id:'d_'+Date.now(),name:n,boss:boss||'',bossRole:bossRole||'',dashboards:[]});save();admTab('depts');toast("OK",'ok')};
+window.editBoss=function(lid,did){var d=fDp(lid,did);if(!d)return;var n=prompt("Bo'lim boshlig'i (F.I.Sh):",d.boss||'');if(n===null)return;d.boss=n.trim();var r=prompt("Lavozimi:",d.bossRole||'');if(r!==null)d.bossRole=r.trim();save();admTab('depts');renderHome();toast("OK",'ok')};
+window.renDp=function(lid,did){var d=fDp(lid,did);if(!d)return;var n=prompt("Nom:",d.name);if(n&&n.trim()){d.name=n.trim();save();admTab('depts');toast("OK",'ok')}};
+window.delDp=function(lid,did){if(!confirm("O'chirish?"))return;fL(lid).departments=fL(lid).departments.filter(function(x){return x.id!==did});save();admTab('depts');toast("O'chirildi",'nf')};
+window.renDb=function(l,d,db){var x=fDb(l,d,db);if(!x)return;var n=prompt("Nom:",x.name);if(n&&n.trim()){x.name=n.trim();save();admTab('dashs');toast("OK",'ok')}};
+window.edPath=function(l,d,db){var x=fDb(l,d,db);if(!x)return;var n=prompt("Yo'l:",x.path||'');if(n!==null){x.path=n.trim();if(n.startsWith('http'))x.type='url';save();admTab('dashs');toast("OK",'ok')}};
+window.delDb=function(l,d,db){var dp=fDp(l,d);if(!dp||!confirm("O'chirish?"))return;dp.dashboards=dp.dashboards.filter(function(b){return b.id!==db});save();admTab('dashs');toast("O'chirildi",'nf')};
+window.doUp=function(){var ds=$('uDp').value,nm=$('uN').value.trim(),ty=$('uTy').value;if(!nm){toast("Nom!",'er');return}var p=ds.split('__'),dp=fDp(p[0],p[1]);if(!dp)return;var nd={id:'db_'+Date.now(),name:nm,type:ty,path:''};if(ty==='url')nd.path=$('uUr').value.trim();else{var fi=$('uFi');if(fi.files[0])nd.path=URL.createObjectURL(fi.files[0])}var xi=$('uXi');if(xi&&xi.files[0])nd.xl=URL.createObjectURL(xi.files[0]);dp.dashboards.push(nd);save();admTab('upload');toast("Qo'shildi!",'ok')};
+window.resetAll=function(){if(!confirm("Davom?"))return;D=JSON.parse(JSON.stringify(INIT));save();go('home');closeAdm();toast("Qaytarildi",'nf')};
+window.expJ=function(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,2)]));a.download='mb_data.json';a.click()};
+window.impJ=function(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){try{D=JSON.parse(e.target.result);save();go('home');toast("OK",'ok')}catch(e){toast("Xato",'er')}};r.readAsText(f)};
+/* Papka brauzeri — qidirish filtri */
+window.fbFilter=function(q){
+  q=q.toLowerCase();var tree=$('fbTree');if(!tree)return;
+  tree.querySelectorAll('.ali').forEach(function(el){
+    var nm=el.querySelector('.ali-nm');
+    if(!nm)return;
+    var match=!q||nm.textContent.toLowerCase().includes(q);
+    el.style.display=match?'':'none';
+    /* Agar topilsa — barcha parent dirlarni ochish */
+    if(match&&q){var p=el.parentElement;while(p&&p!==tree){if(p.style.display==='none')p.style.display='';p=p.parentElement}}
+  });
+};
+/* Papka brauzeri — yangi fayl qo'shish */
+window.fbAddFiles=function(inp){
+  if(!inp.files||!inp.files.length)return;
+  /* Bo'limni tanlash uchun dialog */
+  var opts=[];D.leaders.forEach(function(l){l.departments.forEach(function(d){opts.push({lid:l.id,did:d.id,label:l.name+' → '+d.name})})});
+  var sel=prompt('Qaysi bo\'limga qo\'shilsin?\n'+opts.map(function(o,i){return (i+1)+'. '+o.label}).join('\n'),'1');
+  if(!sel)return;var idx=parseInt(sel)-1;if(idx<0||idx>=opts.length){toast("Noto'g'ri",'er');return}
+  var target=opts[idx];var dp=fDp(target.lid,target.did);if(!dp)return;
+  Array.from(inp.files).forEach(function(f){
+    var ext=f.name.split('.').pop().toLowerCase();
+    var ty=ext==='xlsx'||ext==='xls'?'excel':'html';
+    var blobUrl=URL.createObjectURL(f);
+    dp.dashboards.push({id:'db_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),name:f.name.replace(/\.[^.]+$/,''),type:ty,path:blobUrl});
+    toast(f.name+' qo\'shildi!','ok');
+  });
+  save();admTab('files');
+};
+/* ═══ YANGI DASHBOARD QO'SHISH MODALI ═══ */
+var _adSession={};/* Sessiya xotira: html kontent yoki excel binary */
+
+window.openAddDash=function(lid,did){
+  var ov=$('addDbOv');ov.style.display='';
+  setTimeout(function(){ov.classList.add('on')},10);
+  /* Bo'limlar ro'yxatini to'ldirish */
+  var sel=$('adDept');sel.innerHTML='';
+  D.leaders.forEach(function(l){l.departments.forEach(function(d){
+    var opt=document.createElement('option');
+    opt.value=l.id+'__'+d.id;
+    opt.textContent=l.name.split(' ').pop()+' → '+d.name;
+    if(l.id===lid&&d.id===did)opt.selected=true;
+    sel.appendChild(opt);
+  })});
+  /* Formani tozalash */
+  $('adName').value='';$('adType').value='html';
+  $('adPath').value='';$('adXl').value='';$('adUrl').value='';
+  adTypeChg();_adSession={};
+  lucide.createIcons();
+};
+window.closeAddDash=function(){
+  var ov=$('addDbOv');ov.classList.remove('on');
+  setTimeout(function(){ov.style.display='none'},300);
+};
+window.adTypeChg=function(){
+  var ty=$('adType').value;
+  $('adUrlFg').style.display=ty==='url'?'':'none';
+  $('adFileFg').style.display=ty==='url'?'none':'';
+};
+
+/* Modal ichida fayl tanlash */
+window.adBrowse=function(type,method){
+  if(method==='file'){
+    var inp=document.createElement('input');inp.type='file';
+    inp.accept=type==='excel'?'.xlsx,.xls':'.html,.htm';
+    inp.onchange=function(){if(inp.files&&inp.files[0])adStoreFile(inp.files[0],type)};
+    inp.click();
+  }else if(method==='folder'){
+    var inp2=document.createElement('input');inp2.type='file';
+    inp2.setAttribute('webkitdirectory','');inp2.setAttribute('directory','');
+    inp2.onchange=function(){
+      if(!inp2.files||!inp2.files.length)return;
+      var exts=type==='excel'?['.xlsx','.xls']:['.html','.htm'];
+      var matched=Array.from(inp2.files).filter(function(f){return exts.some(function(e){return f.name.toLowerCase().endsWith(e)})});
+      if(!matched.length){toast('Mos fayl topilmadi','er');return}
+      if(matched.length===1){adStoreFile(matched[0],type);return}
+      /* Tanlash dialogi */
+      var html='<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:10001;display:flex;align-items:center;justify-content:center" id="adFpOv">'
+        +'<div style="background:var(--card-s);border-radius:var(--radius-lg);padding:20px;max-width:500px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:var(--shadow-h)">'
+        +'<div style="font-family:var(--ffd);font-size:16px;font-weight:800;color:var(--t0);margin-bottom:14px">📁 '+matched.length+' ta fayl topildi</div>';
+      matched.forEach(function(f,i){
+        html+='<div class="ali" style="margin-bottom:4px;cursor:pointer" onclick="adFpPick('+i+',\''+type+'\')">'
+          +'<div style="display:flex;align-items:center;gap:8px"><span>'+(type==='excel'?'📊':'🌐')+'</span>'
+          +'<div><div class="ali-nm" style="font-size:12px">'+f.name+'</div>'
+          +'<div class="ali-mt" style="font-size:9px">'+f.webkitRelativePath+'</div></div></div></div>';
+      });
+      html+='<button class="btn btn-s btn-sm" onclick="$(\'adFpOv\').remove()" style="margin-top:10px">Yopish</button></div></div>';
+      document.body.insertAdjacentHTML('beforeend',html);
+      window._adFpFiles=matched;
+    };
+    inp2.click();
+  }else if(method==='zip'){
+    var inp3=document.createElement('input');inp3.type='file';inp3.accept='.zip';
+    inp3.onchange=async function(){
+      if(!inp3.files||!inp3.files[0])return;
+      toast('ZIP ochilmoqda...','nf');
+      try{
+        var ab=await inp3.files[0].arrayBuffer();
+        var entries=await readZipEntries(ab);
+        var exts=type==='excel'?['.xlsx','.xls']:['.html','.htm'];
+        var matched=entries.filter(function(e){return exts.some(function(x){return e.name.toLowerCase().endsWith(x)})});
+        if(!matched.length){toast('ZIP da mos fayl topilmadi','er');return}
+        var html='<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:10001;display:flex;align-items:center;justify-content:center" id="adZpOv">'
+          +'<div style="background:var(--card-s);border-radius:var(--radius-lg);padding:20px;max-width:560px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:var(--shadow-h)">'
+          +'<div style="font-family:var(--ffd);font-size:16px;font-weight:800;color:var(--t0);margin-bottom:14px">📦 '+matched.length+' ta fayl</div>';
+        matched.forEach(function(e,i){
+          var nm=e.name.split('/').pop();
+          html+='<div class="ali" style="margin-bottom:4px;cursor:pointer" onclick="adZpPick('+i+',\''+type+'\')">'
+            +'<div style="display:flex;align-items:center;gap:8px"><span>'+(type==='excel'?'📊':'🌐')+'</span>'
+            +'<div><div class="ali-nm" style="font-size:12px">'+nm+'</div>'
+            +'<div class="ali-mt" style="font-size:9px;word-break:break-all">'+e.name+'</div></div></div></div>';
+        });
+        html+='<button class="btn btn-s btn-sm" onclick="$(\'adZpOv\').remove()" style="margin-top:10px">Yopish</button></div></div>';
+        document.body.insertAdjacentHTML('beforeend',html);
+        window._adZpEntries=matched;
+      }catch(e){toast('ZIP xato: '+e.message,'er')}
+    };
+    inp3.click();
+  }
+};
+window.adFpPick=function(idx,type){
+  var f=window._adFpFiles[idx];if(f)adStoreFile(f,type);
+  var ov=$('adFpOv');if(ov)ov.remove();
+};
+window.adZpPick=async function(idx,type){
+  var e=window._adZpEntries[idx];if(!e)return;
+  try{
+    var blob=await e.getData();
+    var f=new File([blob],e.name.split('/').pop());
+    adStoreFile(f,type);
+  }catch(err){toast('Xato: '+err.message,'er')}
+  var ov=$('adZpOv');if(ov)ov.remove();
+};
+
+/* Faylni sessiyaga saqlash va input ga nomini yozish */
+function adStoreFile(file,type){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    if(type==='excel'){
+      _adSession.xlData=new Uint8Array(e.target.result);
+      _adSession.xlName=file.name;
+      $('adXl').value=file.name;
+      /* Agar turi excel bo'lsa, path ga ham yozish */
+      if($('adType').value==='excel'){
+        _adSession.pathData=_adSession.xlData;
+        _adSession.pathName=file.name;
+        _adSession.pathType='excel';
+        $('adPath').value=file.name;
+      }
+    }else{
+      _adSession.htmlData=e.target.result;
+      _adSession.pathName=file.name;
+      _adSession.pathType='html';
+      $('adPath').value=file.name;
+      /* Agar nom hali bo'sh bo'lsa — fayl nomidan olish */
+      if(!$('adName').value.trim()){
+        $('adName').value=file.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
+      }
+    }
+    toast(file.name+' tanlandi','ok');
+  };
+  if(type==='excel')reader.readAsArrayBuffer(file);
+  else reader.readAsText(file);
+}
+
+/* Yangi dashboard saqlash */
+window.saveAddDash=function(){
+  var nm=$('adName').value.trim();
+  if(!nm){toast('Dashboard nomini kiriting!','er');$('adName').focus();return}
+  var ty=$('adType').value;
+  var deptVal=$('adDept').value;
+  var p=deptVal.split('__');
+  var dp=fDp(p[0],p[1]);
+  if(!dp){toast('Bo\'lim topilmadi','er');return}
+
+  var nd={id:'db_'+Date.now(),name:nm,type:ty,path:''};
+
+  if(ty==='url'){
+    nd.path=$('adUrl').value.trim();
+    if(!nd.path){toast('URL kiriting!','er');return}
+  }else if(ty==='excel'){
+    if(_adSession.xlData){
+      nd._xlCache=_adSession.xlData;
+      nd.path=_adSession.xlName||'excel_file.xlsx';
+    }else{toast('Excel faylni tanlang!','er');return}
+  }else{
+    /* HTML */
+    if(_adSession.htmlData){
+      nd._htmlCache=_adSession.htmlData;
+      nd.path=_adSession.pathName||'dashboard.html';
+    }else if($('adPath').value.trim()){
+      nd.path=$('adPath').value.trim();
+    }else{toast('HTML faylni tanlang!','er');return}
+    /* Excel (ixtiyoriy) */
+    if(_adSession.xlData){
+      nd.xl=_adSession.xlName||'data.xlsx';
+      nd._xlCache=_adSession.xlData;
+    }
+  }
+
+  dp.dashboards.push(nd);save();
+  closeAddDash();
+  toast(nm+' qo\'shildi!','ok');
+  /* Agar hozir bo'lim sahifasida bo'lsa — yangilash */
+  if(_curView==='dept'){renderDept(p[0],p[1])}
+  lucide.createIcons();
+};
+
+
+/* ── Toast ── */
+function toast(msg,t){t=t||'nf';var c=$('toasts'),el=document.createElement('div');el.className='toast '+t;el.innerHTML='<span>'+(t==='ok'?'✓':t==='er'?'✕':'ℹ')+'</span><span>'+msg+'</span>';c.appendChild(el);setTimeout(function(){el.style.opacity='0';el.style.transform='translateX(16px)';el.style.transition='all .3s';setTimeout(function(){el.remove()},300)},3500)}
+
+/* ═══ BULUT BOSHQARISH FUNKSIYALARI ═══ */
+var AI_KEY='';
+function _getAiKey(){return AI_KEY||localStorage.getItem('aiApiKey')||''}
+function saveAiKey(){
+  var inp=$('aiKeyInp');if(!inp)return;
+  var key=inp.value.trim();
+  if(key&&key.includes('••'))return toast('Yangi kalit kiriting','er');
+  if(key&&!key.startsWith('sk-')){toast('Kalit sk- bilan boshlanishi kerak','er');return}
+  localStorage.setItem('aiApiKey',key);AI_KEY=key;
+  toast(key?'🤖 AI kalit saqlandi':'⚪ AI o\'chirildi','ok');
+  if(key)inp.value='••••••••••';
+}
+function saveCloudUrl(){
+  var url=($('cloudUrlInp')||{}).value||'';
+  url=url.trim();
+  if(url&&!url.startsWith('https://')){toast('URL https:// bilan boshlanishi kerak','er');return}
+  localStorage.setItem('cloudUrl',url);
+  CLOUD_URL=url;
+  var ind=$('cloudInd');
+  if(ind){
+    if(url){ind.textContent='☁ Bulut ulangan';ind.style.color='#22c55e'}
+    else{ind.textContent='⚪ Bulut ulanmagan';ind.style.color='var(--t3)'}
+  }
+  toast(url?'☁ Bulut URL saqlandi':'⚪ Bulut o\'chirildi','ok');
+}
+async function testCloud(){
+  var url=_getCloudUrl();
+  if(!url){toast('Avval URL kiriting','er');return}
+  toast('🔍 Test...','nf');
+  try{
+    var r=await fetch(url+'?t='+Date.now());
+    if(r.ok){
+      var d=await r.json();
+      if(d&&typeof d==='object'){
+        toast('✅ Bulut ishlayapti! '+(d.leaders?d.leaders.length+' rahbar':'Bo\'sh'),'ok');
+      }else{toast('⚠ Javob JSON emas','er')}
+    }else{toast('❌ HTTP xato: '+r.status,'er')}
+  }catch(e){toast('❌ Ulanish xatosi: '+e.message,'er')}
+}
+async function pushAllToCloud(){
+  var url=_getCloudUrl();
+  if(!url){toast('Avval URL kiriting','er');return}
+  toast('⬆ Yuklanmoqda...','nf');
+  D._v=(D._v||0)+1;
+  try{
+    var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(D)});
+    if(r.ok){
+      toast('✅ Barcha ma\'lumot bulutga yuklandi (v'+D._v+')','ok');
+      var ind=$('cloudInd');if(ind){ind.textContent='☁ Sinxronlandi ✓';ind.style.color='#22c55e'}
+    }else{toast('❌ Yuklash xatosi: '+r.status,'er')}
+  }catch(e){toast('❌ Xato: '+e.message,'er')}
+}
+
+/* ── readZipEntries (addDash ZIP uchun) ── */
+async function readZipEntries(arrayBuffer){
+  var view=new DataView(arrayBuffer);var entries=[];
+  /* ZIP End of Central Directory topish */
+  var eocdOff=-1;
+  for(var i=arrayBuffer.byteLength-22;i>=0;i--){
+    if(view.getUint32(i,true)===0x06054b50){eocdOff=i;break}
+  }
+  if(eocdOff<0)throw new Error('ZIP emas');
+  var cdOff=view.getUint32(eocdOff+16,true);
+  var cdCount=view.getUint16(eocdOff+8,true);
+  var off=cdOff;
+  for(var i=0;i<cdCount;i++){
+    if(view.getUint32(off,true)!==0x02014b50)break;
+    var method=view.getUint16(off+10,true);
+    var compSize=view.getUint32(off+20,true);
+    var uncompSize=view.getUint32(off+24,true);
+    var nameLen=view.getUint16(off+28,true);
+    var extraLen=view.getUint16(off+30,true);
+    var commentLen=view.getUint16(off+32,true);
+    var localOff=view.getUint32(off+42,true);
+    var nameBytes=new Uint8Array(arrayBuffer,off+46,nameLen);
+    var name=new TextDecoder('utf-8').decode(nameBytes);
+    if(!name.endsWith('/')){
+      entries.push({name:name,method:method,compSize:compSize,uncompSize:uncompSize,localOff:localOff,
+        getData:function(){
+          var e=this;
+          return new Promise(function(resolve,reject){
+            try{
+              var lv=new DataView(arrayBuffer);
+              var lNameLen=lv.getUint16(e.localOff+26,true);
+              var lExtraLen=lv.getUint16(e.localOff+28,true);
+              var dataStart=e.localOff+30+lNameLen+lExtraLen;
+              var raw=new Uint8Array(arrayBuffer,dataStart,e.compSize);
+              if(e.method===0){
+                resolve(new Blob([raw]));
+              }else if(e.method===8){
+                var ds=new DecompressionStream('deflate-raw');
+                var writer=ds.writable.getWriter();
+                writer.write(raw);writer.close();
+                new Response(ds.readable).blob().then(resolve).catch(reject);
+              }else{reject(new Error('Unsupported method: '+e.method))}
+            }catch(err){reject(err)}
+          });
+        }.bind({localOff:localOff,compSize:compSize,uncompSize:uncompSize,method:method})
+      });
+    }
+    off+=46+nameLen+extraLen+commentLen;
+  }
+  return entries;
+}
+
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded',function(){
+  /* Temani sync */
+  var t=localStorage.getItem('cbNT')||'cyber';
+  setTheme(t);
+  
+  /* Auto-login agar sessiya bor */
+  if(sessionStorage.getItem('admAuth')==='1'){
+    $('loginScreen').style.display='none';
+    $('adminPanel').style.display='block';
+    try{admTab('leaders')}catch(e){}
+  }
+  
+  /* Enter bilan kirish */
+  $('passInp').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
+  $('loginInp').addEventListener('keydown',function(e){if(e.key==='Enter')$('passInp').focus()});
+  
+  lucide.createIcons();
+  
+  /* ═══ BULUTDAN MA'LUMOT YUKLASH ═══ */
+  (async function(){
+    try{
+      var cloud=await cloudPull();
+      if(cloud&&cloud.leaders){
+        D=cloud;
+        try{localStorage.setItem('cbNE',JSON.stringify(D))}catch(e){}
+        if(sessionStorage.getItem('admAuth')==='1'){try{admTab('leaders')}catch(e){}}
+        console.log('☁ Admin: Bulutdan yuklandi v'+(D._v||0));
+      }
+    }catch(e){console.log('Lokal ma\'lumot ishlatilmoqda')}
+  })();
+});
+</script>
+</body>
+</html>

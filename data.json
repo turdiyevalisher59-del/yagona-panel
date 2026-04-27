@@ -1,0 +1,164 @@
+{
+  "_v": 51,
+  "_lastModified": 1777330000000,
+  "_cloudUrl": "",
+  "_skipCloud": true,
+
+  "leaders": [
+    {
+      "ci": 0,
+      "id": "fayzullaxojayev",
+      "ini": "JF",
+      "name": "J.X.Fayzullaxo'jayev",
+      "role": "Bosh boshqarma boshlig'i",
+      "departments": [
+        {
+          "id": "d1",
+          "name": "Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",
+          "boss": "Nishanaliev Islombek Valisherovich",
+          "bossRole": "Shu'ba mudiri",
+          "dashboards": [
+            {"id": "db1", "name": "Scoring Banking", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
+            {"id": "db2", "name": "Sirli mijoz tahlili", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/sirli_mijoz_final.html"},
+            {"id": "db3", "name": "Angren moliyaviy xizmatlar xaritasi", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/angren-xarita-mediapipe-gesture.html"}
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "Ijro apparati",
+          "boss": "Axatjanov Abduraxmon Kudratillaevich",
+          "bossRole": "Apparat boshlig'i",
+          "dashboards": [
+            {"id": "db5", "name": "Murojatlar dashboard", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/murojatlar_dashboard (1).html", "xl": "J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/murojatlar_data.xlsx"}
+          ]
+        },
+        {
+          "id": "d_komplaens",
+          "name": "Komplaens Nazorati",
+          "boss": "Turdiyev A.T",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db_komplaens", "name": "Korrupsiya Monitoring", "type": "html", "path": "J.X.Fayzullaxo'jayev yo'nalishi/Komplaens Nazorati/corruption-monitoring.html"}
+          ]
+        }
+      ]
+    },
+    {
+      "ci": 1,
+      "id": "nuraliyev",
+      "ini": "BN",
+      "name": "B.F.Nuraliyev",
+      "role": "Bosh boshqarma boshlig'i o'rinbosari",
+      "departments": [
+        {
+          "id": "d5",
+          "name": "Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi",
+          "boss": "Matboboev Utkirjon Rustamovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db7", "name": "Eksport-Import valyuta", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/eksport import/Eksport Import..html", "xl": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/eksport import/Eksport Import.csv"},
+            {"id": "db8", "name": "Valyuta XPU", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/xpo/XPO..html", "xl": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/xpo/XPO.xlsx"},
+            {"id": "db_vash", "name": "VASH (Valyuta Almashinish)", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/vash/vash.html", "xl": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/vash/VASH 2024-2025.csv"}
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "Kredit tashkilotlarini inspeksiya qilish boshqarmasi",
+          "boss": "Yusupov Murod Abduraxmanovich",
+          "bossRole": "Boshqarma boshlig'i",
+          "dashboards": []
+        },
+        {
+          "id": "d7",
+          "name": "Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi",
+          "boss": "Tangirov Xasan Davlatboevich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db9", "name": "NPL Risk Rating", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/NPL_Risk_Rating_100.html"},
+            {"id": "db10", "name": "NPL Risk Dashboard v3", "type": "html", "path": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/npl dashboard/NPL_Dashboard_v3__69_ (33).html", "xl": "B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarining muammoli aktivlari bilan ishlash va moliyaviy tahlil qilish bo'limi/npl dashboard/npl_data.xlsx"}
+          ]
+        }
+      ]
+    },
+    {
+      "ci": 2,
+      "id": "irgashev",
+      "ini": "ShI",
+      "name": "Sh.R.Irgashev",
+      "role": "Bosh boshqarma boshlig'i o'rinbosari",
+      "departments": [
+        {
+          "id": "d8",
+          "name": "Hududlarni ijtimoiy-iqtisodiy rivojlantirish borasida tijorat banklari faoliyatini monitoring qilish bo'limi",
+          "boss": "Tursunov Normumin Abduxamidovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db12", "name": "Parkentsoy Voice Assistant", "type": "html", "path": "I.R.Irgashev yo'nalishi/Hududlarni ijtimoiy-iqtisodiy rivojlantirish borasida tijorat banklari faoliyatini monitoring qilish bo'limi/parkentsoy/parkentsoy_voice.html"}
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi",
+          "boss": "Karshibaev Ulugbek Baxodir o'g'li",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": [
+            {"id": "db13", "name": "Tadbirkorlik monitoringi", "type": "html", "path": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/index.html", "xl": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/eng_ohiri_dasturlar_2_lotin.xlsx"},
+            {"id": "db14", "name": "Banklar tahlili", "type": "html", "path": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_dashboard (5).html", "xl": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_data.xlsx"},
+            {"id": "db15", "name": "Mahallalar tahlili", "type": "html", "path": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v20_all_filters_fixed.html", "xl": "I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/mahallalar_data.xlsx"}
+          ]
+        }
+      ]
+    },
+    {
+      "ci": 3,
+      "id": "jurayev",
+      "ini": "AJ",
+      "name": "A.A.Jurayev",
+      "role": "Bosh boshqarma boshlig'i o'rinbosari",
+      "departments": [
+        {
+          "id": "d10",
+          "name": "Naqd pul muomalasini tashkil etish boshqarmasi",
+          "boss": "Sobirov Sobitxon Saidburxon o'g'li",
+          "bossRole": "Boshqarma boshlig'i",
+          "dashboards": [
+            {"id": "db16", "name": "Naqd pullar dashboard", "type": "html", "path": "A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar_v3.00.html", "xl": "A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dasturlar_monitoring.xlsx"}
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi",
+          "boss": "Umarov Mirzoxid Mirxilolovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": []
+        },
+        {
+          "id": "d2",
+          "name": "Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi",
+          "boss": "Karimov Alisher Saydumarovich",
+          "bossRole": "Boshqarma boshlig'i",
+          "dashboards": [
+            {"id": "db18", "name": "Buxgalteriya Tahlili", "type": "html", "path": "A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/dashboard_v79 (3).html", "xl": "A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/umumiy jadval — 2026 (3).xlsx"}
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "Narxlar va iqtisodiy kutilmalarni o'rganish bo'limi",
+          "boss": "Shomirov Abdulaziz Abdurashidovich",
+          "bossRole": "Bo'lim boshlig'i",
+          "dashboards": []
+        }
+      ]
+    }
+  ],
+
+  "_tasks": {
+    "overdue": [],
+    "pending": [],
+    "completed": []
+  },
+  "meetings": [],
+  "_documents": [],
+  "_emergencyMsgs": [],
+  "_contacts": null
+}
