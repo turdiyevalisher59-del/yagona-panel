@@ -1031,7 +1031,7 @@ button{cursor:pointer;border:none;background:none;font-family:var(--ff)}
       <div class="sh"><div class="sh-l"><div class="sh-ico"><i data-lucide="users-round"></i></div><div><h2 class="sh-tit">Rahbarlar</h2><div class="sh-sub" id="hSub"></div></div></div><button class="sh-act" onclick="openAdm()"><i data-lucide="plus-circle"></i> Yangi</button></div>
       <div class="leaders" id="leadersGrid"></div>
       <div class="widgets">
-        <div class="wgt"><div class="wgt-t"><i data-lucide="cloud-sun"></i> Ob-havo · Toshkent</div><div class="w-row"><div class="w-ico" id="wIco">⛅</div><div class="w-temp" id="wTemp">--°</div><div class="w-det" id="wDet">...</div></div></div>
+        <div class="wgt"><div class="wgt-t"><i data-lucide="cloud-sun"></i> Ob-havo · Toshkent</div><div class="w-row"><div class="w-ico" id="wIco">⛅</div><div class="w-temp" id="wTemp">--°</div><div class="w-det" id="wDet">...</div></div><div id="wForecast" style="margin-top:10px"></div><div id="wMeta" style="margin-top:6px;font-size:9px;color:var(--t3)"></div></div>
         <div class="wgt"><div class="wgt-t" style="display:flex;align-items:center;justify-content:space-between"><span><i data-lucide="newspaper"></i> <span style="color:#e91e63;font-weight:800">bankers.uz</span></span><span style="display:flex;align-items:center;gap:6px"><span id="nTimeB" style="font-size:9px;color:var(--t3);font-weight:400"></span><button onclick="loadNB()" style="background:none;border:none;cursor:pointer;color:var(--t2);padding:2px" title="Yangilash"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i></button></span></div><div class="n-list" id="nListB"></div></div>
         <div class="wgt"><div class="wgt-t" style="display:flex;align-items:center;justify-content:space-between"><span><i data-lucide="newspaper"></i> <span style="color:#2196f3;font-weight:800">kun.uz</span> <span style="font-size:9px;color:var(--t2);font-weight:600">· iqtisodiyot</span></span><span style="display:flex;align-items:center;gap:6px"><span id="nTimeK" style="font-size:9px;color:var(--t3);font-weight:400"></span><button onclick="loadNK()" style="background:none;border:none;cursor:pointer;color:var(--t2);padding:2px" title="Yangilash"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i></button></span></div><div class="n-list" id="nListK"></div></div>
         <div class="wgt"><div class="wgt-t" style="display:flex;align-items:center;justify-content:space-between"><span><i data-lucide="coins"></i> <span style="color:#4caf50;font-weight:800">Valyuta kurslari</span></span><span style="font-size:9px;color:var(--t3)" id="currencyTime">MB kursi</span></div><div id="currencyRates" style="padding:8px 0"><div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--brd2)"><span style="font-weight:600;font-size:12px">🇺🇸 USD</span><span style="font-family:var(--ffd);font-weight:700;font-size:13px" id="rateUSD">--</span></div><div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--brd2)"><span style="font-weight:600;font-size:12px">🇪🇺 EUR</span><span style="font-family:var(--ffd);font-weight:700;font-size:13px" id="rateEUR">--</span></div><div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-weight:600;font-size:12px">🇷🇺 RUB</span><span style="font-family:var(--ffd);font-weight:700;font-size:13px" id="rateRUB">--</span></div></div></div>
@@ -1314,7 +1314,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:59,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:60,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1785,7 +1785,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 59; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 60; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -2940,11 +2940,12 @@ async function loadW(){
     var kunlar=['Yak','Dush','Sesh','Chor','Pay','Jum','Shan'];
     var week='';
     if(daily&&daily.time){
-      week='<div class="w-forecast" style="display:flex;gap:5px;margin-top:8px;padding-bottom:2px">';
+      /* 7 kun — grid 7 ustun, kichik ekranlarda 4+3 yoki 2 qatorga o'tadi */
+      week='<div class="w-forecast" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(40px,1fr));gap:4px;margin-top:8px">';
       for(var i=0;i<Math.min(7,daily.time.length);i++){
         var dt=new Date(daily.time[i]);
         var dw=wInfo(daily.weather_code[i]);
-        week+='<div style="text-align:center;padding:3px 4px;background:var(--pill-bg);border-radius:6px;border:1px solid var(--pill-brd);min-width:38px;flex-shrink:0;font-size:9px">'
+        week+='<div style="text-align:center;padding:4px 2px;background:var(--pill-bg);border-radius:6px;border:1px solid var(--pill-brd);font-size:9px">'
           +'<div style="font-weight:800;color:var(--t2)">'+kunlar[dt.getDay()]+'</div>'
           +'<div style="font-size:13px;line-height:1.2">'+dw[0]+'</div>'
           +'<div style="color:var(--t0);font-weight:700">'+Math.round(daily.temperature_2m_max[i])+'°</div>'
@@ -2953,14 +2954,15 @@ async function loadW(){
       }
       week+='</div>';
     }
-    $('wDet').innerHTML='<div>'+w[1]+'</div>'
-      +'<div>Namlik: '+cur.relative_humidity_2m+'% · Shamol: '+Math.round(cur.wind_speed_10m)+' km/h</div>'
-      +week
-      +'<div style="margin-top:4px;font-size:9px;color:var(--t3)">Open-Meteo API · yangilandi: '+new Date().toLocaleTimeString('uz',{hour:'2-digit',minute:'2-digit'})+'</div>';
+    $('wDet').innerHTML='<div style="font-weight:700;font-size:14px">'+w[1]+'</div>'
+      +'<div style="font-size:11px;color:var(--t2)">Namlik: '+cur.relative_humidity_2m+'% · Shamol: '+Math.round(cur.wind_speed_10m)+' km/h</div>';
+    var fc=$('wForecast');if(fc)fc.innerHTML=week;
+    var mt=$('wMeta');if(mt)mt.textContent='Open-Meteo API · yangilandi: '+new Date().toLocaleTimeString('uz',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
     /* Fallback — agar internet yo'q bo'lsa */
     $('wTemp').textContent='11°C';$('wIco').textContent='⛅';
-    $('wDet').innerHTML='<div>Qisman bulutli</div><div>Namlik: 52% · Shamol: 3 km/h</div><div style="font-size:9px;color:var(--t3)">Oflayn rejim</div>';
+    $('wDet').innerHTML='<div style="font-weight:700;font-size:14px">Qisman bulutli</div><div style="font-size:11px;color:var(--t2)">Namlik: 52% · Shamol: 3 km/h</div>';
+    var mt2=$('wMeta');if(mt2)mt2.textContent='Oflayn rejim';
   }
 }
 loadW(); setInterval(loadW,1800000); /* Har 30 daqiqada yangilanadi */
