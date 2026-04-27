@@ -1310,7 +1310,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:55,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:56,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1781,7 +1781,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 55; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 56; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -2485,6 +2485,42 @@ async function renderDash(lid,did,dbid){
       var finalHtml=addBaseTag(htmlContent,db.path);
       if(xlData)finalHtml=embedExcelInHtml(finalHtml,xlData,xlName);
       fr.srcdoc=finalHtml;
+      /* ═══ postMessage AUTO-LOAD: srcdoc hajm cheklovini bartaraf etish ═══
+         Excel data'ni iframe'ga postMessage orqali yuborish (npl dashboard uchun)
+         iframe.contentWindow tayyorligini kutib, NPL_AUTOLOAD message yuboriladi
+      */
+      if(xlData){
+        (function(_fr,_xl,_nm){
+          var sent=false,attempts=0;
+          /* iframe READY signal kutish */
+          var readyHandler=function(ev){
+            if(ev.data && ev.data.type==='NPL_READY' && ev.source===_fr.contentWindow && !sent){
+              sent=true;
+              try{
+                var ab = _xl.buffer.slice(_xl.byteOffset, _xl.byteOffset+_xl.byteLength);
+                _fr.contentWindow.postMessage({type:'NPL_AUTOLOAD', buffer: ab, name: _nm}, '*');
+                console.log('[parent] NPL_AUTOLOAD yuborildi:', _nm, '(', ab.byteLength, 'bayt)');
+              }catch(e){console.warn('[parent] postMessage xato:',e)}
+              window.removeEventListener('message', readyHandler);
+            }
+          };
+          window.addEventListener('message', readyHandler);
+          /* Fallback: 5 soniya kutib o'zimiz yuboramiz */
+          var fallback=setInterval(function(){
+            attempts++;
+            if(sent || attempts>10){clearInterval(fallback); return;}
+            try{
+              if(_fr.contentWindow){
+                var ab = _xl.buffer.slice(_xl.byteOffset, _xl.byteOffset+_xl.byteLength);
+                _fr.contentWindow.postMessage({type:'NPL_AUTOLOAD', buffer: ab, name: _nm}, '*');
+                console.log('[parent] fallback NPL_AUTOLOAD yuborildi (urinish '+attempts+')');
+              }
+            }catch(e){}
+          }, 1000);
+          /* 15 soniya'da listener'ni olib tashlash */
+          setTimeout(function(){window.removeEventListener('message', readyHandler);clearInterval(fallback);}, 15000);
+        })(fr, xlData, xlName);
+      }
     }else{
       fr.src=db.path;
       fr.onload=function(){

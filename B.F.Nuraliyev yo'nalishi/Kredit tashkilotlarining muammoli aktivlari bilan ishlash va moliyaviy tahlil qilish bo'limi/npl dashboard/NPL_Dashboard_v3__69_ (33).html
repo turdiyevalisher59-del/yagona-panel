@@ -14888,5 +14888,29 @@ async function exportDashboardPDF(){
   }
 }
 
+/* ═══ PARENT PANEL DAN postMessage AUTO-LOAD ═══ */
+window.addEventListener('message', function(e){
+  try{
+    if(!e.data || e.data.type !== 'NPL_AUTOLOAD' || !e.data.buffer) return;
+    console.log('%c[NPL postMessage]','color:#00e5ff;font-weight:bold','Excel data qabul qilindi:', e.data.name, '(', e.data.buffer.byteLength, 'bayt)');
+    var arr = new Uint8Array(e.data.buffer);
+    var nm = e.data.name || 'data.xlsx';
+    var mt = nm.match(/\.xls$/i) ? 'application/vnd.ms-excel' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    var file;
+    try{ file = new File([arr], nm, {type:mt}); }
+    catch(err){ file = new Blob([arr], {type:mt}); file.name = nm; }
+    if(typeof handleFile === 'function'){
+      console.log('%c[NPL postMessage]','color:#4ade80;font-weight:bold','handleFile chaqirilmoqda...');
+      handleFile(file);
+    } else {
+      console.warn('[NPL postMessage] handleFile yo\'q!');
+    }
+  }catch(err){
+    console.error('[NPL postMessage] xato:', err);
+  }
+});
+/* parent'ga "tayyor" signali yuborish */
+try{ if(window.parent && window.parent !== window){ window.parent.postMessage({type:'NPL_READY'}, '*'); console.log('[NPL] parent\'ga READY signali yuborildi'); } }catch(e){}
+
 </script>
 </body></html>
