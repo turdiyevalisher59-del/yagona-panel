@@ -297,7 +297,11 @@ button{cursor:pointer;border:none;background:none;font-family:var(--ff)}
 
 /* ═══ WIDGETS ═══ */
 .widgets{display:grid;grid-template-columns:380px 1fr;gap:16px;margin-top:18px;animation:cardUp .5s cubic-bezier(.16,1,.3,1) .9s both}
-.wgt{background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--brd2);border-radius:var(--radius);padding:18px;transition:all .3s}
+.wgt{background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--brd2);border-radius:var(--radius);padding:18px;transition:all .3s;min-width:0;overflow:hidden}
+.w-det{min-width:0;overflow:hidden}
+.w-forecast{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.w-forecast::-webkit-scrollbar{display:none}
+.w-forecast > div{flex-shrink:0}
 .wgt:hover{border-color:var(--brd);background:var(--card-h)}
 .wgt-t{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .wgt-t svg{color:var(--ac)!important;width:12px;height:12px}
@@ -1310,7 +1314,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:57,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:59,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1781,7 +1785,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 57; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 59; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -2936,13 +2940,13 @@ async function loadW(){
     var kunlar=['Yak','Dush','Sesh','Chor','Pay','Jum','Shan'];
     var week='';
     if(daily&&daily.time){
-      week='<div class="w-forecast" style="display:flex;gap:6px;margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px">';
+      week='<div class="w-forecast" style="display:flex;gap:5px;margin-top:8px;padding-bottom:2px">';
       for(var i=0;i<Math.min(7,daily.time.length);i++){
         var dt=new Date(daily.time[i]);
         var dw=wInfo(daily.weather_code[i]);
-        week+='<div style="text-align:center;padding:3px 5px;background:var(--pill-bg);border-radius:var(--radius);border:1px solid var(--pill-brd);min-width:42px;font-size:9px">'
+        week+='<div style="text-align:center;padding:3px 4px;background:var(--pill-bg);border-radius:6px;border:1px solid var(--pill-brd);min-width:38px;flex-shrink:0;font-size:9px">'
           +'<div style="font-weight:800;color:var(--t2)">'+kunlar[dt.getDay()]+'</div>'
-          +'<div style="font-size:14px">'+dw[0]+'</div>'
+          +'<div style="font-size:13px;line-height:1.2">'+dw[0]+'</div>'
           +'<div style="color:var(--t0);font-weight:700">'+Math.round(daily.temperature_2m_max[i])+'°</div>'
           +'<div style="color:var(--t3)">'+Math.round(daily.temperature_2m_min[i])+'°</div>'
           +'</div>';
@@ -6597,20 +6601,101 @@ function deleteDocument(docId){
 
 
 
-/* AI Digest */
+/* AI Digest — REAL ma'lumotlar asosida (NPL Dashboard sync, vazifalar, uchrashuvlar) */
 function generateAIDigest(){
-  var digests = [
-    "Bugun bank tizimida 3 ta muhim yangilik: 1) MB asosiy stavkani o'zgartirmadi; 2) Viloyat bo'yicha kredit hajmi o'tgan haftaga nisbatan 8% oshdi; 3) NPL darajasi barqaror - 3.2%.",
-    "Diqqat: Hamkorbank filialida NPL darajasi 6% dan oshdi. Xalq banki eng yaxshi ko'rsatkich - 2.1%. Bugun 127 ta yangi kredit ajratildi.",
-    "Haftalik tahlil: Kredit portfeli 3.6 trln so'mga yetdi (+5%). Muammoli kreditlar bilan ishlash bo'yicha Agrobank eng samarali. Likvidlik barqaror.",
-    "Bugungi muhim: Markaziy bank yangi yo'riqnoma e'lon qildi. Viloyatda 5 ta bank filiali komplayens talablarini bajarmagan. Zudlik bilan tekshirish talab etiladi."
-  ];
-  
   var digestEl = document.getElementById('aiDigestText');
-  if(digestEl){
-    digestEl.textContent = digests[Math.floor(Math.random() * digests.length)];
+  if(!digestEl) return;
+
+  var parts = [];
+
+  /* 1. NPL ma'lumotlari (localStorage 'mb_npl_sync' dan) */
+  var nplData = null;
+  try{
+    var raw = localStorage.getItem('mb_npl_sync');
+    if(raw) nplData = JSON.parse(raw);
+  }catch(e){}
+
+  if(nplData && (nplData.total_portfolio_sum || nplData.npl_pct !== undefined)){
+    /* Asosiy ko'rsatkich */
+    var portfStr = nplData.total_portfolio_sum ? fmtMoney(nplData.total_portfolio_sum) : '--';
+    var nplPct = nplData.npl_pct !== undefined ? nplData.npl_pct.toFixed(2) : '--';
+    var vilPct = nplData.vil_pct !== undefined ? nplData.vil_pct.toFixed(2) : '--';
+    parts.push('📊 Viloyat kredit portfeli — '+portfStr+', NPL ulushi '+nplPct+'%');
+
+    /* Eng yuqori va eng past NPL ko'rsatkichli banklar */
+    if(Array.isArray(nplData.bank_metrics) && nplData.bank_metrics.length > 0){
+      var banks = nplData.bank_metrics.filter(function(b){ return b && b.bank && typeof b.npl_pct === 'number'; });
+      if(banks.length >= 2){
+        banks.sort(function(a,b){ return b.npl_pct - a.npl_pct; });
+        var worst = banks[0];
+        var best = banks[banks.length-1];
+        parts.push('⚠️ Eng yuqori NPL — '+worst.bank+' ('+worst.npl_pct.toFixed(1)+'%)');
+        parts.push('✅ Eng past NPL — '+best.bank+' ('+best.npl_pct.toFixed(1)+'%)');
+      }
+    }
+
+    /* Risk darajasi */
+    if(nplData.npl_pct !== undefined){
+      var risk = nplData.npl_pct < 3 ? 'PAST 🟢' : nplData.npl_pct < 5 ? "O'RTA 🟡" : 'YUQORI 🔴';
+      parts.push('Risk darajasi: '+risk);
+    }
+
+    /* Zahira va huquqiy chora */
+    if(nplData.zahira_qoplami !== undefined && nplData.huquqiy_chora_pct !== undefined){
+      parts.push('Zahira qoplami: '+nplData.zahira_qoplami.toFixed(1)+'%, huquqiy chora: '+nplData.huquqiy_chora_pct.toFixed(1)+'%');
+    }
+  } else {
+    parts.push('ℹ️ NPL ma\'lumoti hali yuklanmadi — NPL Risk Dashboard v3 ni oching');
   }
+
+  /* 2. Bugungi vazifalar */
+  try{
+    if(typeof D !== 'undefined' && D && Array.isArray(D._tasks && D._tasks.pending)){
+      var pending = D._tasks.pending.length;
+      var overdue = (D._tasks.overdue || []).length;
+      if(overdue > 0) parts.push('🔴 '+overdue+' ta muddati o\'tgan vazifa');
+      else if(pending > 0) parts.push('📋 '+pending+' ta kutilayotgan vazifa');
+    }
+  }catch(e){}
+
+  /* 3. Uchrashuvlar (bugungi) */
+  try{
+    if(typeof D !== 'undefined' && D && Array.isArray(D.meetings) && D.meetings.length){
+      parts.push('📅 Bugun '+D.meetings.length+' ta uchrashuv');
+    }
+  }catch(e){}
+
+  /* 4. Yangilangan vaqt */
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+  parts.push('🕐 Yangilangan: '+timeStr);
+
+  digestEl.textContent = parts.join(' · ');
 }
+
+/* fmtMoney — agar mavjud bo'lmasa */
+if(typeof fmtMoney === 'undefined'){
+  window.fmtMoney = function(n){
+    if(!n || isNaN(n)) return '0';
+    if(n >= 1e12) return (n/1e12).toFixed(2)+' trln';
+    if(n >= 1e9) return (n/1e9).toFixed(2)+' mlrd';
+    if(n >= 1e6) return (n/1e6).toFixed(2)+' mln';
+    return n.toLocaleString('uz-UZ');
+  };
+}
+
+/* localStorage o'zgarganda (NPL Dashboard'da fayl yuklanganda) AI Digest'ni yangilash */
+window.addEventListener('storage', function(e){
+  if(e.key === 'mb_npl_sync'){
+    console.log('🔄 NPL data o\'zgardi — AI Digest yangilanmoqda');
+    generateAIDigest();
+  }
+});
+
+/* Har 60 soniyada yangilab turish (vaqt va NPL data o'zgarishi uchun) */
+setInterval(function(){
+  try{ generateAIDigest(); }catch(e){}
+}, 60000);
 
 /* Quick Actions */
 function startVideoCall(){
