@@ -1314,7 +1314,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:62,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:63,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1785,7 +1785,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 62; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 63; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -3477,7 +3477,7 @@ function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t
     +'<div style="display:flex;gap:6px;margin-bottom:8px">'
     +'<input class="fi" type="date" id="newTaskDeadline" style="flex:1">'
     +'<select class="fs" id="newTaskPriority" style="flex:1"><option value="orta">O\'rta</option><option value="yuqori">Yuqori</option><option value="past">Past</option></select>'
-    +'<select class="fs" id="newTaskAssignee" style="flex:1">' + D.leaders.map(function(l){ return '<option value="'+l.id+'">'+l.name+'</option>'; }).join('') + '</select>'
+    +'<select class="fs" id="newTaskAssignee" style="flex:1">' + renderAssigneeOptions() + '</select>'
     +'</div>'
     +'<button class="btn btn-p btn-sm" onclick="addNewTask()" style="width:100%;margin-bottom:8px">➕ Qo\'shish</button>'
     +'<div id="pendingTasksList" style="max-height:180px;overflow-y:auto;background:var(--bg2);border-radius:var(--radius);padding:6px;font-size:10px"></div>'
@@ -6386,18 +6386,26 @@ function addNewTask(){
     return;
   }
   
-  /* Tanlangan rahbar */
+  /* Tanlangan mas'ul (rahbar yoki bo'lim boshlig'i) */
   var assigneeSelect = document.getElementById('newTaskAssignee');
-  var selectedLeader = assigneeSelect ? assigneeSelect.value : 'nuraliyev';
-  var leaderInfo = D.leaders.find(function(l){ return l.id === selectedLeader; });
-  
+  var selectedName = assigneeSelect ? assigneeSelect.value : '';
+  if(!selectedName){
+    toast('Mas\'ulni tanlang', 'er');
+    return;
+  }
+  /* Topish — bu rahbar yoki bo'lim boshlig'i */
+  var assignees = getAllAssignees();
+  var info = assignees.find(function(a){ return a.name === selectedName; });
+
   var newTask = {
     id: Date.now(),
     title: title.value.trim(),
     deadline: deadline ? deadline.value : '',
     priority: priority ? priority.value : 'orta',
-    assignee: leaderInfo ? leaderInfo.name : 'B.F.Nuraliyev',
-    leaderId: selectedLeader
+    assignee: selectedName,
+    role: info ? info.role : '',
+    leaderId: info ? info.leaderId : '',
+    depId: info && info.depId ? info.depId : ''
   };
   
   _TASKS.pending.push(newTask);
@@ -6427,6 +6435,56 @@ function addTaskComment(taskId){
     renderPendingTasksInSettings();
     toast('💬 Izoh saqlandi', 'ok');
   }
+}
+
+/* ═══ Barcha mas'ullar (rahbar + bo'lim boshlig'i) ro'yxati ═══ */
+function getAllAssignees(){
+  var list = [];
+  if(!D || !Array.isArray(D.leaders)) return list;
+  D.leaders.forEach(function(l){
+    /* Rahbar */
+    list.push({
+      group: 'Rahbar',
+      name: l.name,
+      role: l.role || '',
+      leaderId: l.id
+    });
+    /* Bo'lim boshliqlari (har departmentdan) */
+    if(Array.isArray(l.departments)){
+      l.departments.forEach(function(dep){
+        if(dep.boss && dep.boss.trim()){
+          list.push({
+            group: l.name + ' bo\'limlari',
+            name: dep.boss,
+            role: (dep.bossRole || 'Bo\'lim boshlig\'i') + ' — ' + dep.name,
+            leaderId: l.id,
+            depId: dep.id
+          });
+        }
+      });
+    }
+  });
+  return list;
+}
+
+/* HTML <option> generator — guruhlangan ko'rinish */
+function renderAssigneeOptions(selectedName){
+  var list = getAllAssignees();
+  var html = '<option value="">— Tanlang —</option>';
+  var groups = {};
+  list.forEach(function(a){
+    if(!groups[a.group]) groups[a.group] = [];
+    groups[a.group].push(a);
+  });
+  Object.keys(groups).forEach(function(g){
+    html += '<optgroup label="'+g+'">';
+    groups[g].forEach(function(a){
+      var sel = (a.name === selectedName) ? ' selected' : '';
+      html += '<option value="'+a.name.replace(/"/g,'&quot;')+'"'+sel+'>'+a.name+(a.role?' ('+a.role.split('—')[0].trim()+')':'')+'</option>';
+    });
+    html += '</optgroup>';
+  });
+  return html;
 }
 
 /* Vazifani bajarilgan deb belgilash */
@@ -6517,9 +6575,8 @@ function openTaskEditor(taskId){
   });
   if(!task){ toast('Vazifa topilmadi','er'); return; }
 
-  var leadersOpts = (D.leaders||[]).map(function(l){
-    return '<option value="'+l.name+'"'+(l.name===task.assignee?' selected':'')+'>'+l.name+'</option>';
-  }).join('');
+  /* Barcha mas'ullar — rahbar + bo'lim boshlig'i, guruhlangan */
+  var assigneeOpts = renderAssigneeOptions(task.assignee);
 
   var html = '<div id="taskEditorModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">'
     + '<div style="background:var(--card-s);border-radius:16px;max-width:520px;width:100%;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.4)">'
@@ -6544,8 +6601,7 @@ function openTaskEditor(taskId){
     /* Assignee */
     + '<label style="font-size:11px;color:var(--t2);font-weight:600">MAS\'UL RAHBAR</label>'
     + '<select id="teAssignee" style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--brd2);border-radius:8px;background:var(--bg);color:var(--t0);font-size:13px">'
-      + '<option value="">— Tanlang —</option>'
-      + leadersOpts
+      + assigneeOpts
     + '</select>'
     /* Comment */
     + '<label style="font-size:11px;color:var(--t2);font-weight:600">IZOH</label>'
@@ -6594,7 +6650,16 @@ function saveTaskEdits(taskId, oldListName){
   task.title = newTitle;
   task.deadline = newDeadline;
   task.priority = newPriority;
-  task.assignee = newAssignee || task.assignee;
+  if(newAssignee && newAssignee !== task.assignee){
+    task.assignee = newAssignee;
+    /* role/leaderId/depId ni yangilash */
+    var info = getAllAssignees().find(function(a){ return a.name === newAssignee; });
+    if(info){
+      task.role = info.role || '';
+      task.leaderId = info.leaderId || '';
+      task.depId = info.depId || '';
+    }
+  }
   task.comment = newComment;
 
   /* Holatni o'zgartirish — kerak bo'lsa boshqa list'ga ko'chirish */
