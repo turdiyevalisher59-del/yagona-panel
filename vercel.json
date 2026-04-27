@@ -14,12 +14,6 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
-    },
-    {
-      "source": "/(.*\\.(xlsx|xls|csv|json|html))",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }
-      ]
     }
   ]
 }

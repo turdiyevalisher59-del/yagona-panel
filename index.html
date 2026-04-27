@@ -1310,7 +1310,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:52,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:53,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1781,7 +1781,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 52; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 53; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
