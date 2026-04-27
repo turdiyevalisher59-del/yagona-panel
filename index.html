@@ -1314,7 +1314,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:60,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:61,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1785,7 +1785,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 60; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 61; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -7745,37 +7745,36 @@ document.addEventListener('keydown',function(e){
     return null;
   }
 
-  /* AI fallback — mavjud aiAnswer funksiyasidan foydalanish */
+  /* AI + Web Search — har doim /api/ai chaqiramiz; server tarafda 4 darajali fallback bor:
+     1) Claude API (kalit) → 2) Gemini API (kalit) → 3) DuckDuckGo+Wikipedia (bepul) → 4) Google/Claude havolalari */
   async function askAI(text){
-    /* Avval mavjud AI sozlamalarini tekshirish */
-    var hasKey = false;
+    /* Foydalanuvchi kalitini ham yuboramiz (agar kiritgan bo'lsa) */
+    var prov = 'claude', key = '';
     try {
-      var prov = (typeof _aiProvider === 'function') ? _aiProvider() : 'claude';
-      var key = (prov === 'gemini' && typeof _getGeminiKey === 'function') ? _getGeminiKey() :
-                (typeof _getAiKey === 'function') ? _getAiKey() : '';
-      hasKey = !!key;
+      prov = (typeof _aiProvider === 'function') ? _aiProvider() : 'claude';
+      key = (prov === 'gemini' && typeof _getGeminiKey === 'function') ? _getGeminiKey() :
+            (typeof _getAiKey === 'function') ? _getAiKey() : '';
     } catch(e){}
 
-    if(!hasKey){
-      return `⚠ Bu murakkab savol uchun AI kerak, lekin API kalit sozlanmagan.\n\n` +
-             `Sozlamalar uchun:\n` +
-             `1. Yuqoridagi <b>Sozlamalar</b> tugmasini bosing\n` +
-             `2. <b>Claude</b> yoki <b>Gemini</b> API kalitini kiriting\n` +
-             `3. Saqlang va qaytadan so'rang\n\n` +
-             `Yoki tizim bo'yicha aniqroq savol bering — masalan: "NPL qancha?", "Eng yaxshi bank?"`;
-    }
-
+    /* Kontekst — tizim holati + lokal NPL data */
+    var fullCtx = '';
     try {
       var ctx = (typeof _buildAiContext === 'function') ? _buildAiContext() : '';
-      var k = getKpiSnapshot();
-      var fullCtx = ctx + '\n\n=== TIZIM HOLATI ===\n' +
-                    `Viloyat NPL: ${k.vilNplPct.toFixed(2)}% (${fmtMoneyTrln(k.vilNplSum)})\n` +
-                    `Kredit portfel: ${fmtMoneyTrln(k.portSum)} (${fmtNumber(k.portCnt)} kredit)\n` +
-                    `Eng yaxshi bank: ${k.bestBank.name} (NPL ${k.bestBank.npl}%)\n` +
-                    `Dashboardlar soni: ${getDashboardCount()}`;
+      fullCtx = ctx;
+      if(typeof getKpiSnapshot === 'function'){
+        var k = getKpiSnapshot();
+        fullCtx += '\n\n=== TIZIM HOLATI ===\n' +
+          'Viloyat NPL: ' + k.vilNplPct.toFixed(2) + '% (' + fmtMoneyTrln(k.vilNplSum) + ')\n' +
+          'Kredit portfel: ' + fmtMoneyTrln(k.portSum) + ' (' + fmtNumber(k.portCnt) + ' kredit)\n' +
+          'Eng yaxshi bank: ' + k.bestBank.name + ' (NPL ' + k.bestBank.npl + '%)\n' +
+          'Dashboardlar soni: ' + getDashboardCount();
+      }
+      /* localStorage'dan NPL ham qo'shish */
+      var nplRaw = localStorage.getItem('mb_npl_sync');
+      if(nplRaw){ fullCtx += '\n\n=== NPL SYNC ===\n' + nplRaw.slice(0, 800); }
+    } catch(e){}
 
-      var prov = _aiProvider();
-      var key = prov === 'gemini' ? _getGeminiKey() : _getAiKey();
+    try {
       var resp = await fetch('/api/ai', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -7783,13 +7782,34 @@ document.addEventListener('keydown',function(e){
       });
       if(!resp.ok){
         var err = await resp.json().catch(function(){return {};});
-        return `⚠ AI xato: ${err.error || resp.status}`;
+        /* Server xato bo'lsa ham — havolalarni o'zimiz beramiz */
+        return webSearchFallback(text, err.error || ('HTTP ' + resp.status));
       }
       var data = await resp.json();
-      return data.text || 'Javob olinmadi';
+      var ans = data.text || webSearchFallback(text, 'bo\'sh javob');
+      /* Manba ko'rsatish */
+      if(data.source && data.source !== 'fallback'){
+        var srcBadge = data.source === 'claude' ? '🤖 Claude' :
+                       data.source === 'gemini' ? '✨ Gemini' :
+                       data.source === 'web' ? '🌐 Web' : '';
+        if(srcBadge) ans += '\n\n<span style="font-size:10px;color:#888">Manba: ' + srcBadge + '</span>';
+      }
+      return ans;
     } catch(e){
-      return `⚠ AI ulanish xatosi: ${e.message}\n\nIltimos, internet aloqasini tekshiring yoki tizim bo'yicha aniqroq savol bering.`;
+      /* Tarmoq xatosi — o'zimiz havolalarni qaytaramiz (offline ishlash) */
+      return webSearchFallback(text, e.message);
     }
+  }
+
+  /* Tashqi manbalarga yo'naltirish (offline yoki server xato bo'lganda) */
+  function webSearchFallback(query, errMsg){
+    var enc = encodeURIComponent(query);
+    return "Bu savol uchun ichki javob topa olmadim. Tashqi manbalardan qidirib ko'ring:\n\n" +
+      '🔍 <a href="https://www.google.com/search?q=' + enc + '" target="_blank" rel="noopener">Google\'da qidirish</a>\n' +
+      '🤖 <a href="https://claude.ai/new?q=' + enc + '" target="_blank" rel="noopener">Claude AI\'da so\'rash</a>\n' +
+      '✨ <a href="https://gemini.google.com/app?q=' + enc + '" target="_blank" rel="noopener">Gemini\'da so\'rash</a>\n' +
+      '📚 <a href="https://uz.wikipedia.org/wiki/Special:Search?search=' + enc + '" target="_blank" rel="noopener">Wikipedia</a>\n' +
+      (errMsg ? '\n<span style="font-size:10px;color:#888">(' + errMsg + ')</span>' : '');
   }
 
   /* ─────── UI funktsiyalari ─────── */
