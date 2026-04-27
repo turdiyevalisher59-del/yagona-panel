@@ -1310,7 +1310,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:53,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:54,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1781,7 +1781,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 53; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 54; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -2297,28 +2297,44 @@ function embedExcelInHtml(html,xlData,xlName){
   var nm=(xlName||'data.xlsx').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
   var sc='\n<scr'+'ipt>\n'
-  +'/* __XLEMBED__ */\n'
+  +'/* __XLEMBED__ v2 — robust auto-load */\n'
   +'(function(){\n'
   +'var _D=false,_B="'+b64+'";\n'
   +'var _N="'+nm+'";\n'
+  +'var _tries=0,_MAX=120;\n'
   +'function dec(){var r=atob(_B),a=new Uint8Array(r.length);for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a}\n'
-  +'function go(){\n'
-  +'  if(_D)return;_D=true;\n'
+  +'function makeFile(){\n'
   +'  var arr=dec();\n'
   +'  var mt=_N.match(/\\.xls$/i)?"application/vnd.ms-excel":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";\n'
-  +'  var file;\n'
-  +'  try{file=new File([arr],_N,{type:mt})}catch(e){file=new Blob([arr],{type:mt});file.name=_N}\n'
-  +'  if(typeof handleFile==="function"){try{handleFile(file);return}catch(e){}}\n'
-  +'  if(typeof handleFileUpload==="function"){try{handleFileUpload({target:{files:[file]}});return}catch(e){}}\n'
-  +'  if(typeof processExcelFile==="function"&&typeof XLSX!=="undefined"){try{processExcelFile(XLSX.read(arr,{type:"array"}),_N);return}catch(e){}}\n'
-  +'  var fi=document.getElementById("fileInput");\n'
-  +'  if(fi){try{var dt=new DataTransfer();dt.items.add(file);fi.files=dt.files;fi.dispatchEvent(new Event("change",{bubbles:true}));return}catch(e){}}\n'
-  +'  var all=document.querySelectorAll("input[type=file]");\n'
-  +'  for(var i=0;i<all.length;i++){try{var d=new DataTransfer();d.items.add(file);all[i].files=d.files;all[i].dispatchEvent(new Event("change",{bubbles:true}));return}catch(e){}}\n'
-  +'  _D=false;\n'
+  +'  var f;try{f=new File([arr],_N,{type:mt})}catch(e){f=new Blob([arr],{type:mt});f.name=_N}\n'
+  +'  return {file:f,arr:arr};\n'
   +'}\n'
-  +'function wait(){if(typeof XLSX!=="undefined"){go()}else{setTimeout(wait,300)}}\n'
-  +'setTimeout(wait,800);\n'
+  +'function tryHandlers(){\n'
+  +'  var x=makeFile(),file=x.file,arr=x.arr;\n'
+  +'  if(typeof window.handleFile==="function"){try{window.handleFile(file);return true}catch(e){console.warn("[XLEMBED] handleFile error:",e)}}\n'
+  +'  if(typeof handleFile==="function"){try{handleFile(file);return true}catch(e){console.warn("[XLEMBED] handleFile error:",e)}}\n'
+  +'  if(typeof window.handleFileUpload==="function"){try{window.handleFileUpload({target:{files:[file]}});return true}catch(e){}}\n'
+  +'  if(typeof handleFileUpload==="function"){try{handleFileUpload({target:{files:[file]}});return true}catch(e){}}\n'
+  +'  if(typeof processExcelFile==="function"&&typeof XLSX!=="undefined"){try{processExcelFile(XLSX.read(arr,{type:"array"}),_N);return true}catch(e){}}\n'
+  +'  var fi=document.getElementById("fileInput");\n'
+  +'  if(fi){try{var dt=new DataTransfer();dt.items.add(file);fi.files=dt.files;fi.dispatchEvent(new Event("change",{bubbles:true}));return true}catch(e){}}\n'
+  +'  var all=document.querySelectorAll("input[type=file]");\n'
+  +'  for(var i=0;i<all.length;i++){try{var d=new DataTransfer();d.items.add(file);all[i].files=d.files;all[i].dispatchEvent(new Event("change",{bubbles:true}));return true}catch(e){}}\n'
+  +'  return false;\n'
+  +'}\n'
+  +'function go(){\n'
+  +'  if(_D)return;\n'
+  +'  _tries++;\n'
+  +'  if(typeof XLSX==="undefined"){if(_tries<_MAX)setTimeout(go,250);return}\n'
+  +'  if(typeof handleFile!=="function"&&typeof window.handleFile!=="function"&&typeof handleFileUpload!=="function"&&typeof processExcelFile!=="function"){\n'
+  +'    if(_tries<_MAX){setTimeout(go,250);return}\n'
+  +'  }\n'
+  +'  if(tryHandlers()){_D=true;console.log("[XLEMBED] auto-load OK after",_tries,"tries");return}\n'
+  +'  if(_tries<_MAX)setTimeout(go,250);\n'
+  +'  else console.warn("[XLEMBED] auto-load FAILED after",_tries,"tries");\n'
+  +'}\n'
+  +'if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(go,500)}\n'
+  +'else{document.addEventListener("DOMContentLoaded",function(){setTimeout(go,500)});window.addEventListener("load",function(){setTimeout(go,300)});}\n'
   +'})();\n'
   +'</scr'+'ipt>\n';
 
@@ -7914,15 +7930,26 @@ document.addEventListener('keydown',function(e){
     return parts.join(' ');
   }
 
-  /* Decimal raqam: 4.01 → "to'rt butun nol bir" */
+  /* Decimal raqam:
+     - 4.01 → "to'rt butun nol bir" (kasr 0 bilan boshlansa, raqamlab o'qish)
+     - 31.10 → "o'ttiz bir butun o'n" (kasr 0 bilan boshlanmasa, butun son sifatida)
+     - 5.40 → "besh butun qirq"
+  */
   function uzDecimal(s){
     s = String(s).replace(',','.');
     if(s.indexOf('.') < 0) return uzNum(parseFloat(s));
     var p = s.split('.');
     var whole = uzNum(parseInt(p[0],10));
-    /* Kasr qismi — har bir raqamni alohida o'qish (00 → nol nol) */
-    var fracDigits = p[1].split('').map(function(d){return UZ_DIGITS[parseInt(d,10)] || 'nol';});
-    return whole + ' butun ' + fracDigits.join(' ');
+    var frac = p[1] || '';
+    if(!frac) return whole;
+    /* Agar kasr qismi 0 bilan boshlansa — har raqamni alohida o'qish */
+    if(frac.charAt(0) === '0'){
+      var fracDigits = frac.split('').map(function(d){return UZ_DIGITS[parseInt(d,10)] || 'nol';});
+      return whole + ' butun ' + fracDigits.join(' ');
+    }
+    /* Aks holda — kasrni butun son sifatida o'qish (oxiridagi 0 larni qoldirib) */
+    var fracInt = parseInt(frac,10);
+    return whole + ' butun ' + uzNum(fracInt);
   }
 
   /* Sana (1-31) uchun -inchi yoki -i */
@@ -7956,7 +7983,22 @@ document.addEventListener('keydown',function(e){
         var nextM = D.meetings[0];
         if(nextM && nextM.title){
           var who = nextM.who ? ' ishtirokchi: ' + nextM.who : '';
-          parts.push('Eng yaqin uchrashuv: ' + nextM.title + '. Sana: ' + uzNum(nextM.day||1) + '-inchi ' + (nextM.month || 'fevral') + ', soat ' + (nextM.time || 'belgilanmagan') + '.' + who + '.');
+          /* Sana — UZ_DAY_ORD orqali "uchinchi" */
+          var mtgDay = parseInt(nextM.day,10) || 1;
+          var dayOrdMtg = UZ_DAY_ORD[mtgDay] || (uzNum(mtgDay) + '-inchi');
+          /* Oy nomini to'liq shaklga aylantirish (Fev → fevral) */
+          var monthMap = {
+            'Yan':'yanvar','Fev':'fevral','Mar':'mart','Apr':'aprel','May':'may','Iyn':'iyun',
+            'Iyl':'iyul','Avg':'avgust','Sen':'sentabr','Okt':'oktabr','Noy':'noyabr','Dek':'dekabr',
+            'Jan':'yanvar','Feb':'fevral','Apr':'aprel','Jun':'iyun','Jul':'iyul','Aug':'avgust',
+            'Sep':'sentabr','Oct':'oktabr','Nov':'noyabr','Dec':'dekabr'
+          };
+          var rawMonth = (nextM.month || 'fevral').toString();
+          var fullMonth = monthMap[rawMonth] || rawMonth.toLowerCase();
+          /* Yil — "ikki ming yigirma oltinchi yil" */
+          var mtgYear = parseInt(nextM.year,10) || now.getFullYear();
+          var yearWord = uzYearOrd(mtgYear) + ' yil';
+          parts.push('Eng yaqin uchrashuv: ' + nextM.title + '. Sana: ' + dayOrdMtg + ' ' + fullMonth + ', ' + yearWord + ', soat ' + (nextM.time || 'belgilanmagan') + '.' + who + '.');
         }
       }
     } catch(e){}
