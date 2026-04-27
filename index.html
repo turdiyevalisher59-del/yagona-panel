@@ -1314,7 +1314,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:61,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:62,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1785,7 +1785,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 61; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 62; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -6200,41 +6200,56 @@ function showTasksList(filter){
     + '</div>'
     + '<div style="padding:16px;max-height:50vh;overflow-y:auto">';
   
+  /* Tugmalar HTML — har vazifa uchun ✏️ tahrirlash + 🗑 o'chirish */
+  function taskBtns(taskId, listName){
+    return '<div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end" onclick="event.stopPropagation()">'
+      + '<button onclick="openTaskEditor('+taskId+')" style="padding:4px 8px;background:#3b82f6;color:#fff;border:none;border-radius:5px;font-size:10px;cursor:pointer" title="Tahrirlash">✏️ Tahrir</button>'
+      + '<button onclick="deleteAnyTask('+taskId+',\''+listName+'\')" style="padding:4px 8px;background:#dc2626;color:#fff;border:none;border-radius:5px;font-size:10px;cursor:pointer" title="O\'chirish">🗑 O\'chir</button>'
+      + '</div>';
+  }
+
   /* Muddati o'tganlar */
   if(_TASKS.overdue.length > 0 && filter !== 'completed' && filter !== 'pending'){
-    html += '<div style="font-weight:700;font-size:12px;color:#dc2626;margin-bottom:8px">❌ MUDDATI O\'TGAN ('+_TASKS.overdue.length+')</div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-weight:700;font-size:12px;color:#dc2626">❌ MUDDATI O\'TGAN ('+_TASKS.overdue.length+')</div>'
+      + '<button onclick="clearAllTasks(\'overdue\')" style="background:#fee;color:#dc2626;border:1px solid #dc2626;padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer">🗑 Barchasini o\'chirish</button></div>';
     _TASKS.overdue.forEach(function(t){
-      html += '<div style="background:#fee2e2;padding:10px;margin-bottom:6px;border-radius:8px;border-left:3px solid #dc2626">'
+      html += '<div onclick="openTaskEditor('+t.id+')" style="background:#fee2e2;padding:10px;margin-bottom:6px;border-radius:8px;border-left:3px solid #dc2626;cursor:pointer" title="Tahrirlash uchun bosing">'
         + '<div style="font-weight:600;font-size:12px">'+t.title+'</div>'
-        + '<div style="font-size:10px;color:#991b1b;margin-top:4px">📅 '+t.deadline+' | 👤 '+t.assignee+(t.comment ? ' | 💬 '+t.comment : '')+'</div>'
+        + '<div style="font-size:10px;color:#991b1b;margin-top:4px">📅 '+(t.deadline||'-')+' | 👤 '+(t.assignee||'-')+(t.comment ? ' | 💬 '+t.comment : '')+'</div>'
+        + taskBtns(t.id, 'overdue')
         + '</div>';
     });
     html += '<div style="margin-bottom:12px"></div>';
   }
-  
+
   /* Kutilayotganlar */
   if(_TASKS.pending.length > 0 && filter !== 'completed' && filter !== 'overdue'){
-    html += '<div style="font-weight:700;font-size:12px;color:#f59e0b;margin-bottom:8px">⏳ KUTILAYOTGAN ('+_TASKS.pending.length+')</div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-weight:700;font-size:12px;color:#f59e0b">⏳ KUTILAYOTGAN ('+_TASKS.pending.length+')</div>'
+      + '<button onclick="clearAllTasks(\'pending\')" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer">🗑 Barchasini o\'chirish</button></div>';
     _TASKS.pending.forEach(function(t){
       var priorityColor = t.priority === 'yuqori' ? '#dc2626' : (t.priority === 'past' ? '#6b7280' : '#f59e0b');
-      html += '<div style="background:var(--bg2);padding:10px;margin-bottom:6px;border-radius:8px;border-left:3px solid '+priorityColor+'">'
+      html += '<div onclick="openTaskEditor('+t.id+')" style="background:var(--bg2);padding:10px;margin-bottom:6px;border-radius:8px;border-left:3px solid '+priorityColor+';cursor:pointer" title="Tahrirlash uchun bosing">'
         + '<div style="display:flex;justify-content:space-between;align-items:start">'
         + '<div style="font-weight:600;font-size:12px">'+t.title+'</div>'
         + '<span style="font-size:9px;padding:2px 6px;border-radius:10px;background:'+priorityColor+';color:#fff">'+(t.priority||'o\'rta').toUpperCase()+'</span>'
         + '</div>'
-        + '<div style="font-size:10px;color:var(--t2);margin-top:4px">📅 '+t.deadline+' | 👤 '+t.assignee+(t.comment ? ' | 💬 '+t.comment : '')+'</div>'
+        + '<div style="font-size:10px;color:var(--t2);margin-top:4px">📅 '+(t.deadline||'-')+' | 👤 '+(t.assignee||'-')+(t.comment ? ' | 💬 '+t.comment : '')+'</div>'
+        + taskBtns(t.id, 'pending')
         + '</div>';
     });
     html += '<div style="margin-bottom:12px"></div>';
   }
-  
+
   /* Bajarilganlar */
   if(filter !== 'pending' && filter !== 'overdue'){
-    html += '<div style="font-weight:700;font-size:12px;color:#22c55e;margin-bottom:8px">✅ BAJARILGAN ('+_TASKS.completed.length+')</div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-weight:700;font-size:12px;color:#22c55e">✅ BAJARILGAN ('+_TASKS.completed.length+')</div>'
+      + (_TASKS.completed.length > 0 ? '<button onclick="clearAllTasks(\'completed\')" style="background:#dcfce7;color:#166534;border:1px solid #22c55e;padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer">🗑 Barchasini o\'chirish</button>' : '')
+      + '</div>';
     _TASKS.completed.slice(0, filter === 'completed' ? 50 : 5).forEach(function(t){
-      html += '<div style="background:#dcfce7;padding:10px;margin-bottom:6px;border-radius:8px;border-left:3px solid #22c55e">'
+      html += '<div onclick="openTaskEditor('+t.id+')" style="background:#dcfce7;padding:10px;margin-bottom:6px;border-radius:8px;border-left:3px solid #22c55e;cursor:pointer" title="Ko\'rish/tahrirlash uchun bosing">'
         + '<div style="font-weight:600;font-size:12px;text-decoration:line-through;opacity:.7">'+t.title+'</div>'
-        + '<div style="font-size:10px;color:#166534;margin-top:4px">✅ '+t.completedDate+' | 👤 '+t.assignee+'</div>'
+        + '<div style="font-size:10px;color:#166534;margin-top:4px">✅ '+(t.completedDate||'-')+' | 👤 '+(t.assignee||'-')+'</div>'
+        + taskBtns(t.id, 'completed')
         + '</div>';
     });
     if(_TASKS.completed.length > 5 && filter !== 'completed'){
@@ -6444,13 +6459,164 @@ function clearCompletedTasks(){
     toast('Bajarilgan vazifalar yo\'q', 'nf');
     return;
   }
-  
+
   if(confirm('Barcha bajarilgan vazifalar ('+_TASKS.completed.length+' ta) o\'chirilsinmi?')){
     _TASKS.completed = [];
     saveTasksToD(); /* Bulutga sinxronlash */
     renderTasksStatus();
     toast('🗑 Bajarilganlar o\'chirildi', 'ok');
   }
+}
+
+/* ═══ Universal vazifa o'chirish (har qanday list'dan) ═══ */
+function deleteAnyTask(taskId, listName){
+  var list = _TASKS[listName];
+  if(!list){ toast('Ro\'yxat topilmadi','er'); return; }
+  var idx = list.findIndex(function(t){ return t.id === taskId; });
+  if(idx < 0){
+    /* Boshqa list'lardan ham qidirish */
+    ['pending','overdue','completed'].forEach(function(name){
+      var i = _TASKS[name].findIndex(function(t){return t.id===taskId;});
+      if(i >= 0){ idx = i; listName = name; list = _TASKS[name]; }
+    });
+  }
+  if(idx < 0){ toast('Vazifa topilmadi','er'); return; }
+  var task = list[idx];
+  if(!confirm('"'+task.title+'" vazifasini butunlay o\'chirilsinmi?')) return;
+  list.splice(idx, 1);
+  saveTasksToD();
+  renderTasksStatus();
+  /* Modal'ni qayta ochish */
+  var oldPanel = document.querySelector('div[style*="position:fixed"][style*="z-index:9999"]');
+  if(oldPanel) oldPanel.remove();
+  showTasksList();
+  toast('🗑 Vazifa o\'chirildi','ok');
+}
+
+/* ═══ Butun ro'yxatni tozalash ═══ */
+function clearAllTasks(listName){
+  var list = _TASKS[listName];
+  if(!list || list.length === 0){ toast('Ro\'yxat bo\'sh','nf'); return; }
+  var names = {pending:'kutilayotgan', overdue:'muddati o\'tgan', completed:'bajarilgan'};
+  if(!confirm('Barcha '+names[listName]+' vazifalar ('+list.length+' ta) butunlay o\'chirilsinmi?\n\nBu amalni qaytarib bo\'lmaydi!')) return;
+  _TASKS[listName] = [];
+  saveTasksToD();
+  renderTasksStatus();
+  var oldPanel = document.querySelector('div[style*="position:fixed"][style*="z-index:9999"]');
+  if(oldPanel) oldPanel.remove();
+  showTasksList();
+  toast('🗑 Barcha '+names[listName]+' vazifalar o\'chirildi','ok');
+}
+
+/* ═══ Vazifa tahrirlash modali ═══ */
+function openTaskEditor(taskId){
+  var task = null, listName = '';
+  ['pending','overdue','completed'].forEach(function(name){
+    var f = _TASKS[name].find(function(t){return t.id===taskId;});
+    if(f){ task = f; listName = name; }
+  });
+  if(!task){ toast('Vazifa topilmadi','er'); return; }
+
+  var leadersOpts = (D.leaders||[]).map(function(l){
+    return '<option value="'+l.name+'"'+(l.name===task.assignee?' selected':'')+'>'+l.name+'</option>';
+  }).join('');
+
+  var html = '<div id="taskEditorModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">'
+    + '<div style="background:var(--card-s);border-radius:16px;max-width:520px;width:100%;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.4)">'
+    + '<div style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);padding:18px;color:#fff;display:flex;justify-content:space-between;align-items:center">'
+    + '<div><div style="font-size:16px;font-weight:700">✏️ Vazifani tahrirlash</div><div style="font-size:11px;opacity:.85;margin-top:2px">Holat: '+(listName==='pending'?'⏳ Kutilmoqda':listName==='overdue'?'❌ Muddati o\'tgan':'✅ Bajarilgan')+'</div></div>'
+    + '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:rgba(255,255,255,0.2);border:none;width:30px;height:30px;border-radius:50%;color:#fff;font-size:18px;cursor:pointer">×</button>'
+    + '</div>'
+    + '<div style="padding:18px;max-height:65vh;overflow-y:auto">'
+    /* Title */
+    + '<label style="font-size:11px;color:var(--t2);font-weight:600">VAZIFA NOMI</label>'
+    + '<input id="teTitle" type="text" value="'+(task.title||'').replace(/"/g,'&quot;')+'" style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--brd2);border-radius:8px;background:var(--bg);color:var(--t0);font-size:13px">'
+    /* Deadline */
+    + '<label style="font-size:11px;color:var(--t2);font-weight:600">MUDDAT</label>'
+    + '<input id="teDeadline" type="date" value="'+(task.deadline||'')+'" style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--brd2);border-radius:8px;background:var(--bg);color:var(--t0);font-size:13px">'
+    /* Priority */
+    + '<label style="font-size:11px;color:var(--t2);font-weight:600">USTUVORLIK</label>'
+    + '<select id="tePriority" style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--brd2);border-radius:8px;background:var(--bg);color:var(--t0);font-size:13px">'
+      + '<option value="yuqori"'+(task.priority==='yuqori'?' selected':'')+'>🔴 Yuqori</option>'
+      + '<option value="o\'rta"'+(task.priority==='o\'rta'||!task.priority?' selected':'')+'>🟡 O\'rta</option>'
+      + '<option value="past"'+(task.priority==='past'?' selected':'')+'>⚪ Past</option>'
+    + '</select>'
+    /* Assignee */
+    + '<label style="font-size:11px;color:var(--t2);font-weight:600">MAS\'UL RAHBAR</label>'
+    + '<select id="teAssignee" style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--brd2);border-radius:8px;background:var(--bg);color:var(--t0);font-size:13px">'
+      + '<option value="">— Tanlang —</option>'
+      + leadersOpts
+    + '</select>'
+    /* Comment */
+    + '<label style="font-size:11px;color:var(--t2);font-weight:600">IZOH</label>'
+    + '<textarea id="teComment" rows="3" placeholder="Qo\'shimcha ma\'lumot..." style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--brd2);border-radius:8px;background:var(--bg);color:var(--t0);font-size:13px;resize:vertical">'+(task.comment||'').replace(/</g,'&lt;')+'</textarea>'
+    /* Status changer */
+    + '<label style="font-size:11px;color:var(--t2);font-weight:600">HOLATNI O\'ZGARTIRISH</label>'
+    + '<select id="teStatus" style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--brd2);border-radius:8px;background:var(--bg);color:var(--t0);font-size:13px">'
+      + '<option value="pending"'+(listName==='pending'?' selected':'')+'>⏳ Kutilmoqda</option>'
+      + '<option value="overdue"'+(listName==='overdue'?' selected':'')+'>❌ Muddati o\'tgan</option>'
+      + '<option value="completed"'+(listName==='completed'?' selected':'')+'>✅ Bajarilgan</option>'
+    + '</select>'
+    + '</div>'
+    /* Buttons */
+    + '<div style="padding:14px 18px;border-top:1px solid var(--brd2);display:flex;gap:8px;justify-content:space-between">'
+    + '<button onclick="deleteAnyTask('+taskId+',\''+listName+'\')" style="padding:10px 18px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">🗑 O\'chirish</button>'
+    + '<div style="display:flex;gap:8px">'
+    + '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:10px 18px;background:var(--bg2);color:var(--t1);border:1px solid var(--brd);border-radius:8px;font-size:12px;cursor:pointer">Bekor</button>'
+    + '<button onclick="saveTaskEdits('+taskId+',\''+listName+'\')" style="padding:10px 18px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">💾 Saqlash</button>'
+    + '</div>'
+    + '</div>'
+    + '</div></div>';
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+/* ═══ Tahrirlangan vazifani saqlash ═══ */
+function saveTaskEdits(taskId, oldListName){
+  var task = null, oldList = _TASKS[oldListName];
+  if(oldList){
+    var idx = oldList.findIndex(function(t){return t.id===taskId;});
+    if(idx >= 0) task = oldList[idx];
+  }
+  if(!task){ toast('Vazifa topilmadi','er'); return; }
+
+  /* Inputlardan qiymatlarni o'qish */
+  var newTitle = (document.getElementById('teTitle').value || '').trim();
+  var newDeadline = document.getElementById('teDeadline').value;
+  var newPriority = document.getElementById('tePriority').value;
+  var newAssignee = document.getElementById('teAssignee').value;
+  var newComment = document.getElementById('teComment').value;
+  var newStatus = document.getElementById('teStatus').value;
+
+  if(!newTitle){ toast('Nom bo\'sh bo\'lmasligi kerak','er'); return; }
+
+  /* Vazifani yangilash */
+  task.title = newTitle;
+  task.deadline = newDeadline;
+  task.priority = newPriority;
+  task.assignee = newAssignee || task.assignee;
+  task.comment = newComment;
+
+  /* Holatni o'zgartirish — kerak bo'lsa boshqa list'ga ko'chirish */
+  if(newStatus !== oldListName){
+    /* Eski list'dan olib tashlash */
+    var idx = oldList.findIndex(function(t){return t.id===taskId;});
+    if(idx >= 0) oldList.splice(idx, 1);
+    /* Yangi list'ga qo'shish */
+    if(newStatus === 'completed' && !task.completedDate){
+      task.completedDate = new Date().toISOString().slice(0,10);
+    }
+    _TASKS[newStatus].unshift(task);
+  }
+
+  saveTasksToD();
+  renderTasksStatus();
+  document.getElementById('taskEditorModal').remove();
+  /* Vazifalar ro'yxatini yangilash */
+  var oldPanel = document.querySelector('div[style*="position:fixed"][style*="z-index:9999"]');
+  if(oldPanel) oldPanel.remove();
+  showTasksList();
+  toast('✅ Vazifa yangilandi','ok');
 }
 
 /* Vazifalarni eksport qilish */
