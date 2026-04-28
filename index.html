@@ -1086,9 +1086,16 @@ button{cursor:pointer;border:none;background:none;font-family:var(--ff)}
   </div>
 </div></div>
 
-<div class="adm-ov" id="admOv"><div class="adm-p"><div class="adm-hd"><h2><i data-lucide="shield-check"></i> Boshqaruv</h2><button class="adm-x" onclick="closeAdm()"><i data-lucide="x"></i></button></div><div class="adm-tabs"><button class="adm-tab on" data-tab="leaders" onclick="admTab('leaders')">Rahbarlar</button><button class="adm-tab" data-tab="transfer" onclick="admTab('transfer')">Ko'chirish</button><button class="adm-tab" data-tab="depts" onclick="admTab('depts')">Bo'limlar</button><button class="adm-tab" data-tab="dashs" onclick="admTab('dashs')">Dashboardlar</button><button class="adm-tab" data-tab="files" onclick="admTab('files')">📁 Papkalar</button><button class="adm-tab" data-tab="upload" onclick="admTab('upload')">Yuklash</button><button class="adm-tab" data-tab="meets" onclick="admTab('meets')">Uchrashuvlar</button><button class="adm-tab" data-tab="contacts" onclick="admTab('contacts')">Kontaktlar</button><button class="adm-tab" data-tab="github" onclick="admTab('github')">☁️ GitHub</button><button class="adm-tab" data-tab="cfg" onclick="admTab('cfg')">Sozlamalar</button></div><div class="adm-bd" id="admBd"></div></div></div>
+<div class="adm-ov" id="admOv"><div class="adm-p"><div class="adm-hd"><h2><i data-lucide="shield-check"></i> Boshqaruv</h2><button class="adm-x" onclick="closeAdm()"><i data-lucide="x"></i></button></div><div class="adm-tabs"><button class="adm-tab on" data-tab="leaders" onclick="admTab('leaders')">Rahbarlar</button><button class="adm-tab" data-tab="transfer" onclick="admTab('transfer')">Ko'chirish</button><button class="adm-tab" data-tab="depts" onclick="admTab('depts')">Bo'limlar</button><button class="adm-tab" data-tab="dashs" onclick="admTab('dashs')">Dashboardlar</button><button class="adm-tab" data-tab="files" onclick="admTab('files')">📁 Papkalar</button><button class="adm-tab" data-tab="upload" onclick="admTab('upload')">Yuklash</button><button class="adm-tab" data-tab="meets" onclick="admTab('meets')">Uchrashuvlar</button><button class="adm-tab" data-tab="contacts" onclick="admTab('contacts')">Kontaktlar</button><button class="adm-tab" data-tab="github" onclick="admTab('github')">☁️ GitHub</button><button class="adm-tab" data-tab="users" onclick="admTab('users')">👤 Foydalanuvchilar</button><button class="adm-tab" data-tab="cfg" onclick="admTab('cfg')">Sozlamalar</button></div><div class="adm-bd" id="admBd"></div></div></div>
 <!-- Eski voice asisstent UI olib tashlandi — endi yagona MB Yordamchi chat-bot ichida (mic + TTS + matn). Skeleton elementlar (vSt, vLog, vChatInp) aynan eski koddan keluvchi vMsg/recogStart kabi funksiyalar ishlamasligi uchun saqlanadi (yashirin) -->
 <div id="vSt" style="display:none"></div><div id="vLog" style="display:none"></div><div id="vWave" style="display:none"></div><div id="vStopBtn" style="display:none"></div><input id="vChatInp" type="hidden">
+
+<!-- ═══ Ovozni to'xtatish — floating button (har doim ko'rinadi gapirayotganda) ═══ -->
+<button id="globalStopVoice" onclick="stopAllVoice()" title="Ovozni to'xtatish" style="display:none;position:fixed;bottom:170px;right:30px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;font-size:22px;cursor:pointer;z-index:9998;box-shadow:0 8px 24px rgba(220,38,38,0.5);animation:stopPulse 1.2s ease-in-out infinite">⏹</button>
+<style>
+@keyframes stopPulse{0%,100%{transform:scale(1);box-shadow:0 8px 24px rgba(220,38,38,0.5)}50%{transform:scale(1.08);box-shadow:0 12px 32px rgba(220,38,38,0.7)}}
+#globalStopVoice:hover{transform:scale(1.15) !important;animation:none}
+</style>
 <div class="toasts" id="toasts"></div>
 <script>
 
@@ -1314,7 +1321,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:65,_cloudUrl:"",_skipCloud:true,leaders:[
+var INIT={_v:67,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1785,7 +1792,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 65; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 67; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
@@ -3408,6 +3415,65 @@ function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t
       + '</div></div>';
     setTimeout(function(){ renderGitHubFilesPanel(); }, 100);
   }
+  else if(tab==='users'){
+    /* Faqat admin barchasini ko'radi/o'zgartiradi; oddiy user faqat o'zinikini */
+    var isAdmin = _CURRENT_USER && _CURRENT_USER.role === 'admin';
+    var cu = _CURRENT_USER ? _CURRENT_USER.username : '';
+    var html = '<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:4px">👤 Foydalanuvchilar boshqaruvi</div>'
+      + '<div style="font-size:11px;color:var(--t2);margin-bottom:14px">'
+        + (isAdmin ? 'Admin sifatida — barchasini ko\'rishingiz va parolini o\'zgartirishingiz mumkin' : 'Faqat o\'z parolingizni o\'zgartira olasiz')
+      + '</div>';
+    Object.keys(_USERS).forEach(function(u){
+      var user = _USERS[u];
+      var canEdit = isAdmin || u === cu;
+      var roleColor = user.role==='admin' ? '#dc2626' : '#3b82f6';
+      var roleLabel = user.role==='admin' ? '🛡 ADMIN' : '👔 ORINBOSAR';
+      html += '<div style="background:var(--bg2);border:1px solid var(--brd2);border-radius:10px;padding:12px;margin-bottom:10px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        + '<div>'
+          + '<div style="font-size:13px;font-weight:700;color:var(--t0)">' + (user.fullName || user.name) + '</div>'
+          + '<div style="font-size:11px;color:var(--t2)">' + (user.title || '') + '</div>'
+        + '</div>'
+        + '<span style="padding:3px 10px;border-radius:12px;background:'+roleColor+';color:#fff;font-size:9px;font-weight:700">' + roleLabel + '</span>'
+        + '</div>';
+      if(canEdit){
+        var idSafe = u.replace(/[^a-zA-Z0-9_]/g,'_');
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+          + '<div><label style="font-size:10px;color:var(--t2);font-weight:600">LOGIN</label><input id="usr_'+idSafe+'_login" value="'+u+'" '+(isAdmin?'':'readonly')+' style="width:100%;padding:7px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px;margin-top:2px"></div>'
+          + '<div><label style="font-size:10px;color:var(--t2);font-weight:600">YANGI PAROL</label><input id="usr_'+idSafe+'_pass" type="password" placeholder="O\'zgartirmaslik uchun bo\'sh qoldiring" style="width:100%;padding:7px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px;margin-top:2px"></div>'
+          + '</div>'
+          + '<div style="display:flex;gap:6px;justify-content:flex-end">'
+          + '<button onclick="saveUserCreds(\''+u.replace(/'/g,"\\'")+'\')" style="padding:6px 14px;background:#22c55e;color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600">💾 Saqlash</button>'
+          + (isAdmin && u !== cu && u !== 'MBtoshvil' ? '<button onclick="deleteUser(\''+u.replace(/'/g,"\\'")+'\')" style="padding:6px 14px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600">🗑 O\'chirish</button>' : '')
+          + '</div>';
+      } else {
+        html += '<div style="font-size:11px;color:var(--t3);font-style:italic">Login: <code>'+u+'</code> · 🔒 Parolni o\'zgartirish ruxsati yo\'q</div>';
+      }
+      html += '</div>';
+    });
+
+    /* Admin uchun yangi user qo'shish */
+    if(isAdmin){
+      html += '<hr style="margin:18px 0;border:none;border-top:1px solid var(--brd2)">'
+        + '<div style="font-family:var(--ffd);font-size:15px;font-weight:800;color:var(--ac);margin-bottom:8px">➕ Yangi foydalanuvchi qo\'shish</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+        + '<input id="newUsrLogin" placeholder="Login" style="padding:8px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px">'
+        + '<input id="newUsrPass" type="password" placeholder="Parol" style="padding:8px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px">'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+        + '<input id="newUsrName" placeholder="Ism Sharif" style="padding:8px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px">'
+        + '<input id="newUsrTitle" placeholder="Lavozim" style="padding:8px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px">'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">'
+        + '<select id="newUsrRole" style="padding:8px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px"><option value="deputy">O\'rinbosar</option><option value="admin">Admin</option></select>'
+        + '<select id="newUsrLeader" style="padding:8px;border:1px solid var(--brd2);border-radius:6px;background:var(--bg);color:var(--t0);font-size:12px"><option value="">— Rahbarsiz (admin) —</option>'
+          + (D.leaders||[]).map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>';}).join('')
+        + '</select>'
+        + '</div>'
+        + '<button onclick="addNewUser()" style="width:100%;padding:10px;background:var(--ac);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">➕ Foydalanuvchi qo\'shish</button>';
+    }
+    b.innerHTML = html;
+  }
   else if(tab==='cfg'){var cUrl=_getCloudUrl();b.innerHTML='<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:4px">📦 Loyihani yuklash</div>'
     +'<div style="font-size:11px;color:var(--t2);margin-bottom:10px">ZIP yoki papka yuklang — barcha dashboard va Excel fayllar avtomatik ishlaydi</div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">'
@@ -4288,6 +4354,7 @@ function vStopSpeech(){
   vSpeaking=false;
   _stopStopListener();
   var btn=$('vStopBtn');if(btn)btn.style.display='none';
+  var gBtn=document.getElementById('globalStopVoice');if(gBtn)gBtn.style.display='none';
   if(azSynthesizer){
     try{
       azSynthesizer.close();
@@ -4296,6 +4363,28 @@ function vStopSpeech(){
       azSynthesizer=new SpeechSDK.SpeechSynthesizer(azSpeechCfg,audioOut);
     }catch(e){}
   }
+}
+
+/* ═══ UNIVERSAL OVOZNI TO'XTATISH — istalgan TTS uchun ═══ */
+function stopAllVoice(){
+  /* 1. Azure TTS to'xtatish */
+  try{ vStopSpeech(); }catch(e){}
+  /* 2. Web Speech API (browser TTS) to'xtatish */
+  try{
+    if(typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking){
+      speechSynthesis.cancel();
+    }
+  }catch(e){}
+  /* 3. Floating tugmani yashirish */
+  var gBtn=document.getElementById('globalStopVoice');if(gBtn)gBtn.style.display='none';
+  /* 4. Foydalanuvchi xohishida — ovozni butunlay o'chirish */
+  if(typeof toast === 'function') toast('⏹ Ovoz to\'xtatildi','ok');
+}
+
+/* Floating stop tugmani ko'rsatish */
+function showGlobalStopBtn(){
+  var gBtn=document.getElementById('globalStopVoice');
+  if(gBtn) gBtn.style.display='';
 }
 
 /* Foydalanuvchi to'xtatish — visual feedback bilan */
@@ -4355,6 +4444,8 @@ function vSpeak(text){
   /* Gapirayotgan holatni belgilash */
   vSpeaking=true;
   var btn=$('vStopBtn');if(btn)btn.style.display='';
+  /* Floating "stop" tugmasini ko'rsatish */
+  showGlobalStopBtn();
 
   var voiceName=localStorage.getItem('azVoice')||'uz-UZ-MadinaNeural';
   var ssml=buildSsml(text,voiceName);
@@ -7415,12 +7506,98 @@ setTimeout(function(){
 
 /* ═══ LOGIN TIZIMI ═══ */
 /* Foydalanuvchilar tizimi */
-var _USERS = {
+var _DEFAULT_USERS = {
   'MBtoshvil': {p: 'CBU_toshvil', role: 'admin', name: 'Administrator', fullName: 'Administrator', title: 'Tizim administratori', leaderId: null},
   'nuraliyev_m': {p: 'nuraliyev2025', role: 'deputy', name: "B.F.Nuraliyev o'rinbosari", fullName: 'Nuraliyev Bekzod Fazliddinovich', title: 'Boshqaruvchi o\'rinbosari', leaderId: 'nuraliyev'},
   'irgashev_m': {p: 'irgashev2025', role: 'deputy', name: "Sh.R.Irgashev o'rinbosari", fullName: 'Irgashev Sherzod Rabimovich', title: 'Boshqaruvchi o\'rinbosari', leaderId: 'irgashev'},
   'jurayev_m': {p: 'jurayev2025', role: 'deputy', name: "A.A.Jurayev o'rinbosari", fullName: 'Jurayev Anvar Abdumurotovich', title: 'Boshqaruvchi o\'rinbosari', leaderId: 'jurayev'}
 };
+/* ═══ FOYDALANUVCHI BOSHQARUVI ═══ */
+window.saveUserCreds = function(login){
+  var isAdmin = _CURRENT_USER && _CURRENT_USER.role === 'admin';
+  var canEdit = isAdmin || login === (_CURRENT_USER && _CURRENT_USER.username);
+  if(!canEdit){ toast('Ruxsat yo\'q','er'); return; }
+  var idSafe = login.replace(/[^a-zA-Z0-9_]/g,'_');
+  var newLogin = (document.getElementById('usr_'+idSafe+'_login').value || '').trim();
+  var newPass = document.getElementById('usr_'+idSafe+'_pass').value;
+  if(!newLogin){ toast('Login bo\'sh bo\'lmaydi','er'); return; }
+  if(newPass && newPass.length < 4){ toast('Parol kamida 4 ta belgi','er'); return; }
+
+  var user = _USERS[login];
+  if(!user) return;
+
+  /* Login o'zgargan bo'lsa — yangi kalit yaratib eskini o'chirish */
+  if(newLogin !== login){
+    if(_USERS[newLogin]){ toast('Bunday login mavjud','er'); return; }
+    _USERS[newLogin] = user;
+    delete _USERS[login];
+    /* Joriy user'ni ham yangilash */
+    if(_CURRENT_USER && _CURRENT_USER.username === login){
+      _CURRENT_USER.username = newLogin;
+      localStorage.setItem('currentUser', JSON.stringify(_CURRENT_USER));
+    }
+    user = _USERS[newLogin];
+  }
+  /* Parol o'zgartirish */
+  if(newPass) user.p = newPass;
+  _saveUsers();
+  toast('✅ Saqlandi','ok');
+  admTab('users');
+};
+
+window.deleteUser = function(login){
+  if(!_CURRENT_USER || _CURRENT_USER.role !== 'admin'){ toast('Faqat admin','er'); return; }
+  if(login === _CURRENT_USER.username){ toast('O\'zingizni o\'chirib bo\'lmaydi','er'); return; }
+  if(login === 'MBtoshvil'){ toast('Asosiy adminni o\'chirib bo\'lmaydi','er'); return; }
+  if(!confirm('"'+login+'" foydalanuvchini o\'chirilsinmi?')) return;
+  delete _USERS[login];
+  _saveUsers();
+  toast('🗑 O\'chirildi','ok');
+  admTab('users');
+};
+
+window.addNewUser = function(){
+  if(!_CURRENT_USER || _CURRENT_USER.role !== 'admin'){ toast('Faqat admin','er'); return; }
+  var login = (document.getElementById('newUsrLogin').value || '').trim();
+  var pass = document.getElementById('newUsrPass').value;
+  var name = (document.getElementById('newUsrName').value || '').trim();
+  var title = (document.getElementById('newUsrTitle').value || '').trim();
+  var role = document.getElementById('newUsrRole').value;
+  var leaderId = document.getElementById('newUsrLeader').value;
+
+  if(!login || login.length < 3){ toast('Login kamida 3 ta belgi','er'); return; }
+  if(!pass || pass.length < 4){ toast('Parol kamida 4 ta belgi','er'); return; }
+  if(!name){ toast('Ism Sharif kerak','er'); return; }
+  if(_USERS[login]){ toast('Bunday login mavjud','er'); return; }
+
+  _USERS[login] = {
+    p: pass,
+    role: role,
+    name: name,
+    fullName: name,
+    title: title || (role==='admin' ? 'Tizim administratori' : 'Boshqaruvchi o\'rinbosari'),
+    leaderId: leaderId || null
+  };
+  _saveUsers();
+  toast('✅ '+name+' qo\'shildi','ok');
+  admTab('users');
+};
+
+/* localStorage'dan saqlangan foydalanuvchilarni o'qish, yo'q bo'lsa default'lardan boshlash */
+function _loadUsers(){
+  try{
+    var saved = localStorage.getItem('mb_users');
+    if(saved){
+      var parsed = JSON.parse(saved);
+      if(parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) return parsed;
+    }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(_DEFAULT_USERS));
+}
+function _saveUsers(){
+  try{ localStorage.setItem('mb_users', JSON.stringify(_USERS)); }catch(e){}
+}
+var _USERS = _loadUsers();
 var _CURRENT_USER = null;
 function checkAuth(){
   var auth=localStorage.getItem('mb_auth');
@@ -8568,7 +8745,7 @@ document.addEventListener('keydown',function(e){
     }
 
     /* Yopilish */
-    parts.push('Sizning yordamchingiz shu yerda bo\'ladi. Yordam kerak bo\'lsa, chatni bosing.');
+    parts.push('Sizning AI yordamchingiz shu yerda bo\'ladi. Yordam kerak bo\'lsa, chatni bosing.');
 
     return parts.join(' ');
   }
