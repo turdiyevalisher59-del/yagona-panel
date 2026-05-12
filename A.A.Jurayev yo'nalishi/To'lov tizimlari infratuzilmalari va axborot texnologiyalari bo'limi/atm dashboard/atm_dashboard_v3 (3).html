@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Банкомат Мониторинг | Тошкент вилояти МБД</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1628;--navy2:#0f2040;--blue:#1a3a6b;
+  --accent:#c8a94a;--accent2:#e8c96a;
+  --cyan:#00bcd4;--green:#00c896;--red:#ff4757;--orange:#ff8c00;
+  --text:#e8eef8;--text2:#a0b0c8;
+  --border:rgba(200,169,74,0.2);--card:rgba(15,32,64,0.92);
+  --humo:#00bcd4;--uzcard:#f39c12;--adm:#9b59b6;
+  --qizil:#ff4757;--sariq:#ffb300;--yashil:#00c896;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 10% 20%,rgba(0,188,212,.05) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 90% 80%,rgba(200,169,74,.06) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+/* UPLOAD */
+#upload-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--navy);transition:opacity .5s,transform .5s;}
+#upload-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none;}
+.upload-logo{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:48px;opacity:.8;}
+.upload-box{width:520px;max-width:92vw;border:2px dashed var(--accent);border-radius:16px;padding:60px 48px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(200,169,74,.03);}
+.upload-box:hover,.upload-box.drag-over{border-color:var(--accent2);background:rgba(200,169,74,.07);transform:translateY(-2px);box-shadow:0 20px 60px rgba(200,169,74,.1);}
+.upload-icon{width:68px;height:68px;margin:0 auto 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;}
+.upload-title{font-size:21px;font-weight:600;margin-bottom:10px;}
+.upload-sub{font-size:14px;color:var(--text2);margin-bottom:28px;line-height:1.6;}
+.upload-btn{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--navy);font-weight:700;font-size:14px;padding:12px 32px;border-radius:8px;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s;}
+.upload-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(200,169,74,.4);}
+#file-input{display:none;}
+.upload-hint{margin-top:18px;font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace;}
+.loading-bar{width:100%;height:3px;background:rgba(200,169,74,.15);border-radius:2px;margin-top:22px;overflow:hidden;display:none;}
+.loading-bar.active{display:block;}
+.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));animation:loading 1.5s ease-in-out infinite;}
+@keyframes loading{0%{width:0%;margin-left:0}50%{width:70%;margin-left:0}100%{width:10%;margin-left:90%}}
+
+/* LAYOUT */
+#dashboard{display:none;position:relative;z-index:1;}
+#dashboard.visible{display:block;}
+.header{padding:16px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(10,22,40,.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;}
+.header-left{display:flex;align-items:center;gap:16px;}
+.header-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--navy);font-weight:700;font-size:11px;padding:4px 12px;border-radius:4px;letter-spacing:1.5px;}
+.header-title{font-size:16px;font-weight:600;}
+.header-sub{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace;}
+.header-btns{display:flex;gap:8px;}
+.hbtn{background:transparent;border:1px solid var(--border);color:var(--text2);font-size:12px;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:'IBM Plex Sans',sans-serif;}
+.hbtn:hover{border-color:var(--accent);color:var(--accent);}
+.hbtn-green{border-color:rgba(0,200,150,.3);color:var(--green);}
+.hbtn-green:hover{background:rgba(0,200,150,.1);}
+
+/* NAV */
+.nav-tabs{display:flex;border-bottom:1px solid var(--border);background:rgba(10,22,40,.8);padding:0 32px;}
+.nav-tab{padding:13px 22px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+
+.main{padding:22px 32px;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* FILTERS */
+.filters-row{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:flex-end;}
+.filter-group{display:flex;flex-direction:column;gap:4px;}
+.filter-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;}
+.filter-select,.filter-input{background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 13px;border-radius:7px;font-size:13px;min-width:150px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;outline:none;transition:border-color .2s;}
+.filter-select:focus,.filter-input:focus{border-color:var(--accent);}
+.filter-input{min-width:185px;}
+.filter-reset{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);color:var(--red);padding:8px 13px;border-radius:7px;font-size:12px;cursor:pointer;transition:all .2s;font-family:'IBM Plex Sans',sans-serif;}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:22px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;transition:transform .2s;}
+.kpi-card:hover{transform:translateY(-2px);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kpi-color,var(--accent));}
+.kpi-icon{font-size:20px;margin-bottom:9px;}
+.kpi-value{font-size:25px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+.kpi-label{font-size:11px;color:var(--text2);margin-top:5px;text-transform:uppercase;letter-spacing:.7px;}
+.kpi-sub{font-size:12px;color:var(--accent);margin-top:4px;font-weight:500;}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px;}
+.charts-row2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.chart-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;}
+.chart-sub{font-size:11px;color:var(--text2);margin:4px 0 16px;}
+.chart-wrap{position:relative;height:228px;}
+.top-list{}
+.top-item{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid rgba(200,169,74,.07);gap:10px;}
+.top-item:last-child{border-bottom:none;}
+.top-rank{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2);width:18px;text-align:right;}
+.top-name{flex:1;font-size:12.5px;}
+.top-bar-wrap{width:75px;}
+.top-bar{height:4px;background:var(--blue);border-radius:2px;position:relative;}
+.top-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--cyan));}
+.top-val{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);min-width:65px;text-align:right;}
+
+/* TABLE */
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.table-header{padding:15px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.table-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;}
+.table-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text2);}
+.table-wrap{overflow-x:auto;max-height:400px;overflow-y:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+thead th{background:rgba(26,58,107,.6);padding:9px 13px;text-align:left;font-weight:600;color:var(--text2);position:sticky;top:0;z-index:5;white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+thead th:hover{color:var(--accent);}
+thead th.sort-asc::after{content:' ↑';color:var(--accent);}
+thead th.sort-desc::after{content:' ↓';color:var(--accent);}
+tbody tr{border-bottom:1px solid rgba(200,169,74,.07);transition:background .15s;}
+tbody tr:hover{background:rgba(200,169,74,.05);}
+tbody td{padding:8px 13px;white-space:nowrap;}
+td.num{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--cyan);}
+td.num0{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--red);}
+td.numr{font-family:'IBM Plex Mono',monospace;text-align:right;}
+.device-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.d-humo{background:rgba(0,188,212,.15);color:var(--humo);}
+.d-uzcard{background:rgba(243,156,18,.15);color:var(--uzcard);}
+.d-adm{background:rgba(155,89,182,.15);color:var(--adm);}
+.tier{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.4px;}
+.t-q{background:rgba(255,71,87,.15);color:var(--qizil);border:1px solid rgba(255,71,87,.3);}
+.t-s{background:rgba(255,179,0,.15);color:var(--sariq);border:1px solid rgba(255,179,0,.3);}
+.t-y{background:rgba(0,200,150,.15);color:var(--yashil);border:1px solid rgba(0,200,150,.3);}
+.pagination{padding:11px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.page-info{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace;}
+.page-btns{display:flex;gap:4px;}
+.page-btn{background:transparent;border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:5px;font-size:12px;cursor:pointer;transition:all .15s;}
+.page-btn:hover{border-color:var(--accent);color:var(--accent);}
+.page-btn.active{background:var(--accent);border-color:var(--accent);color:var(--navy);font-weight:700;}
+.page-btn:disabled{opacity:.3;cursor:default;}
+
+/* ============================
+   САМАРАДОРЛИК — ТОПШИРИҚНОМА
+   ============================ */
+
+/* Alert bar */
+.alert-bar{background:linear-gradient(90deg,rgba(255,71,87,.12),rgba(255,179,0,.08));border:1px solid rgba(255,71,87,.3);border-radius:10px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.alert-bar-left{display:flex;align-items:center;gap:14px;}
+.alert-icon{font-size:24px;}
+.alert-text h3{font-size:14px;font-weight:700;color:var(--red);margin-bottom:3px;}
+.alert-text p{font-size:13px;color:var(--text2);}
+.alert-stats{display:flex;gap:20px;}
+.alert-stat{text-align:center;}
+.alert-stat-val{font-size:20px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+.alert-stat-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-top:2px;}
+
+/* Bank directive cards */
+.directive-section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.directive-section-title span{color:var(--accent);}
+
+.dir-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+
+.dir-card{background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+.dir-card.urgent{border-color:rgba(255,71,87,.4);}
+.dir-card.warning{border-color:rgba(255,179,0,.3);}
+
+/* Card stripe */
+.dir-stripe{height:4px;}
+.dir-stripe.urgent{background:linear-gradient(90deg,var(--qizil),#ff8566);}
+.dir-stripe.warning{background:linear-gradient(90deg,var(--sariq),#ffe066);}
+
+.dir-head{padding:14px 18px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.dir-bank-name{font-size:15px;font-weight:700;color:var(--text);flex:1;}
+.dir-badge{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+
+/* Metrics row */
+.dir-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:14px 18px;background:rgba(10,22,40,.5);border-radius:8px;overflow:hidden;border:1px solid rgba(200,169,74,.1);}
+.dir-metric{padding:10px 8px;text-align:center;border-right:1px solid rgba(200,169,74,.1);}
+.dir-metric:last-child{border-right:none;}
+.dir-metric-val{font-size:17px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text);}
+.dir-metric-val.bad{color:var(--red);}
+.dir-metric-val.warn{color:var(--sariq);}
+.dir-metric-val.good{color:var(--yashil);}
+.dir-metric-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+
+/* Problem line */
+.dir-problem{margin:0 18px 12px;padding:9px 12px;background:rgba(255,71,87,.06);border-left:3px solid var(--qizil);border-radius:0 6px 6px 0;font-size:12.5px;color:var(--text2);line-height:1.5;}
+.dir-problem.warn-bg{background:rgba(255,179,0,.06);border-left-color:var(--sariq);}
+
+/* Directives list */
+.dir-tasks{padding:0 18px 16px;}
+.dir-tasks-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+.dir-task{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;margin-bottom:5px;border-radius:7px;background:rgba(10,22,40,.4);border:1px solid rgba(200,169,74,.08);}
+.dir-task-num{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(200,169,74,.15);border:1px solid rgba(200,169,74,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;}
+.dir-task-body{flex:1;}
+.dir-task-text{font-size:12.5px;color:var(--text);line-height:1.5;}
+.dir-task-deadline{margin-top:3px;font-size:11px;color:var(--text2);font-family:'IBM Plex Mono',monospace;}
+.dir-task-deadline span{color:var(--orange);font-weight:600;}
+
+/* Footer sig */
+.dir-footer{margin:0 18px 16px;padding:10px 14px;border:1px solid var(--border);border-radius:7px;background:rgba(10,22,40,.3);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+.dir-footer-item{font-size:11px;color:var(--text2);}
+.dir-footer-item strong{color:var(--text);}
+.dir-sign-line{width:100px;height:1px;background:var(--border);margin-top:4px;}
+
+/* ВИЛОЯТ ЭТАЛОН ПАНЕЛИ */
+.bench-panel{background:linear-gradient(135deg,rgba(200,169,74,.08),rgba(0,188,212,.05));border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:16px;}
+.bench-panel-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.bench-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+.bench-kpi{background:rgba(10,22,40,.5);border:1px solid rgba(200,169,74,.12);border-radius:8px;padding:12px 10px;text-align:center;}
+.bench-kpi-val{font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--accent);}
+.bench-kpi-label{font-size:10px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;line-height:1.3;}
+.bench-kpi-note{font-size:10px;color:var(--text2);margin-top:3px;}
+
+/* САМАРАДОРЛИК ПАРАМЕТРЛАРИ ЖАДВАЛИ */
+.params-table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+.params-table-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.params-table-head h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.params-table-head small{font-size:12px;color:var(--text2);}
+.params-wrap{overflow-x:auto;}
+.params-table{width:100%;border-collapse:collapse;font-size:12px;}
+.params-table thead tr:first-child th{background:rgba(26,58,107,.7);padding:8px 12px;text-align:center;font-weight:700;color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.params-table thead tr:last-child th{background:rgba(26,58,107,.5);padding:7px 12px;text-align:center;font-weight:600;color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.params-table thead th.col-bank{text-align:left;}
+.params-table tbody tr{border-bottom:1px solid rgba(200,169,74,.07);transition:background .15s;}
+.params-table tbody tr:hover{background:rgba(200,169,74,.04);}
+.params-table tbody tr.bench-row{background:rgba(200,169,74,.06);border-top:1px solid rgba(200,169,74,.2);border-bottom:1px solid rgba(200,169,74,.2);}
+.params-table tbody tr.bench-row td{font-weight:700;color:var(--accent);}
+.params-table td{padding:7px 12px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;white-space:nowrap;}
+.params-table td.col-bank{text-align:left;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text);}
+.params-table td.col-bank small{display:block;font-weight:400;color:var(--text2);font-size:10px;margin-top:1px;}
+.p-good{color:var(--yashil);}
+.p-warn{color:var(--sariq);}
+.p-bad{color:var(--qizil);font-weight:700;}
+.p-neu{color:var(--text2);}
+.trend-up{color:var(--green);}
+.trend-dn{color:var(--red);}
+.trend-fl{color:var(--text2);}
+.gap-bar-wrap{display:flex;align-items:center;gap:5px;justify-content:center;}
+.gap-bar{width:36px;height:4px;background:var(--blue);border-radius:2px;position:relative;display:inline-block;}
+.gap-bar-fill{position:absolute;top:0;height:100%;border-radius:2px;}
+
+/* Yashil banks compact table */
+.yashil-table{background:var(--card);border:1px solid rgba(0,200,150,.2);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.yashil-table-head{padding:12px 18px;border-bottom:1px solid rgba(0,200,150,.15);display:flex;align-items:center;gap:10px;}
+.yashil-table-head span{font-size:13px;font-weight:600;color:var(--yashil);}
+.yashil-table-head small{font-size:12px;color:var(--text2);}
+.yashil-row{display:flex;align-items:center;padding:9px 18px;border-bottom:1px solid rgba(0,200,150,.07);gap:12px;font-size:12.5px;}
+.yashil-row:last-child{border-bottom:none;}
+.yashil-rank{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2);width:18px;}
+.yashil-bank{flex:1;}
+.yashil-cnt{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text2);min-width:55px;text-align:right;}
+.yashil-avg{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--yashil);min-width:70px;text-align:right;}
+.yashil-badge{font-size:11px;color:var(--yashil);}
+
+/* MFY BREAKDOWN inside directive card */
+.dir-mfy-section{margin:0 18px 14px;}
+.dir-mfy-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.dir-mfy-title span{color:var(--cyan);}
+.dir-mfy-toggle{font-size:11px;color:var(--accent);cursor:pointer;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:rgba(200,169,74,.08);user-select:none;}
+.dir-mfy-toggle:hover{background:rgba(200,169,74,.15);}
+.dir-mfy-wrap{overflow:hidden;transition:max-height .3s ease;}
+.dir-mfy-wrap.collapsed{max-height:0;}
+.dir-mfy-wrap.expanded{max-height:600px;}
+.mfy-mini-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+.mfy-mini-table thead th{background:rgba(10,22,40,.7);padding:6px 9px;text-align:left;font-weight:600;color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid rgba(200,169,74,.15);}
+.mfy-mini-table thead th:not(:first-child){text-align:right;}
+.mfy-mini-table tbody tr{border-bottom:1px solid rgba(200,169,74,.05);transition:background .1s;}
+.mfy-mini-table tbody tr:hover{background:rgba(200,169,74,.04);}
+.mfy-mini-table tbody tr:last-child{border-bottom:none;}
+.mfy-mini-table td{padding:5px 9px;white-space:nowrap;}
+.mfy-mini-table td:not(:first-child){text-align:right;font-family:'IBM Plex Mono',monospace;}
+.mfy-tag-q{color:var(--qizil);font-weight:700;}
+.mfy-tag-s{color:var(--sariq);font-weight:700;}
+.mfy-tag-y{color:var(--yashil);}
+.mfy-zero-cell{color:var(--red);font-weight:700;}
+.mfy-bar-inline{display:inline-flex;align-items:center;gap:5px;}
+.mfy-bar-s{width:50px;height:3px;background:var(--blue);border-radius:2px;display:inline-block;vertical-align:middle;position:relative;}
+.mfy-bar-f{position:absolute;left:0;top:0;height:100%;border-radius:2px;}
+.mfy-district-label{font-size:10px;color:var(--text2);}
+
+/* Print styles */
+@media print{
+  #upload-screen,.nav-tabs,.header-btns,.filters-row,.pagination,#tab-overview,#tab-table,button{display:none!important;}
+  #tab-efficiency{display:block!important;}
+  body{background:white!important;color:#111!important;}
+  body::before{display:none!important;}
+  .header{position:relative;background:white!important;border-bottom:2px solid #c8a94a!important;}
+  .header-badge{background:#c8a94a!important;color:#111!important;}
+  .header-title,.header-sub{color:#111!important;}
+  .alert-bar,.dir-card,.yashil-table{background:white!important;border-color:#ddd!important;}
+  .dir-card.urgent{border-color:#ff4757!important;border-width:2px!important;}
+  .dir-card.warning{border-color:#ffb300!important;border-width:2px!important;}
+  .dir-bank-name,.dir-task-text,.dir-metric-val{color:#111!important;}
+  .dir-metric-label,.dir-task-deadline,.filter-label{color:#555!important;}
+  .dir-metrics{background:#f8f8f8!important;border-color:#eee!important;}
+  .dir-metric{border-color:#eee!important;}
+  .dir-task{background:#f8f8f8!important;border-color:#eee!important;}
+  .dir-problem{background:#fff5f5!important;}
+  .dir-problem.warn-bg{background:#fffbf0!important;}
+  .dir-tasks-title{color:#c8a94a!important;}
+  .alert-text h3{color:#c0392b!important;}
+  .alert-text p,.alert-stat-label{color:#555!important;}
+  .alert-stat-val{color:#111!important;}
+  .dir-grid{grid-template-columns:1fr 1fr!important;}
+  .dir-card{break-inside:avoid;}
+  .directive-section-title{color:#555!important;}
+  .directive-section-title span{color:#c8a94a!important;}
+  .yashil-bank{color:#111!important;}
+  .yashil-cnt{color:#555!important;}
+  .dir-footer{border-color:#eee!important;background:white!important;}
+  .dir-footer-item strong{color:#111!important;}
+  .dir-footer-item{color:#555!important;}
+  .dir-sign-line{background:#ccc!important;}
+  .dir-mfy-wrap.collapsed{max-height:none!important;}
+  .bench-panel{background:#f9f7f0!important;border-color:#c8a94a!important;}
+  .bench-kpi{background:#fff!important;border-color:#ddd!important;}
+  .bench-kpi-val{color:#8a6e20!important;}
+  .bench-kpi-label,.bench-kpi-note{color:#555!important;}
+  .bench-panel-title{color:#8a6e20!important;}
+  .params-table-card{background:white!important;border-color:#ddd!important;}
+  .params-table thead tr:first-child th{background:#f0ecd8!important;color:#8a6e20!important;}
+  .params-table thead tr:last-child th{background:#f5f5f5!important;color:#555!important;}
+  .params-table tbody tr.bench-row{background:#fdf8e8!important;}
+  .params-table tbody tr.bench-row td{color:#8a6e20!important;}
+  .params-table td{color:#333!important;}
+  .params-table td.col-bank{color:#111!important;}
+  .params-table td.col-bank small{color:#666!important;}
+  .p-good{color:#1a8a6a!important;}.p-warn{color:#b07d00!important;}.p-bad{color:#c0392b!important;}
+  .trend-up{color:#1a8a6a!important;}.trend-dn{color:#c0392b!important;}
+  .params-table-head h3{color:#111!important;}
+  .dir-mfy-toggle{display:none!important;}
+}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--navy2);}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+.fade-in{animation:fadeIn .4s ease forwards;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr)}.charts-row{grid-template-columns:1fr}.charts-row2{grid-template-columns:1fr 1fr}.dir-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.main{padding:14px}.header{padding:12px 16px}.kpi-row{grid-template-columns:repeat(2,1fr)}.charts-row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- UPLOAD -->
+<div id="upload-screen">
+  <div class="upload-logo">Марказий банк · Тошкент вилоят МБД · Тўлов тизимлари</div>
+  <div class="upload-box" id="drop-zone">
+    <div class="upload-icon">📊</div>
+    <div class="upload-title">Банкомат дислокация маълумотлари</div>
+    <div class="upload-sub">Excel файлни юкланг — дашборд ва банкларга<br>топшириқнома <strong>автоматик</strong> тайёрланади.</div>
+    <label class="upload-btn" for="file-input">Excel файлни танлаш</label>
+    <input type="file" id="file-input" accept=".xlsx,.xls,.xlsm">
+    <div class="upload-hint">.xlsx · .xls · .xlsm</div>
+    <div class="loading-bar" id="loading-bar"><div class="loading-fill"></div></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="header">
+    <div class="header-left">
+      <div class="header-badge">МБД</div>
+      <div>
+        <div class="header-title">Банкомат Самарадорлик Мониторинги</div>
+        <div class="header-sub" id="header-sub">Тошкент вилояти · 2026 йил</div>
+      </div>
+    </div>
+    <div class="header-btns">
+      <button class="hbtn hbtn-green" onclick="switchTab('efficiency');setTimeout(()=>window.print(),200)">🖨 Топшириқномани чоп этиш</button>
+      <button class="hbtn" onclick="resetDashboard()">⬆ Янги файл</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('overview')">📊 Умумий кўриниш</div>
+    <div class="nav-tab" onclick="switchTab('efficiency')">📋 Банкларга топшириқ</div>
+    <div class="nav-tab" onclick="switchTab('table')">🏧 Банкоматлар рўйхати</div>
+  </div>
+
+  <div class="main">
+
+    <!-- TAB 1: OVERVIEW -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="filters-row">
+        <div class="filter-group"><div class="filter-label">Банк</div>
+          <select class="filter-select" id="f-bank" onchange="applyFilters()"><option value="">Барча банклар</option></select></div>
+        <div class="filter-group"><div class="filter-label">Ҳудуд / Туман</div>
+          <select class="filter-select" id="f-district" onchange="applyFilters()"><option value="">Барча ҳудудлар</option></select></div>
+        <div class="filter-group"><div class="filter-label">Қурилма тури</div>
+          <select class="filter-select" id="f-device" onchange="applyFilters()">
+            <option value="">Барчаси</option><option value="humo">Humo</option><option value="uzcard">Uzcard</option><option value="adm">ADM</option></select></div>
+        <div class="filter-group"><div class="filter-label">Ой</div>
+          <select class="filter-select" id="f-month" onchange="applyFilters()">
+            <option value="">Барча ойлар (жами)</option>
+            <option value="0">Январь</option><option value="1">Февраль</option><option value="2">Март</option>
+            <option value="3">Апрель</option><option value="4">Май</option><option value="5">Июнь</option>
+            <option value="6">Июль</option><option value="7">Август</option><option value="8">Сентябрь</option>
+            <option value="9">Октябрь</option><option value="10">Ноябрь</option><option value="11">Декабрь</option></select></div>
+        <div class="filter-group"><div class="filter-label">Қидирув</div>
+          <input class="filter-input" id="f-search" type="text" placeholder="Банк, туман, МФЙ..." oninput="applyFilters()"></div>
+        <button class="filter-reset" onclick="resetFilters()">✕ Тозалаш</button>
+      </div>
+      <div class="kpi-row" id="kpi-row"></div>
+      <div class="charts-row">
+        <div class="chart-card fade-in">
+          <div class="chart-title">Ойлик нақд пул ечиш динамикаси</div>
+          <div class="chart-sub">Жами банкоматлар · ойлар кесимида (млн.сўм)</div>
+          <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+        </div>
+        <div class="chart-card fade-in">
+          <div class="chart-title">Қурилма тури нисбати</div>
+          <div class="chart-sub">Humo / Uzcard / ADM</div>
+          <div class="chart-wrap"><canvas id="chartDevice"></canvas></div>
+        </div>
+      </div>
+      <div class="charts-row2">
+        <div class="chart-card fade-in">
+          <div class="chart-title">Топ-10 банклар</div>
+          <div class="chart-sub">Банкоматлар сони бўйича</div>
+          <div class="top-list" id="topBanks"></div>
+        </div>
+        <div class="chart-card fade-in">
+          <div class="chart-title">Топ-10 ҳудудлар</div>
+          <div class="chart-sub">Ечилган маблағ бўйича (млн.сўм)</div>
+          <div class="top-list" id="topDistricts"></div>
+        </div>
+        <div class="chart-card fade-in">
+          <div class="chart-title">Банк рейтинги</div>
+          <div class="chart-sub">Ўртача ечиш (млн / банкомат)</div>
+          <div class="chart-wrap"><canvas id="chartBankRating"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DIRECTIVES -->
+    <div class="tab-content" id="tab-efficiency">
+
+      <!-- Alert summary bar -->
+      <div class="alert-bar fade-in" id="eff-alert"></div>
+
+      <!-- Viloyat benchmark + params table -->
+      <div id="eff-params"></div>
+
+      <!-- QIZIL + SARIQ bank directives -->
+      <div class="directive-section-title">🔴🟡 <span>ЗУДЛИК БИЛАН ЧОРА КЎРИШ ЗАРУР БЎЛГАН БАНКЛАР</span> — ТОПШИРИҚНОМА</div>
+      <div class="dir-grid" id="dir-grid-low"></div>
+
+      <!-- YASHIL banks -->
+      <div class="directive-section-title">🟢 <span>ЯХШИ КО'РСАТКИЧ</span> — НАМУНАВИЙ БАНКЛАР</div>
+      <div class="yashil-table" id="dir-yashil"></div>
+
+    </div>
+
+    <!-- TAB 3: TABLE -->
+    <div class="tab-content" id="tab-table">
+      <div class="filters-row">
+        <div class="filter-group"><div class="filter-label">Банк</div>
+          <select class="filter-select" id="t-bank" onchange="applyTableFilter()"><option value="">Барча банклар</option></select></div>
+        <div class="filter-group"><div class="filter-label">Ҳудуд / Туман</div>
+          <select class="filter-select" id="t-district" onchange="applyTableFilter()"><option value="">Барча ҳудудлар</option></select></div>
+        <div class="filter-group"><div class="filter-label">Қурилма тури</div>
+          <select class="filter-select" id="t-device" onchange="applyTableFilter()">
+            <option value="">Барчаси</option><option value="humo">Humo</option><option value="uzcard">Uzcard</option><option value="adm">ADM</option></select></div>
+        <div class="filter-group"><div class="filter-label">Самарадорлик</div>
+          <select class="filter-select" id="t-tier" onchange="applyTableFilter()">
+            <option value="">Барчаси</option><option value="qizil">🔴 Қизил</option><option value="sariq">🟡 Сариқ</option><option value="yashil">🟢 Яшил</option></select></div>
+        <div class="filter-group"><div class="filter-label">Қидирув</div>
+          <input class="filter-input" id="t-search" type="text" placeholder="Банк, туман, МФЙ..." oninput="applyTableFilter()"></div>
+        <button class="filter-reset" onclick="resetTableFilter()">✕ Тозалаш</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">🏧 Банкоматлар тўлиқ рўйхати</div>
+          <div class="table-count" id="table-count"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th onclick="sortTable(0)">№</th>
+              <th onclick="sortTable(1)">Банк</th>
+              <th onclick="sortTable(2)">Филиал</th>
+              <th onclick="sortTable(4)">Туман</th>
+              <th onclick="sortTable(5)">МФЙ</th>
+              <th onclick="sortTable(6)">Қурилма</th>
+              <th onclick="sortTable(7)" style="text-align:right">Янв</th>
+              <th onclick="sortTable(8)" style="text-align:right">Фев</th>
+              <th onclick="sortTable(9)" style="text-align:right">Мар</th>
+              <th onclick="sortTable(-1)" style="text-align:right">Жами (млн)</th>
+              <th>Даража</th>
+            </tr></thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <div class="page-info" id="page-info"></div>
+          <div class="page-btns" id="page-btns"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allData=[],filteredData=[],tableData=[];
+let chartMonthly,chartDevice,chartBankRating;
+let sortCol=-1,sortDir=1,currentPage=1;
+const PAGE_SIZE=25;
+const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+// ── Upload ──────────────────────────────────────────────────────
+const dropZone=document.getElementById('drop-zone');
+const fileInput=document.getElementById('file-input');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');handleFile(e.dataTransfer.files[0]);});
+fileInput.addEventListener('change',e=>handleFile(e.target.files[0]));
+dropZone.addEventListener('click',e=>{if(e.target!==fileInput&&!e.target.closest('label'))fileInput.click();});
+
+function handleFile(file){
+  if(!file)return;
+  document.getElementById('loading-bar').classList.add('active');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      parseData(XLSX.utils.sheet_to_json(ws,{header:1,defval:null}));
+      document.getElementById('upload-screen').classList.add('hidden');
+      document.getElementById('dashboard').classList.add('visible');
+      document.getElementById('header-sub').textContent=`Тошкент вилояти · ${file.name} · ${allData.length} та банкомат`;
+    }catch(err){alert('Хатолик: '+err.message);}
+    document.getElementById('loading-bar').classList.remove('active');
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function parseData(raw){
+  allData=[];
+  for(let i=4;i<raw.length;i++){
+    const r=raw[i];
+    if(!r||!r[0]||typeof r[0]!=='number')continue;
+    const months=[];
+    for(let m=0;m<12;m++)months.push(parseFloat(r[7+m])||0);
+    const total=months.reduce((a,b)=>a+b,0);
+    const device=(r[6]||'').toString().trim().toUpperCase();
+    allData.push({
+      num:r[0],bank:(r[1]||'').trim(),branch:(r[2]||'').trim(),
+      mfo:r[3],district:(r[4]||'').trim(),mfy:(r[5]||'').trim(),
+      device:(r[6]||'').trim(),
+      deviceNorm:device.includes('HUMO')?'humo':device.includes('UZCARD')?'uzcard':device.includes('ADM')?'adm':'other',
+      months,total,activeMonths:months.filter(v=>v>0).length,
+    });
+  }
+  // Compute bank-level tiers
+  const ba=bankAvgMap(allData);
+  allData.forEach(d=>{d.tier=ba[d.bank]?.tier||'sariq';});
+  populateFilters();
+  filteredData=[...allData];tableData=[...allData];
+  applyFilters();applyTableFilter();
+  renderDirectives();
+}
+
+function bankAvgMap(data){
+  const m={};
+  data.forEach(d=>{
+    if(!m[d.bank])m[d.bank]={sum:0,cnt:0,zero:0,atms:[]};
+    m[d.bank].sum+=d.total;m[d.bank].cnt++;
+    if(d.total===0)m[d.bank].zero++;
+    m[d.bank].atms.push(d);
+  });
+  const list=Object.entries(m).map(([b,v])=>({bank:b,...v,avg:v.cnt?v.sum/v.cnt:0}));
+  const sorted=[...list].sort((a,b)=>a.avg-b.avg);
+  const p25=sorted[Math.floor(sorted.length*.25)]?.avg||0;
+  const p75=sorted[Math.floor(sorted.length*.75)]?.avg||0;
+  const res={};
+  list.forEach(b=>{
+    const zr=b.zero/b.cnt;
+    let tier='yashil';
+    if(b.avg<p25||zr>0.3)tier='qizil';
+    else if(b.avg<p75||zr>0.15)tier='sariq';
+    res[b.bank]={...b,tier,p25,p75};
+  });
+  return res;
+}
+
+// ── Filters ──────────────────────────────────────────────────────
+function populateFilters(){
+  const banks=[...new Set(allData.map(d=>d.bank))].sort();
+  const dists=[...new Set(allData.map(d=>d.district))].sort();
+  ['f-bank','t-bank'].forEach(id=>{document.getElementById(id).innerHTML='<option value="">Барча банклар</option>'+banks.map(b=>`<option value="${b}">${b}</option>`).join('');});
+  ['f-district','t-district'].forEach(id=>{document.getElementById(id).innerHTML='<option value="">Барча ҳудудлар</option>'+dists.map(d=>`<option value="${d}">${d}</option>`).join('');});
+}
+
+function applyFilters(){
+  const bank=document.getElementById('f-bank').value;
+  const dist=document.getElementById('f-district').value;
+  const dev=document.getElementById('f-device').value;
+  const month=document.getElementById('f-month').value;
+  const search=document.getElementById('f-search').value.toLowerCase();
+  filteredData=allData.filter(d=>{
+    if(bank&&d.bank!==bank)return false;
+    if(dist&&d.district!==dist)return false;
+    if(dev&&d.deviceNorm!==dev)return false;
+    if(search&&![d.bank,d.district,d.mfy,d.branch].some(s=>s.toLowerCase().includes(search)))return false;
+    return true;
+  }).map(d=>({...d,ft:month!==''?d.months[parseInt(month)]:d.total}));
+  renderKPIs();renderCharts();renderTopLists();
+}
+function resetFilters(){['f-bank','f-district','f-device','f-month'].forEach(id=>document.getElementById(id).value='');document.getElementById('f-search').value='';applyFilters();}
+
+function applyTableFilter(){
+  const bank=document.getElementById('t-bank').value;
+  const dist=document.getElementById('t-district').value;
+  const dev=document.getElementById('t-device').value;
+  const tier=document.getElementById('t-tier').value;
+  const search=document.getElementById('t-search').value.toLowerCase();
+  tableData=allData.filter(d=>{
+    if(bank&&d.bank!==bank)return false;
+    if(dist&&d.district!==dist)return false;
+    if(dev&&d.deviceNorm!==dev)return false;
+    if(tier&&d.tier!==tier)return false;
+    if(search&&![d.bank,d.district,d.mfy,d.branch].some(s=>s.toLowerCase().includes(search)))return false;
+    return true;
+  }).map(d=>({...d,ft:d.total}));
+  currentPage=1;renderTable();
+}
+function resetTableFilter(){['t-bank','t-district','t-device','t-tier'].forEach(id=>document.getElementById(id).value='');document.getElementById('t-search').value='';applyTableFilter();}
+
+// ── Overview rendering ────────────────────────────────────────────
+function fN(n){if(!n||isNaN(n))return'0';if(n>=1000000)return(n/1000000).toFixed(1)+' трлн';if(n>=1000)return(n/1000).toFixed(1)+' млрд';return n.toFixed(0);}
+
+// fSom: input is millions of soums → human-readable Uzbek format
+function fSom(n){
+  if(!n||isNaN(n)||n===0)return'0 сўм';
+  const som=n*1000000; // convert to actual soums
+  if(som>=1000000000000)return(som/1000000000000).toFixed(2).replace('.',',')+' трлн сўм';
+  if(som>=1000000000)return(som/1000000000).toFixed(1).replace('.',',')+' млрд сўм';
+  if(som>=1000000)return Math.round(som/1000000).toLocaleString('ru-RU')+' млн сўм';
+  return Math.round(som).toLocaleString('ru-RU')+' сўм';
+}
+// Short version for table cells
+function fSomS(n){
+  if(!n||isNaN(n)||n===0)return'—';
+  const som=n*1000000;
+  if(som>=1000000000)return(som/1000000000).toFixed(1).replace('.',',')+' млрд';
+  if(som>=1000000)return Math.round(som/1000000).toLocaleString('ru-RU')+' млн';
+  return Math.round(som).toLocaleString('ru-RU');
+}
+
+function renderKPIs(){
+  const d=filteredData,total=d.length;
+  const sum=d.reduce((a,x)=>a+(x.ft||0),0);
+  const humo=d.filter(x=>x.deviceNorm==='humo').length;
+  const uzcard=d.filter(x=>x.deviceNorm==='uzcard').length;
+  const banks=new Set(d.map(x=>x.bank)).size;
+  const dists=new Set(d.map(x=>x.district)).size;
+  const cols=['var(--accent)','var(--humo)','var(--uzcard)','var(--green)','var(--cyan)'];
+  document.getElementById('kpi-row').innerHTML=[
+    {i:'🏧',v:total.toLocaleString(),l:'Жами банкоматлар',s:`${banks} та банк`},
+    {i:'💳',v:humo.toLocaleString(),l:'Humo қурилмалари',s:`${Math.round(humo/total*100)||0}%`},
+    {i:'💳',v:uzcard.toLocaleString(),l:'Uzcard қурилмалари',s:`${Math.round(uzcard/total*100)||0}%`},
+    {i:'💰',v:fN(sum),l:'Жами ечилган (млн)',s:`${dists} та ҳудуд`},
+    {i:'📊',v:total>0?fN(sum/total):'0',l:'Ўртача / банкомат',s:'самарадорлик'},
+  ].map((k,i)=>`<div class="kpi-card fade-in" style="--kpi-color:${cols[i]}"><div class="kpi-icon">${k.i}</div><div class="kpi-value">${k.v}</div><div class="kpi-label">${k.l}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
+}
+
+function renderCharts(){
+  const d=filteredData;
+  const mT=Array(12).fill(0);d.forEach(x=>x.months.forEach((v,i)=>mT[i]+=v));
+  if(chartMonthly)chartMonthly.destroy();
+  chartMonthly=new Chart(document.getElementById('chartMonthly').getContext('2d'),{type:'bar',data:{labels:MONTHS,datasets:[{data:mT,backgroundColor:mT.map(v=>v>0?'rgba(200,169,74,.7)':'rgba(200,169,74,.1)'),borderColor:'rgba(200,169,74,1)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y.toLocaleString()+' млн'}}},scales:{x:{ticks:{color:'#a0b0c8',font:{size:10}},grid:{color:'rgba(200,169,74,.07)'}},y:{ticks:{color:'#a0b0c8',font:{size:10},callback:v=>(v/1000).toFixed(0)+'K'},grid:{color:'rgba(200,169,74,.07)'}}}}});
+  const h=d.filter(x=>x.deviceNorm==='humo').length,u=d.filter(x=>x.deviceNorm==='uzcard').length,a=d.filter(x=>x.deviceNorm==='adm').length,o=d.length-h-u-a;
+  if(chartDevice)chartDevice.destroy();
+  chartDevice=new Chart(document.getElementById('chartDevice').getContext('2d'),{type:'doughnut',data:{labels:['Humo','Uzcard','ADM','Бошқа'],datasets:[{data:[h,u,a,o],backgroundColor:['rgba(0,188,212,.8)','rgba(243,156,18,.8)','rgba(155,89,182,.8)','rgba(160,176,200,.3)'],borderColor:'#0a1628',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#a0b0c8',font:{size:11},padding:10,boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} та (${Math.round(c.raw/d.length*100)||0}%)`}}}}});
+  const bm={};d.forEach(x=>{if(!bm[x.bank])bm[x.bank]={s:0,c:0};bm[x.bank].s+=x.ft||0;bm[x.bank].c++;});
+  const ba=Object.entries(bm).map(([b,v])=>({b,a:v.s/v.c})).sort((a,b)=>b.a-a.a).slice(0,10);
+  if(chartBankRating)chartBankRating.destroy();
+  chartBankRating=new Chart(document.getElementById('chartBankRating').getContext('2d'),{type:'bar',data:{labels:ba.map(x=>x.b.replace(/банк/i,'').trim().substring(0,14)),datasets:[{data:ba.map(x=>x.a.toFixed(0)),backgroundColor:'rgba(0,200,150,.6)',borderColor:'rgba(0,200,150,1)',borderWidth:1,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+parseFloat(c.parsed.x).toLocaleString()+' млн'}}},scales:{x:{ticks:{color:'#a0b0c8',font:{size:10}},grid:{color:'rgba(200,169,74,.07)'}},y:{ticks:{color:'#a0b0c8',font:{size:10}},grid:{display:false}}}}});
+}
+
+function renderTopLists(){
+  const d=filteredData;
+  const bc={};d.forEach(x=>{bc[x.bank]=(bc[x.bank]||0)+1;});
+  const tb=Object.entries(bc).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const mbC=tb[0]?.[1]||1;
+  document.getElementById('topBanks').innerHTML=tb.map((b,i)=>`<div class="top-item"><div class="top-rank">${i+1}</div><div class="top-name">${b[0]}</div><div class="top-bar-wrap"><div class="top-bar"><div class="top-bar-fill" style="width:${b[1]/mbC*100}%"></div></div></div><div class="top-val">${b[1]} та</div></div>`).join('');
+  const ds={};d.forEach(x=>{ds[x.district]=(ds[x.district]||0)+(x.ft||0);});
+  const td=Object.entries(ds).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const mbD=td[0]?.[1]||1;
+  document.getElementById('topDistricts').innerHTML=td.map((x,i)=>`<div class="top-item"><div class="top-rank">${i+1}</div><div class="top-name">${x[0]}</div><div class="top-bar-wrap"><div class="top-bar"><div class="top-bar-fill" style="width:${x[1]/mbD*100}%"></div></div></div><div class="top-val">${(x[1]/1000).toFixed(0)} млрд</div></div>`).join('');
+}
+
+// ── Directives tab ────────────────────────────────────────────────
+function renderDirectives(){
+  const ba=bankAvgMap(allData);
+  const globalAvg=allData.length?allData.reduce((a,d)=>a+d.total,0)/allData.length:1;
+  const today=new Date();
+  const dateStr=`${today.getDate().toString().padStart(2,'0')}.${(today.getMonth()+1).toString().padStart(2,'0')}.${today.getFullYear()}`;
+
+  // Deadline helpers
+  const deadline=(days)=>{
+    const d=new Date(today);d.setDate(d.getDate()+days);
+    return`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
+  };
+
+  // Sort: qizil first, then sariq, sorted by avg asc
+  const problem=Object.values(ba).filter(b=>b.tier!=='yashil').sort((a,b)=>{
+    if(a.tier===b.tier)return a.avg-b.avg;
+    return a.tier==='qizil'?-1:1;
+  });
+  const good=Object.values(ba).filter(b=>b.tier==='yashil').sort((a,b)=>b.avg-a.avg);
+
+  // Alert bar
+  const qCnt=Object.values(ba).filter(b=>b.tier==='qizil').length;
+  const sCnt=Object.values(ba).filter(b=>b.tier==='sariq').length;
+  const totalZero=allData.filter(d=>d.total===0).length;
+  document.getElementById('eff-alert').innerHTML=`
+    <div class="alert-bar-left">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-text">
+        <h3>Банкомат самарадорлиги — ${dateStr} ҳолатига кўра зудлик таҳлили</h3>
+        <p>Тошкент вилояти бўйича банкомат тармоғида самарадорлик муаммолари аниқланди — банкларга топшириқлар тайёрланди</p>
+      </div>
+    </div>
+    <div class="alert-stats">
+      <div class="alert-stat"><div class="alert-stat-val" style="color:var(--qizil)">${qCnt}</div><div class="alert-stat-label">Қизил банк</div></div>
+      <div class="alert-stat"><div class="alert-stat-val" style="color:var(--sariq)">${sCnt}</div><div class="alert-stat-label">Сариқ банк</div></div>
+      <div class="alert-stat"><div class="alert-stat-val" style="color:var(--red)">${totalZero}</div><div class="alert-stat-label">Ноль фаолиятли</div></div>
+      <div class="alert-stat"><div class="alert-stat-val" style="color:var(--text)">${Object.values(ba).length}</div><div class="alert-stat-label">Жами банк</div></div>
+    </div>`;
+
+  // ── Вилоят эталон кўрсаткичлари ──────────────────────────────
+  const totalATMs=allData.length;
+  const totalSum=allData.reduce((a,d)=>a+d.total,0);
+  const totalZeroATMs=allData.filter(d=>d.total===0).length;
+  const activeATMs=totalATMs-totalZeroATMs;
+  const activityRate=(activeATMs/totalATMs*100);
+
+  // Month totals for trend (months 0,1,2 = Jan,Feb,Mar)
+  const vilMonths=Array(12).fill(0);
+  allData.forEach(d=>d.months.forEach((v,i)=>vilMonths[i]+=v));
+  const vilAvgJan=vilMonths[0]?vilMonths[0]/totalATMs:0;
+  const vilAvgFeb=vilMonths[1]?vilMonths[1]/totalATMs:0;
+  const vilAvgMar=vilMonths[2]?vilMonths[2]/totalATMs:0;
+  const vilTrend=vilAvgJan>0?((vilAvgMar-vilAvgJan)/vilAvgJan*100):0;
+
+  // Best bank avg
+  const bestBank=Object.values(ba).sort((a,b)=>b.avg-a.avg)[0];
+
+  document.getElementById('eff-params').innerHTML=`
+    <div class="bench-panel fade-in">
+      <div class="bench-panel-title">📐 Тошкент вилояти эталон кўрсаткичлари — ${dateStr} ҳолатига</div>
+      <div class="bench-kpis">
+        <div class="bench-kpi">
+          <div class="bench-kpi-val">${totalATMs.toLocaleString('ru-RU')}</div>
+          <div class="bench-kpi-label">Жами банкомат</div>
+          <div class="bench-kpi-note">${Object.keys(ba).length} та банк</div>
+        </div>
+        <div class="bench-kpi">
+          <div class="bench-kpi-val">${activityRate.toFixed(1)}%</div>
+          <div class="bench-kpi-label">Фаоллик даражаси</div>
+          <div class="bench-kpi-note">${activeATMs} та фаол / ${totalZeroATMs} та нофаол</div>
+        </div>
+        <div class="bench-kpi">
+          <div class="bench-kpi-val">${fSom(globalAvg)}</div>
+          <div class="bench-kpi-label">Ўртача / банкомат</div>
+          <div class="bench-kpi-note">вилоят меъёри</div>
+        </div>
+        <div class="bench-kpi">
+          <div class="bench-kpi-val">${fSomS(vilAvgJan)} → ${fSomS(vilAvgMar)}</div>
+          <div class="bench-kpi-label">Янв → Март тренд</div>
+          <div class="bench-kpi-note" style="color:${vilTrend>=0?'var(--green)':'var(--red)'}">${vilTrend>=0?'▲':'▼'} ${Math.abs(vilTrend).toFixed(1)}%</div>
+        </div>
+        <div class="bench-kpi">
+          <div class="bench-kpi-val">${fSomS(totalSum/1000)} млрд</div>
+          <div class="bench-kpi-label">Жами ечилган</div>
+          <div class="bench-kpi-note">барча ойлар</div>
+        </div>
+        <div class="bench-kpi">
+          <div class="bench-kpi-val">${fSom(bestBank?.avg||0)}</div>
+          <div class="bench-kpi-label">Энг юқори ўртача</div>
+          <div class="bench-kpi-note">${(bestBank?.bank||'').substring(0,14)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="params-table-card fade-in">
+      <div class="params-table-head">
+        <h3>📊 Барча банклар самарадорлик параметрлари — вилоят кўрсаткичлари билан таққослаш</h3>
+        <small>${Object.keys(ba).length} та банк</small>
+      </div>
+      <div class="params-wrap">
+        <table class="params-table">
+          <thead>
+            <tr>
+              <th class="col-bank" rowspan="2">Банк номи</th>
+              <th colspan="3">Банкомат тармоғи</th>
+              <th colspan="4">Ойлик ечиш динамикаси (млн.сўм / банкомат)</th>
+              <th colspan="2">Самарадорлик</th>
+              <th rowspan="2">Даража</th>
+            </tr>
+            <tr>
+              <th>Жами</th>
+              <th>Ноль фаол.</th>
+              <th>Фаоллик %</th>
+              <th>Январь</th>
+              <th>Февраль</th>
+              <th>Март</th>
+              <th>Тренд</th>
+              <th>Ўртача</th>
+              <th>Вилоятдан фарқ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bench-row">
+              <td class="col-bank">🏛 Вилоят эталони<small>меъёр кўрсаткичлар</small></td>
+              <td>${totalATMs}</td>
+              <td>${totalZeroATMs}</td>
+              <td>${activityRate.toFixed(1)}%</td>
+              <td>${fSomS(vilAvgJan)}</td>
+              <td>${fSomS(vilAvgFeb)}</td>
+              <td>${fSomS(vilAvgMar)}</td>
+              <td style="color:${vilTrend>=0?'var(--green)':'var(--red)'};">${vilTrend>=0?'▲':'▼'}${Math.abs(vilTrend).toFixed(1)}%</td>
+              <td>${fSomS(globalAvg)}</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            ${Object.values(ba).sort((a,b)=>b.avg-a.avg).map((b,idx)=>{
+              const bMonths=Array(12).fill(0);
+              b.atms.forEach(d=>d.months.forEach((v,i)=>bMonths[i]+=v));
+              const bAvgJan=b.cnt?bMonths[0]/b.cnt:0;
+              const bAvgFeb=b.cnt?bMonths[1]/b.cnt:0;
+              const bAvgMar=b.cnt?bMonths[2]/b.cnt:0;
+              const bTrend=bAvgJan>0?((bAvgMar-bAvgJan)/bAvgJan*100):0;
+              const bAct=b.cnt?((b.cnt-b.zero)/b.cnt*100):0;
+              const gapPct=((b.avg-globalAvg)/globalAvg*100);
+              const gapAbs=Math.min(Math.abs(gapPct),100);
+              const actClass=bAct>=90?'p-good':bAct>=70?'p-warn':'p-bad';
+              const avgClass=b.tier==='yashil'?'p-good':b.tier==='sariq'?'p-warn':'p-bad';
+              const trendClass=bTrend>=5?'trend-up':bTrend<=-5?'trend-dn':'trend-fl';
+              const tierLabel=b.tier==='qizil'?'<span class="tier t-q">ҚИЗИЛ</span>':b.tier==='sariq'?'<span class="tier t-s">САРИҚ</span>':'<span class="tier t-y">ЯШИЛ</span>';
+              const gapBarColor=gapPct>=0?'var(--yashil)':gapPct>=-25?'var(--sariq)':'var(--qizil)';
+              const gapBarLeft=gapPct>=0?50:Math.max(0,50+gapPct/2);
+              const gapBarWidth=Math.min(50,Math.abs(gapPct/2));
+              return`<tr>
+                <td class="col-bank">${idx+1}. ${b.bank}<small>${b.cnt} та банкомат</small></td>
+                <td class="p-neu">${b.cnt}</td>
+                <td class="${b.zero>0?'p-bad':'p-good'}">${b.zero>0?b.zero:'✓ 0'}</td>
+                <td class="${actClass}">${bAct.toFixed(0)}%</td>
+                <td class="p-neu">${fSomS(bAvgJan)}</td>
+                <td class="p-neu">${fSomS(bAvgFeb)}</td>
+                <td class="p-neu">${fSomS(bAvgMar)}</td>
+                <td class="${trendClass}">${bTrend>=0?'▲':'▼'}${Math.abs(bTrend).toFixed(0)}%</td>
+                <td class="${avgClass}">${fSomS(b.avg)}</td>
+                <td>
+                  <div class="gap-bar-wrap">
+                    <span style="font-size:11px;min-width:40px;text-align:right;color:${gapBarColor}">${gapPct>=0?'+':''}${gapPct.toFixed(0)}%</span>
+                    <span class="gap-bar">
+                      <span class="gap-bar-fill" style="left:${gapBarLeft}%;width:${gapBarWidth}%;background:${gapBarColor};"></span>
+                    </span>
+                  </div>
+                </td>
+                <td>${tierLabel}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  function bankMfyStats(bankAtms, bankAvg){
+    const m={};
+    bankAtms.forEach(d=>{
+      const key=d.district+'||'+d.mfy;
+      if(!m[key])m[key]={district:d.district,mfy:d.mfy,cnt:0,sum:0,zero:0,atms:[]};
+      m[key].cnt++;m[key].sum+=d.total;
+      if(d.total===0)m[key].zero++;
+      m[key].atms.push(d);
+    });
+    return Object.values(m).map(r=>{
+      r.avg=r.cnt?r.sum/r.cnt:0;
+      // Tier relative to bank's own average
+      r.tier=r.avg<bankAvg*0.3||r.zero/r.cnt>0.5?'qizil':r.avg<bankAvg*0.7||r.zero/r.cnt>0.25?'sariq':'yashil';
+      return r;
+    }).sort((a,b)=>a.avg-b.avg); // worst first
+  }
+
+  // Generate directive card for each problem bank
+  let cardIdx=0;
+  document.getElementById('dir-grid-low').innerHTML=problem.map(b=>{
+    const isUrgent=b.tier==='qizil';
+    const urgClass=isUrgent?'urgent':'warning';
+    const gap=((globalAvg-b.avg)/globalAvg*100);
+    const zeroRatio=(b.zero/b.cnt*100);
+    const actPct=(100-zeroRatio).toFixed(0);
+    const cIdx=cardIdx++;
+
+    // MFY stats for this bank
+    const mfyList=bankMfyStats(b.atms,b.avg);
+    const mfyProblems=mfyList.filter(m=>m.tier!=='yashil');
+    const maxMfyAvg=Math.max(...mfyList.map(m=>m.avg),1);
+
+    // Problem statement
+    let problemText='';
+    if(b.zero>0&&b.avg<globalAvg*0.4)
+      problemText=`${b.zero} та банкомат умуман фаол эмас, ўртача самарадорлик вилоят кўрсаткичидан ${gap.toFixed(0)}% паст (${fSom(b.avg)} vs ${fSom(globalAvg)}).`;
+    else if(b.zero>0)
+      problemText=`${b.zero} та банкомат (${zeroRatio.toFixed(0)}%) нақд пул ечиш кўрсатмаган, фаоллик даражаси — ${actPct}%.`;
+    else
+      problemText=`1 банкоматга ўртача ечиш — ${fSom(b.avg)}, вилоят ўртачасидан ${gap.toFixed(0)}% паст.`;
+
+    // Tasks — include MFY-specific ones
+    const tasks=[];
+    if(b.zero>0){
+      // Find worst MFYs with zero ATMs
+      const zeroMfys=mfyList.filter(m=>m.zero>0).slice(0,3).map(m=>`${m.district} — ${m.mfy} МФЙ (${m.zero} та)`).join(', ');
+      tasks.push({text:`Нофаол банкоматларни зудлик билан фаоллаштириш: <em>${zeroMfys}</em> — ишга тушмаслик сабаблари ёзма ҳисобот билан МБДга тақдим этилсин`,days:3});
+    }
+    if(b.zero>0)
+      tasks.push({text:`Нофаол банкоматлар учун касета тўлдириш ва техник хизмат кўрсатиш жадвалини тасдиқлаш`,days:7});
+    if(mfyProblems.length>0){
+      const worstMfy=mfyProblems[0];
+      tasks.push({text:`Самарадорлиги паст МФЙлар бўйича нақд пул талабини таҳлил қилиш ва касета тўлдириш частотасини ошириш: биринчи навбатда <em>${worstMfy.district} — ${worstMfy.mfy}</em> (ўртача ${fSom(worstMfy.avg)})`,days:10});
+    }
+    if(b.avg<globalAvg*0.3||zeroRatio>30){
+      const lowMfys=mfyList.filter(m=>m.avg<b.avg*0.3).slice(0,2).map(m=>m.mfy).join(', ');
+      tasks.push({text:`Трафик юқори ҳудудларга (бозор, марказ, йўл ёқаси) банкоматларни кўчириш имкониятини баҳолаш${lowMfys?': '+lowMfys+' МФЙларидаги банкоматларни устувор кўриб чиқиш':''}`,days:14});
+    }
+    if(b.cnt<8)
+      tasks.push({text:`${new Date().getFullYear()+1} йилга банкомат тармоғини ривожлантириш режасини МБДга тақдим этиш — МФЙ кесимида жойлаштириш таклифлари билан`,days:30});
+    tasks.push({text:`Ҳар ойнинг 5-кунига қадар МФЙ кесимида банкомат фаоллик ҳисоботини Тошкент вилоят МБДга электрон жўнатиш`,days:7});
+
+    const avgColor=b.avg<globalAvg*0.25?'bad':b.avg<globalAvg*0.5?'warn':'';
+    const zeroColor=b.zero>0?'bad':'good';
+
+    // MFY table rows
+    const mfyRows=mfyList.map(m=>{
+      const barPct=(m.avg/maxMfyAvg*100).toFixed(0);
+      const barColor=m.tier==='qizil'?'var(--qizil)':m.tier==='sariq'?'var(--sariq)':'var(--yashil)';
+      const tagClass=`mfy-tag-${m.tier}`;
+      const tierIcon=m.tier==='qizil'?'🔴':m.tier==='sariq'?'🟡':'🟢';
+      return`<tr>
+        <td>
+          <div style="font-weight:600;font-size:12px;">${m.mfy}</div>
+          <div class="mfy-district-label">${m.district}</div>
+        </td>
+        <td>${m.cnt}</td>
+        <td class="${m.zero>0?'mfy-zero-cell':''}">${m.zero>0?m.zero:'—'}</td>
+        <td>${fSomS(m.sum)}</td>
+        <td>
+          <div class="mfy-bar-inline">
+            <span style="position:relative;display:inline-block;width:44px;height:3px;background:var(--blue);border-radius:2px;vertical-align:middle;">
+              <span style="position:absolute;left:0;top:0;height:100%;width:${barPct}%;background:${barColor};border-radius:2px;"></span>
+            </span>
+            <span class="${tagClass}">${fSomS(m.avg)}</span>
+          </div>
+        </td>
+        <td class="${tagClass}">${tierIcon}</td>
+      </tr>`;
+    }).join('');
+
+    return`<div class="dir-card ${urgClass}">
+      <div class="dir-stripe ${urgClass}"></div>
+      <div class="dir-head">
+        <div class="dir-bank-name">🏦 ${b.bank}</div>
+        <div class="dir-badge"><span class="tier ${isUrgent?'t-q':'t-s'}">${isUrgent?'● ЗУДЛИК':'● ДИҚҚАТ'}</span></div>
+      </div>
+
+      <div class="dir-metrics">
+        <div class="dir-metric"><div class="dir-metric-val">${b.cnt}</div><div class="dir-metric-label">Банкомат</div></div>
+        <div class="dir-metric"><div class="dir-metric-val ${zeroColor}">${b.zero}</div><div class="dir-metric-label">Ноль фаол.</div></div>
+        <div class="dir-metric"><div class="dir-metric-val ${avgColor}" style="font-size:13px;">${fSom(b.avg)}</div><div class="dir-metric-label">Ўртача / банкомат</div></div>
+        <div class="dir-metric"><div class="dir-metric-val ${avgColor}">${gap.toFixed(0)}%↓</div><div class="dir-metric-label">Нормадан</div></div>
+      </div>
+
+      <div class="dir-problem ${isUrgent?'':'warn-bg'}">⚡ ${problemText}</div>
+
+      <div class="dir-mfy-section">
+        <div class="dir-mfy-title">
+          🏘 МФЙ кесимида самарадорлик — <span>${mfyList.length} та МФЙ · ${mfyProblems.length} та муаммоли</span>
+          <span class="dir-mfy-toggle" onclick="toggleMfy(${cIdx})">▼ Очиш</span>
+        </div>
+        <div class="dir-mfy-wrap collapsed" id="mfy-wrap-${cIdx}">
+          <table class="mfy-mini-table">
+            <thead><tr>
+              <th>МФЙ · Туман</th>
+              <th>Банкомат</th>
+              <th>Ноль</th>
+              <th>Жами ечиш</th>
+              <th>Ўртача / банкомат</th>
+              <th>Даража</th>
+            </tr></thead>
+            <tbody>${mfyRows}</tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dir-tasks">
+        <div class="dir-tasks-title">📌 Банкка берилаётган топшириқлар</div>
+        ${tasks.map((t,i)=>`
+          <div class="dir-task">
+            <div class="dir-task-num">${i+1}</div>
+            <div class="dir-task-body">
+              <div class="dir-task-text">${t.text}</div>
+              <div class="dir-task-deadline">Муддат: <span>${deadline(t.days)} (${t.days} иш куни)</span></div>
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <div class="dir-footer">
+        <div class="dir-footer-item"><div>Топшириқ берди:</div><div><strong>Тошкент вилоят МБД раҳбарияти</strong></div><div class="dir-sign-line"></div></div>
+        <div class="dir-footer-item"><div>Жавобгар (банк):</div><div><strong>_______________________</strong></div><div class="dir-sign-line"></div></div>
+        <div class="dir-footer-item"><div>Сана: <strong>${dateStr}</strong></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Yashil banks
+  document.getElementById('dir-yashil').innerHTML=`
+    <div class="yashil-table-head">
+      <span>🏆 Намунавий банклар — топшириқ: юқори самарадорликни сақлаш ва бошқа банкларга тажриба улашиш</span>
+      <small>${good.length} та банк</small>
+    </div>
+    ${good.map((b,i)=>`
+      <div class="yashil-row">
+        <div class="yashil-rank">${i+1}</div>
+        <div class="yashil-bank"><strong>${b.bank}</strong></div>
+        <div class="yashil-cnt">${b.cnt} та банкомат</div>
+        <div class="yashil-cnt">${b.zero>0?`<span style="color:var(--sariq)">${b.zero} нофаол</span>`:'<span style="color:var(--yashil)">барчаси фаол</span>'}</div>
+        <div class="yashil-avg">${fSom(b.avg)} / банкомат</div>
+        <div class="yashil-badge">✅ ЯШИЛ</div>
+      </div>`).join('')}`;
+}
+
+// ── MFY toggle ────────────────────────────────────────────────────
+function toggleMfy(idx){
+  const wrap=document.getElementById('mfy-wrap-'+idx);
+  const btn=wrap.previousElementSibling.querySelector('.dir-mfy-toggle');
+  if(wrap.classList.contains('collapsed')){
+    wrap.classList.remove('collapsed');wrap.classList.add('expanded');
+    btn.textContent='▲ Yopish';
+  }else{
+    wrap.classList.remove('expanded');wrap.classList.add('collapsed');
+    btn.textContent='▼ Ochish';
+  }
+}
+
+// ── Table ─────────────────────────────────────────────────────────
+function renderTable(){
+  let data=[...tableData];
+  if(sortCol>=0){
+    data.sort((a,b)=>{
+      const cols=['num','bank','branch','mfo','district','mfy','device'];
+      let va,vb;
+      if(sortCol<cols.length){va=a[cols[sortCol]];vb=b[cols[sortCol]];}
+      else if(sortCol===7){va=a.months[0];vb=b.months[0];}
+      else if(sortCol===8){va=a.months[1];vb=b.months[1];}
+      else if(sortCol===9){va=a.months[2];vb=b.months[2];}
+      else{va=a.ft||a.total;vb=b.ft||b.total;}
+      if(typeof va==='string')return va.localeCompare(vb,'uz')*sortDir;
+      return((va||0)-(vb||0))*sortDir;
+    });
+  }
+  const total=data.length,pages=Math.ceil(total/PAGE_SIZE);
+  const start=(currentPage-1)*PAGE_SIZE,page=data.slice(start,start+PAGE_SIZE);
+  document.getElementById('table-count').textContent=`${total.toLocaleString()} та банкомат`;
+  document.getElementById('page-info').textContent=`${start+1}–${Math.min(start+PAGE_SIZE,total)} / ${total.toLocaleString()}`;
+  const db=d=>{if(d.deviceNorm==='humo')return`<span class="device-badge d-humo">${d.device}</span>`;if(d.deviceNorm==='uzcard')return`<span class="device-badge d-uzcard">${d.device}</span>`;if(d.deviceNorm==='adm')return`<span class="device-badge d-adm">${d.device}</span>`;return`<span class="device-badge">${d.device}</span>`;};
+  const tb=d=>{if(d.tier==='qizil')return`<span class="tier t-q">ҚИЗИЛ</span>`;if(d.tier==='sariq')return`<span class="tier t-s">САРИҚ</span>`;return`<span class="tier t-y">ЯШИЛ</span>`;};
+  document.getElementById('table-body').innerHTML=page.map(d=>`
+    <tr>
+      <td>${d.num}</td><td>${d.bank}</td><td>${d.branch}</td>
+      <td>${d.district}</td><td>${d.mfy}</td><td>${db(d)}</td>
+      <td class="${d.months[0]>0?'num':'num0'}">${d.months[0]>0?d.months[0].toFixed(0):'-'}</td>
+      <td class="${d.months[1]>0?'num':'num0'}">${d.months[1]>0?d.months[1].toFixed(0):'-'}</td>
+      <td class="${d.months[2]>0?'num':'num0'}">${d.months[2]>0?d.months[2].toFixed(0):'-'}</td>
+      <td class="num">${(d.ft||d.total).toFixed(0)}</td>
+      <td>${tb(d)}</td>
+    </tr>`).join('');
+  let btns=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  let sp=Math.max(1,currentPage-2),ep=Math.min(pages,sp+4);
+  if(sp>1)btns+=`<button class="page-btn" onclick="goPage(1)">1</button>${sp>2?'<span style="color:var(--text2);padding:0 4px">…</span>':''}`;
+  for(let p=sp;p<=ep;p++)btns+=`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  if(ep<pages)btns+=`${ep<pages-1?'<span style="color:var(--text2);padding:0 4px">…</span>':''}<button class="page-btn" onclick="goPage(${pages})">${pages}</button>`;
+  btns+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+  document.getElementById('page-btns').innerHTML=btns;
+}
+function goPage(p){const pages=Math.ceil(tableData.length/PAGE_SIZE);if(p<1||p>pages)return;currentPage=p;renderTable();}
+function sortTable(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=-1;}currentPage=1;renderTable();}
+
+function switchTab(tab){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  const idx=['overview','efficiency','table'].indexOf(tab);
+  document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='table')renderTable();
+}
+function resetDashboard(){
+  allData=[];filteredData=[];tableData=[];
+  document.getElementById('upload-screen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.remove('visible');
+  document.getElementById('file-input').value='';
+  switchTab('overview');
+}
+
+Chart.defaults.color='#a0b0c8';
+Chart.defaults.font.family="'IBM Plex Sans',sans-serif";
+</script>
+</body>
+</html>

@@ -1,15 +1,21 @@
 /* Supabase Storage proxy
- * Vercel env variables (Settings → Environment Variables) orqali sozlanadi:
- *   - SUPABASE_URL    (default: yangi loyiha URL'i)
- *   - SUPABASE_KEY    (anon yoki service_role kalit)
- *   - SUPABASE_BUCKET (default: MB-dashboard)
+ * Vercel env variables (Settings → Environment Variables) orqali sozlanadi.
+ * Vercel-Supabase rasmiy integratsiyasi quyidagi nomlarni avtomatik qo'shadi:
+ *   - SUPABASE_URL              (= NEXT_PUBLIC_SUPABASE_URL)
+ *   - SUPABASE_SERVICE_ROLE_KEY (= SUPABASE_KEY orqasi bilan moslashuv uchun)
+ *   - SUPABASE_BUCKET           (qo'shimcha; default: dashboard-files)
  *
- * Eski env'lar bo'lmasa — pastdagi default qiymatlar ishlatiladi.
- * Yangi loyiha: https://nywnogjogqlmhthsgkvz.supabase.co
+ * Eski env nomlar (SUPABASE_KEY) ham qo'llab-quvvatlanadi.
+ * Loyiha: https://nywnogjogqlmhthsgkvz.supabase.co
  */
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://nywnogjogqlmhthsgkvz.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
-const BUCKET       = process.env.SUPABASE_BUCKET || 'MB-dashboard';
+const SUPABASE_URL = process.env.SUPABASE_URL
+                  || process.env.NEXT_PUBLIC_SUPABASE_URL
+                  || 'https://nywnogjogqlmhthsgkvz.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+                  || process.env.SUPABASE_SECRET_KEY
+                  || process.env.SUPABASE_KEY
+                  || '';
+const BUCKET       = process.env.SUPABASE_BUCKET || 'dashboard-files';
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -49,7 +55,7 @@ module.exports = async function handler(req, res) {
     if (req.method === 'POST') {
       if (!SUPABASE_KEY) {
         return res.status(500).json({
-          error: 'SUPABASE_KEY env variable sozlanmagan. Vercel Settings → Environment Variables ga SUPABASE_KEY qo\'shing.'
+          error: 'SUPABASE_SERVICE_ROLE_KEY env variable sozlanmagan. Vercel Settings → Environment Variables ga SUPABASE_KEY qo\'shing.'
         });
       }
       const { path, data, contentType } = req.body;
@@ -82,7 +88,7 @@ module.exports = async function handler(req, res) {
     // DELETE — fayl o'chirish (eski fayllarni tozalash uchun)
     if (req.method === 'DELETE') {
       if (!SUPABASE_KEY) {
-        return res.status(500).json({ error: 'SUPABASE_KEY env variable sozlanmagan' });
+        return res.status(500).json({ error: 'SUPABASE_SERVICE_ROLE_KEY env variable sozlanmagan' });
       }
       const path = req.query.path;
       if (!path) return res.status(400).json({ error: 'Path required' });

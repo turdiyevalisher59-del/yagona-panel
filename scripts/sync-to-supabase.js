@@ -10,7 +10,7 @@
  * Env variables (GitHub Secrets):
  *   - SUPABASE_URL    (default: https://nywnogjogqlmhthsgkvz.supabase.co)
  *   - SUPABASE_KEY    (Service Role yoki anon — yozish ruxsati bilan)
- *   - SUPABASE_BUCKET (default: MB-dashboard)
+ *   - SUPABASE_BUCKET (default: dashboard-files)
  *   - FULL_SYNC       (true bo'lsa — barcha fayllarni qayta yuklaydi)
  */
 
@@ -19,8 +19,11 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://nywnogjogqlmhthsgkvz.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
-const BUCKET       = process.env.SUPABASE_BUCKET || 'MB-dashboard';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+                  || process.env.SUPABASE_SECRET_KEY
+                  || process.env.SUPABASE_KEY
+                  || '';
+const BUCKET       = process.env.SUPABASE_BUCKET || 'dashboard-files';
 const FULL_SYNC    = process.env.FULL_SYNC === 'true';
 
 if (!SUPABASE_KEY) {

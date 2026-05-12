@@ -1321,8 +1321,8 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:68,_cloudUrl:"",_skipCloud:true,leaders:[
-{id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
+var INIT={_v:68,_cloudUrl:"",_skipCloud:false,leaders:[
+{id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",firstName:"Jasur",patronymic:"Hakimovich",lastName:"Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
     {id:"db2",name:"Sirli mijoz tahlili",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/sirli_mijoz_final.html"},
@@ -1350,9 +1350,13 @@ var INIT={_v:68,_cloudUrl:"",_skipCloud:true,leaders:[
 {id:"jurayev",name:"A.A.Jurayev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"AJ",ci:3,departments:[
   {id:"d10",name:"Naqd pul muomalasini tashkil etish boshqarmasi",boss:"Sobirov Sobitxon Saidburxon o'g'li",bossRole:"Boshqarma boshlig'i",dashboards:[
     {id:"db16",name:"Naqd pullar dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar_v3.00.html",xl:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dasturlar_monitoring.xlsx"}]},
-  {id:"d11",name:"To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi",boss:"Umarov Mirzoxid Mirxilolovich",bossRole:"Bo'lim boshlig'i",dashboards:[]},
+  {id:"d11",name:"To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi",boss:"Umarov Mirzoxid Mirxilolovich",bossRole:"Bo'lim boshlig'i",dashboards:[
+    {id:"db_pay1",name:"To'lov tizimi dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/To'lov tizimi dashboard/banking_dashboard_pro (42).html",xl:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/To'lov tizimi dashboard/Ҳисоботлар илова Нилуфарга.+.xlsx"},
+    {id:"db_pay2",name:"ATM Dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/atm dashboard/atm_dashboard_v3 (3).html",xl:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/atm dashboard/Ҳисоботлар_илова_Нилуфарга_банкомат.xlsx"},
+    {id:"db_pay3",name:"Bankomat bozor imkoniyatlari",type:"html",path:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/bankomat bozor imkoniyatlari/toshkent_dashboard_complete (18).html"}
+  ]},
   {id:"d2",name:"Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi",boss:"Karimov Alisher Saydumarovich",bossRole:"Boshqarma boshlig'i",dashboards:[
-    {id:"db18",name:"Buxgalteriya Tahlili",type:"html",path:"A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/dashboard_v79 (3).html",xl:"A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/umumiy jadval — 2026 (3).xlsx"}]},
+    {id:"db18",name:"Buxgalteriya Tahlili",type:"html",path:"A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/dashboard_v79 (3).html",xl:"_data/umumiy_jadval.xlsx"}]},
   {id:"d4",name:"Narxlar va iqtisodiy kutilmalarni o'rganish bo'limi",boss:"Shomirov Abdulaziz Abdurashidovich",bossRole:"Bo'lim boshlig'i",dashboards:[]}]}],
 _tasks:{overdue:[{id:7,title:"Markaziy bankka choraklik hisobot",deadline:"2025-02-08",priority:"yuqori",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"}],pending:[{id:1,title:"Haftalik NPL hisobotini tayyorlash",deadline:"2025-02-12",priority:"yuqori",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"},{id:2,title:"Yangi kredit siyosati loyihasini ko'rib chiqish",deadline:"2025-02-14",priority:"o'rta",assignee:"Sh.R.Irgashev",leaderId:"irgashev"},{id:3,title:"Filiallar audit natijalarini tahlil qilish",deadline:"2025-02-13",priority:"yuqori",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"},{id:4,title:"Xodimlar treningi rejasini tasdiqlash",deadline:"2025-02-15",priority:"past",assignee:"J.X.Fayzullaxo'jayev",leaderId:"fayzullaxojayev"},{id:5,title:"Oylik moliyaviy hisobot",deadline:"2025-02-20",priority:"o'rta",assignee:"A.A.Jurayev",leaderId:"jurayev"},{id:6,title:"Risk matritsasini yangilash",deadline:"2025-02-18",priority:"yuqori",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"}],completed:[{id:8,title:"Yanvar oyi NPL tahlili",completedDate:"2025-02-05",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"},{id:9,title:"Kredit portfeli monitoring",completedDate:"2025-02-06",assignee:"Sh.R.Irgashev",leaderId:"irgashev"},{id:10,title:"Filiallar reytingi hisoblash",completedDate:"2025-02-07",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"},{id:11,title:"Xodimlar attestatsiyasi",completedDate:"2025-02-04",assignee:"J.X.Fayzullaxo'jayev",leaderId:"fayzullaxojayev"},{id:12,title:"IT infratuzilma tekshiruvi",completedDate:"2025-02-03",assignee:"A.A.Jurayev",leaderId:"jurayev"},{id:13,title:"Mijozlar shikoyatlarini ko'rib chiqish",completedDate:"2025-02-02",assignee:"J.X.Fayzullaxo'jayev",leaderId:"fayzullaxojayev"},{id:14,title:"Valyuta operatsiyalari tahlili",completedDate:"2025-02-01",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"},{id:15,title:"Kichik biznes kreditlari monitoring",completedDate:"2025-01-31",assignee:"Sh.R.Irgashev",leaderId:"irgashev"},{id:16,title:"Antikorrupsiya treningi",completedDate:"2025-01-30",assignee:"J.X.Fayzullaxo'jayev",leaderId:"fayzullaxojayev"},{id:17,title:"Bank filiallari reytingi",completedDate:"2025-01-29",assignee:"B.F.Nuraliyev",leaderId:"nuraliyev"},{id:18,title:"Ipoteka kreditlari tahlili",completedDate:"2025-01-28",assignee:"Sh.R.Irgashev",leaderId:"irgashev"},{id:19,title:"Likvidlik hisoboti",completedDate:"2025-01-27",assignee:"A.A.Jurayev",leaderId:"jurayev"},{id:20,title:"Xavfsizlik auditi",completedDate:"2025-01-26",assignee:"A.A.Jurayev",leaderId:"jurayev"}]},
 _documents:[{id:1,org:"Agrobank ATB",name:"Kredit shartnomasi #1245",status:"urgent",comment:"Shoshilinch imzo talab etiladi",assignee:"nuraliyev",deadline:"2025-02-12"},{id:2,org:"Markaziy bank",name:"Haftalik moliyaviy hisobot",status:"normal",comment:"",assignee:"nuraliyev",deadline:"2025-02-14"},{id:3,org:"Tashqi audit",name:"Audit xulosasi 2024",status:"urgent",comment:"Bugun imzolanishi shart",assignee:"irgashev",deadline:"2025-02-10"},{id:4,org:"MB Boshqaruvi",name:"Kredit siyosati yangilanishi",status:"normal",comment:"Ko'rib chiqish va imzolash",assignee:"jurayev",deadline:"2025-02-15"},{id:5,org:"Tahlil bo'limi",name:"Filiallar reytingi hisoboti",status:"normal",comment:"",assignee:"nuraliyev",deadline:"2025-02-13"}],
@@ -1421,7 +1425,10 @@ function load(){
     "B.F.Nuraliyev yo\u0027nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo\u0027limi/Valyuta XPU/\u0436\u0430\u043c\u0438 2024-25 \u0438\u0448\u043b\u0430\u0448\u0433\u0430 \u0432\u0430\u0448.xlsx":"_data/valyuta_xpu_jami.xlsx",
     "I.R.Irgashev yo\u0027nalishi/Tadbirkorlikni qo\u0027llab-quvvatlash va aholi bandligini ta\u0027minlash bo\u0027limi/eng_ohiri_dasturlar_2_lotin.xlsx":"_data/eng_ohiri_dasturlar.xlsx",
     "I.R.Irgashev yo\u0027nalishi/Tadbirkorlikni qo\u0027llab-quvvatlash va aholi bandligini ta\u0027minlash bo\u0027limi/banklar tahlili/+++\u0411\u0430\u043d\u043a\u043b\u0430\u0440_2025_\u0439_\u0420\u0435\u0439\u0442\u0438\u043d\u0433_\u0411\u0430\u043d\u043a\u043b\u0430\u0440_\u0443\u0447\u0443\u043d_01122025_\u0439 (3).xlsx":"_data/banklar_reyting.xlsx",
-    "I.R.Irgashev yo\u0027nalishi/Tadbirkorlikni qo\u0027llab-quvvatlash va aholi bandligini ta\u0027minlash bo\u0027limi/mahallalar tahlili dastur bo\u0027yicha/++++\u044d\u043d\u0433 \u043e\u0445\u0438\u0440\u0438 \u0434\u0430\u0441\u0442\u0443\u0440\u043b\u0430\u0440 (2).xlsx":"_data/eng_ohiri_mahalla.xlsx"
+    "I.R.Irgashev yo\u0027nalishi/Tadbirkorlikni qo\u0027llab-quvvatlash va aholi bandligini ta\u0027minlash bo\u0027limi/mahallalar tahlili dastur bo\u0027yicha/++++\u044d\u043d\u0433 \u043e\u0445\u0438\u0440\u0438 \u0434\u0430\u0441\u0442\u0443\u0440\u043b\u0430\u0440 (2).xlsx":"_data/eng_ohiri_mahalla.xlsx",
+    "A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/umumiy jadval — 2026 (3).xlsx":"_data/umumiy_jadval.xlsx",
+    "A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/umumiy jadval - 2026 (3).xlsx":"_data/umumiy_jadval.xlsx",
+    "A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dastur_uchun.xlsx":"_data/Dastur_uchun.xlsx"
   };
   if(d.leaders){var _xlFixed=0;d.leaders.forEach(function(l){if(l.departments)l.departments.forEach(function(dep){if(dep.dashboards)dep.dashboards.forEach(function(db){if(db.xl&&_xlMap[db.xl]){db.xl=_xlMap[db.xl];_xlFixed++}})})});if(_xlFixed>0){console.log('🔄 '+_xlFixed+' ta Excel yo\'l yangilandi (_data/ ga)');try{localStorage.setItem('cbNE',JSON.stringify(d))}catch(e){}}}
   return d;
@@ -1458,41 +1465,50 @@ function save(){
   cloudPush();
 }
 
-/* ═══ BULUT SINXRONIZATSIYA — npoint.io orqali barcha qurilmalar orasida sync ═══ */
-var CLOUD_URL=localStorage.getItem('cloudUrl')||'https://api.npoint.io/73a6a46079966e775e20';
+/* ═══ BULUT SINXRONIZATSIYA — Supabase Storage orqali (v44+) ═══
+ * Eski npoint.io o'chirildi (rate-limit + 1MB limit muammolari).
+ * Endi Supabase Storage'da `mb-data.json.gz` (gzip siqilgan) sifatida saqlanadi.
+ * - Push: D obyektni gzip qiladi va /api/storage POST orqali yuklaydi
+ * - Pull: /api/storage GET dan oladi va gunzip qiladi
+ * - Barcha qurilmalar bir manbadan o'qiydi → sinxron
+ */
+var CLOUD_URL=localStorage.getItem('cloudUrl')||'/api/storage?path=mb-data.json.gz';
 var _cloudSyncing=false;
+var _SUPABASE_DATA_PATH='mb-data.json.gz';
 function _getCloudUrl(){
-  /* DOIM hardcoded URL qaytaradi — ishonchli sinxronizatsiya uchun */
-  return 'https://api.npoint.io/73a6a46079966e775e20';
+  return '/api/storage?path='+_SUPABASE_DATA_PATH;
 }
 
-/* Bulutdan ma'lumot olish */
+/* Bulutdan ma'lumot olish (Supabase Storage'dan gzip ochib o'qish) */
 async function cloudPull(){
-  var url=_getCloudUrl();if(!url)return null;
   try{
-    var r=await fetch(url,{cache:'no-store'});
-    if(!r.ok)return null;
-    var data=await r.json();
+    var r=await fetch('/api/storage?path='+_SUPABASE_DATA_PATH+'&_t='+Date.now(),{cache:'no-store'});
+    if(!r.ok){
+      if(r.status===404)console.log('☁ Cloud bo\'sh — birinchi push kutilmoqda');
+      return null;
+    }
+    var contentEnc = r.headers.get('content-encoding');
+    var data;
+    try{
+      // Gzip ochib JSON
+      var stream = r.body.pipeThrough(new DecompressionStream('gzip'));
+      var jsonText = await new Response(stream).text();
+      data = JSON.parse(jsonText);
+    }catch(gzErr){
+      // Fallback: ehtimol gzip emas, oddiy JSON
+      var raw = await r.clone().text();
+      try{ data = JSON.parse(raw); }catch(e2){ console.warn('Cloud parse xato:',e2); return null; }
+    }
     if(data&&data.leaders&&data.leaders.length>0){
-      console.log('☁ Cloud pull OK - ' + data.leaders.length + ' rahbar');
+      console.log('☁ Supabase pull OK - ' + data.leaders.length + ' rahbar (v'+data._v+')');
       return data;
     }
   }catch(e){console.warn('Cloud pull xatosi:',e)}
   return null;
 }
 
-/* Bulutga ma'lumot yuklash */
+/* Bulutga ma'lumot yuklash (D'ni gzip qilib Supabase Storage'ga POST) */
 async function cloudPush(){
-  /* v43: cloudPush butunlay o'chirilgan — npoint.io ga eski ma'lumot yozilishini oldini olish */
-  if((typeof D !== 'undefined' && D && D._skipCloud) || (typeof INIT !== 'undefined' && INIT && INIT._skipCloud)){
-    console.log('🚫 cloudPush chetlangan (_skipCloud=true)');
-    return false;
-  }
-  var url = _getCloudUrl();
-  if(!url){
-    console.warn('☁️ cloudPush: URL mavjud emas');
-    return false;
-  }
   if(_cloudSyncing){
     console.log('☁️ cloudPush: allaqachon sinxronlanmoqda...');
     return false;
@@ -1501,26 +1517,45 @@ async function cloudPush(){
     console.error('☁️ cloudPush: D mavjud emas!');
     return false;
   }
-  
+
   _cloudSyncing = true;
-  console.log('☁️ BULUTGA YUKLANMOQDA...');
-  
+  console.log('☁️ Supabase\'ga yuklanmoqda...');
+
   try{
-    var dataToSend = JSON.stringify(D);
-    console.log('☁️ Yuborilmoqda: ' + (dataToSend.length/1024).toFixed(1) + ' KB');
-    
-    var response = await fetch(url, {
+    var jsonStr = JSON.stringify(D);
+    var origSize = jsonStr.length;
+
+    // Gzip siqish (4.5MB Vercel body limitiga moslashish uchun)
+    var gzStream = new Response(jsonStr).body.pipeThrough(new CompressionStream('gzip'));
+    var gzBuf = await new Response(gzStream).arrayBuffer();
+    var gzSize = gzBuf.byteLength;
+
+    // Base64 kodlash (binary safe — chunked)
+    var bytes = new Uint8Array(gzBuf);
+    var binary = '';
+    var CHUNK = 0x8000;
+    for(var i=0;i<bytes.length;i+=CHUNK){
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i+CHUNK, bytes.length)));
+    }
+    var b64 = btoa(binary);
+
+    console.log('☁️ '+(origSize/1024).toFixed(0)+'KB → '+(gzSize/1024).toFixed(0)+'KB gzip → '+(b64.length/1024).toFixed(0)+'KB base64');
+
+    /* Bucket faqat 'application/json' qabul qiladi — gzipped binary'ni shu MIME bilan yuklaymiz.
+       cloudPull tarafda gzip ochish (DecompressionStream) baribir ishlaydi. */
+    var response = await fetch('/api/storage', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      },
-      body: dataToSend
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        path: _SUPABASE_DATA_PATH,
+        data: b64,
+        contentType: 'application/json'
+      })
     });
-    
+
     if(response.ok){
       console.log('☁️ ═══════════════════════════════════════════');
-      console.log('☁️ ✅ BULUTGA MUVAFFAQIYATLI SAQLANDI!');
+      console.log('☁️ ✅ SUPABASE\'GA SAQLANDI!');
       console.log('☁️    📊 Versiya: v' + D._v);
       console.log('☁️    👥 Rahbarlar: ' + D.leaders.length);
       console.log('☁️    📁 Bo\'limlar: ' + D.leaders.reduce(function(s,l){return s+(l.departments?l.departments.length:0)},0));
@@ -1529,7 +1564,8 @@ async function cloudPush(){
       _cloudSyncing = false;
       return true;
     }else{
-      console.error('☁️ Sinxronlash xatosi: HTTP ' + response.status);
+      var errText = await response.text().catch(()=>('HTTP '+response.status));
+      console.error('☁️ Sinxronlash xatosi: '+errText);
       _cloudSyncing = false;
       return false;
     }
@@ -1795,32 +1831,12 @@ async function syncOnLoad(){
 var LOCAL_MIN_VERSION = 68; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
-  /* AGAR data.json yoki INIT da _skipCloud === true bo'lsa — cloud sync to'liq o'tkaziladi */
-  if((typeof D !== 'undefined' && D && D._skipCloud) || (typeof INIT !== 'undefined' && INIT && INIT._skipCloud)){
-    console.log('☁️ Cloud sync skip qilindi (_skipCloud=true)');
-    return false;
-  }
-  var url = _getCloudUrl();
-  if(!url){
-    console.log('Cloud URL yo\'q');
-    return false;
-  }
-
+  /* v44+: Supabase Storage'dan cloudPull() orqali oladi (gzip ochib) */
   try{
-    console.log('🔄 Bulutdan yuklanmoqda: ' + url);
-    var r = await fetch(url + '?t=' + Date.now(), {
-      cache: 'no-store',
-      headers: {'Cache-Control': 'no-cache'}
-    });
-    
-    if(!r.ok){
-      console.warn('Cloud fetch failed:', r.status);
-      return false;
-    }
-    
-    var cloudData = await r.json();
+    console.log('🔄 Bulutdan (Supabase) yuklanmoqda...');
+    var cloudData = await cloudPull();
     console.log('📥 Cloud javob:', cloudData ? 'OK' : 'BO\'SH', cloudData ? ('v' + (cloudData._v||0)) : '');
-    
+
     if(cloudData && cloudData.leaders && cloudData.leaders.length > 0){
       var cloudVer = cloudData._v || 0;
       console.log('☁️ Cloud ma\'lumot: ' + cloudData.leaders.length + ' rahbar, v' + cloudVer);
@@ -1918,9 +1934,12 @@ function setCr(items){var c=$('crumbs');c.innerHTML=items.map(function(it,i){var
 function renderHome(){
   var grads=['var(--g1)','var(--g2)','var(--g3)','var(--g4)'];
   $('hSub').textContent=D.leaders.length+' ta rahbar · '+D.leaders.reduce(function(s,l){return s+cDb(l)},0)+' dashboard';
+  /* Tahrir tugmasi faqat admin foydalanuvchilarda ko'rinadi (deputy emas) */
+  var canEdit = !(typeof _CURRENT_USER !== 'undefined' && _CURRENT_USER && _CURRENT_USER.role==='deputy');
   $('leadersGrid').innerHTML=D.leaders.map(function(l,i){
     var tags=l.departments.slice(0,3).map(function(d){return '<span class="ltag">'+d.name.split(/[\s,]+/).slice(0,2).join(' ')+'</span>'}).join('');
-    return '<div class="lc" style="--i:'+i+'" onclick="go(\'leader\',{lid:\''+l.id+'\'})"><div class="lc-bar" style="background:'+grads[i%4]+'"></div><div class="lc-body"><div class="lc-head"><div class="lc-ava" style="background:'+grads[i%4]+'">'+l.ini+'</div><div><div class="lc-name">'+l.name+'</div><div class="lc-role">'+l.role+'</div></div></div><div class="lc-stats"><div class="st"><div class="st-n" data-t="'+cD(l)+'">0</div><div class="st-l">Bo\'lim</div></div><div class="st"><div class="st-n" data-t="'+cDb(l)+'">0</div><div class="st-l">Dashboard</div></div><div class="st"><div class="st-n" data-t="'+cXl(l)+'">0</div><div class="st-l">Excel</div></div></div><div class="lc-tags">'+tags+'</div></div></div>'}).join('');
+    var editBtn = canEdit ? '<button class="lc-edit" title="Ism, otasining ismi, lavozimini tahrirlash" onclick="event.stopPropagation();editLN(\''+l.id+'\')" style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:all .2s;z-index:5" onmouseover="this.style.background=\'rgba(255,255,255,0.25)\';this.style.transform=\'scale(1.08)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.12)\';this.style.transform=\'scale(1)\'"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>' : '';
+    return '<div class="lc" style="--i:'+i+';position:relative" onclick="go(\'leader\',{lid:\''+l.id+'\'})">'+editBtn+'<div class="lc-bar" style="background:'+grads[i%4]+'"></div><div class="lc-body"><div class="lc-head"><div class="lc-ava" style="background:'+grads[i%4]+'">'+l.ini+'</div><div><div class="lc-name">'+l.name+'</div><div class="lc-role">'+l.role+'</div></div></div><div class="lc-stats"><div class="st"><div class="st-n" data-t="'+cD(l)+'">0</div><div class="st-l">Bo\'lim</div></div><div class="st"><div class="st-n" data-t="'+cDb(l)+'">0</div><div class="st-l">Dashboard</div></div><div class="st"><div class="st-n" data-t="'+cXl(l)+'">0</div><div class="st-l">Excel</div></div></div><div class="lc-tags">'+tags+'</div></div></div>'}).join('');
   setTimeout(function(){document.querySelectorAll('.st-n').forEach(function(el){animN(el,+el.dataset.t||0)})},400);
   renderMeetings()}
 
@@ -3322,7 +3341,12 @@ function doAdmLogin(){
 }
 function closeAdm(){$('admOv').classList.remove('on')}
 function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t.classList.toggle('on',t.dataset.tab===tab)});var b=$('admBd');
-  if(tab==='leaders')b.innerHTML='<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:12px">Rahbarlar</div>'+D.leaders.map(function(l){return '<div class="ali"><div><div class="ali-nm">'+l.name+'</div><div class="ali-mt">'+l.role+'</div></div><div class="ali-acts"><button class="btn btn-sm btn-s" onclick="editLN(\''+l.id+'\')"><i data-lucide="pencil" style="width:11px;height:11px"></i></button></div></div>'}).join('');
+  if(tab==='leaders')b.innerHTML='<div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0);margin-bottom:12px">Rahbarlar (ism, otasining ismi, familiya, lavozimini tahrirlash)</div>'+D.leaders.map(function(l){
+    var fullName = (l.firstName||'') + (l.patronymic ? ' '+l.patronymic : '') + (l.lastName ? ' '+l.lastName : '');
+    fullName = fullName.trim();
+    var subText = fullName ? '<div class="ali-mt" style="opacity:.85">👤 '+fullName+'</div>' : '<div class="ali-mt" style="color:#f59e0b">⚠️ Ism va otasining ismi kiritilmagan — tahrir qiling</div>';
+    return '<div class="ali"><div><div class="ali-nm">'+l.name+'</div><div class="ali-mt">'+l.role+'</div>'+subText+'</div><div class="ali-acts"><button class="btn btn-sm btn-s" onclick="editLN(\''+l.id+'\')" title="Tahrirlash"><i data-lucide="pencil" style="width:11px;height:11px"></i> Tahrir</button></div></div>'
+  }).join('');
   else if(tab==='transfer'){var ad=[];D.leaders.forEach(function(l){l.departments.forEach(function(d){ad.push({lid:l.id,ln:l.name,did:d.id,dn:d.name})})});b.innerHTML='<div class="fg"><label class="fl">Bo\'lim</label><select class="fs" id="trD"><option>Tanlang</option>'+ad.map(function(d){return '<option value="'+d.lid+'__'+d.did+'">'+d.dn+'</option>'}).join('')+'</select></div><div style="text-align:center;font-size:24px;color:var(--ac);margin:8px 0">↓</div><div class="fg"><label class="fl">Yangi rahbar</label><select class="fs" id="trT">'+D.leaders.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>'}).join('')+'</select></div><button class="btn btn-p" onclick="doTr()">Ko\'chirish</button>'}
   else if(tab==='depts'){b.innerHTML='<div class="fg"><label class="fl">Rahbar</label><select class="fs" id="ndL">'+D.leaders.map(function(l){return '<option value="'+l.id+'">'+l.name+'</option>'}).join('')+'</select></div><div class="fg"><label class="fl">Nomi</label><input class="fi" id="ndN" placeholder="Bo\'lim nomi"></div><div class="fg"><label class="fl">Bo\'lim boshlig\'i</label><input class="fi" id="ndBoss" placeholder="F.I.Sh"></div><div class="fg"><label class="fl">Lavozimi</label><input class="fi" id="ndBossRole" placeholder="Bo\'lim boshlig\'i"></div><button class="btn btn-p" onclick="addDp()">Qo\'shish</button><hr style="margin:16px 0;border:none;border-top:1px solid var(--brd2)">'+D.leaders.map(function(l){return '<div style="font-family:var(--ffd);font-size:13px;font-weight:800;color:var(--ac);margin:12px 0 6px">'+l.name+'</div>'+l.departments.map(function(d){return '<div class="ali"><div><div class="ali-nm">'+d.name+'</div><div class="ali-mt">'+(d.boss?'<span style="color:var(--ac)">👤 '+d.boss+(d.bossRole?' — '+d.bossRole:'')+'</span>':'<span style="color:var(--t3)">Boshliq tayinlanmagan</span>')+'</div></div><div class="ali-acts"><button class="btn btn-sm btn-s" onclick="editBoss(\''+l.id+'\',\''+d.id+'\')" title="Boshliq"><i data-lucide="user-circle" style="width:11px;height:11px"></i></button><button class="btn btn-sm btn-s" onclick="renDp(\''+l.id+'\',\''+d.id+'\')" title="Nom"><i data-lucide="pencil" style="width:11px;height:11px"></i></button><button class="btn btn-sm btn-d" onclick="delDp(\''+l.id+'\',\''+d.id+'\')"><i data-lucide="trash-2" style="width:11px;height:11px"></i></button></div></div>'}).join('')}).join('')}
   else if(tab==='dashs'){var all=[];D.leaders.forEach(function(l){l.departments.forEach(function(d){d.dashboards.forEach(function(db){all.push({lid:l.id,did:d.id,dn:d.name,db:db})})})});b.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-family:var(--ffd);font-size:18px;font-weight:800;color:var(--t0)">Dashboardlar</div><button class="btn btn-p btn-sm" onclick="closeAdm();openAddDash()"><i data-lucide="plus-circle" style="width:12px;height:12px"></i> Yangi</button></div>'+(all.length?all.map(function(it){return '<div class="ali" style="flex-wrap:wrap"><div style="flex:1;min-width:150px"><div class="ali-nm">'+it.db.name+'</div><div class="ali-mt">'+it.dn+'</div></div><div class="ali-acts"><button class="btn btn-sm btn-p" onclick="updFile(\''+it.lid+'\',\''+it.did+'\',\''+it.db.id+'\',\'html\')">📄 HTML</button><button class="btn btn-sm btn-p" onclick="updFile(\''+it.lid+'\',\''+it.did+'\',\''+it.db.id+'\',\'xl\')">📊 Excel</button><button class="btn btn-sm btn-s" onclick="renDb(\''+it.lid+'\',\''+it.did+'\',\''+it.db.id+'\')">Nom</button><button class="btn btn-sm btn-d" onclick="delDb(\''+it.lid+'\',\''+it.did+'\',\''+it.db.id+'\')"><i data-lucide="trash-2" style="width:11px;height:11px"></i></button></div></div>'}).join(''):'<p style="color:var(--t2)">Yo\'q</p>')}
@@ -3566,7 +3590,64 @@ function admTab(tab){document.querySelectorAll('.adm-tab').forEach(function(t){t
   renderPendingTasksInSettings();
   renderDocsList();
   lucide.createIcons()}
-window.editLN=function(id){var l=fL(id);if(!l)return;var n=prompt("Nom:",l.name);if(n&&n.trim()){l.name=n.trim();save();admTab('leaders');toast('OK','ok')}};
+window.editLN=function(id){
+  var l=fL(id);if(!l)return;
+  /* Mavjud qiymatlarni olish (yo'q bo'lsa name'dan parse qilish) */
+  var existingLast = l.lastName || (l.name ? l.name.replace(/^[A-Za-z']+\.[A-Za-z']+\./,'') : '');
+  var existingFirst = l.firstName || '';
+  var existingPatron = l.patronymic || '';
+  var existingRole = l.role || '';
+
+  /* Familiya */
+  var lastName = prompt("Familiya (masalan: Fayzullaxo'jayev):", existingLast);
+  if(lastName === null) return;
+  lastName = lastName.trim();
+  if(!lastName){toast("Familiya bo'sh bo'lishi mumkin emas!", 'er'); return;}
+
+  /* Ism */
+  var firstName = prompt("Ism — to'liq (masalan: Jasur):", existingFirst);
+  if(firstName === null) return;
+  firstName = firstName.trim();
+
+  /* Otasining ismi */
+  var patronymic = prompt("Otasining ismi — to'liq (masalan: Hakimovich):", existingPatron);
+  if(patronymic === null) return;
+  patronymic = patronymic.trim();
+
+  /* Lavozim */
+  var role = prompt("Lavozim:", existingRole);
+  if(role === null) return;
+  role = role.trim();
+
+  /* Saqlash */
+  l.firstName = firstName;
+  l.patronymic = patronymic;
+  l.lastName = lastName;
+  l.role = role || existingRole;
+
+  /* Qisqa nomni qayta tuzish (J.X.Fayzullaxo'jayev formatda) */
+  var firstInit = firstName ? firstName.charAt(0).toUpperCase()+'.' : '';
+  var patronInit = patronymic ? patronymic.charAt(0).toUpperCase()+'.' : '';
+  l.name = (firstInit + patronInit + lastName) || lastName;
+
+  /* Avatar initiali (JF, BN, ShI...) — birinchi ism + birinchi familiya harfi */
+  if(firstName && lastName){
+    /* Familiya 2 harfli prefiks bilan boshlansa (Sh, Ch...) o'shani qo'llash */
+    var fHead = firstName.charAt(0).toUpperCase();
+    var lHead = lastName.charAt(0).toUpperCase();
+    /* Maxsus qoida — agar oldingi ini 2-3 harfli bo'lsa (ShI), saqlab qolish */
+    if((l.ini||'').length>2){
+      l.ini = l.ini; /* o'zgartirilmaydi */
+    } else {
+      l.ini = fHead + lHead;
+    }
+  }
+
+  save();
+  admTab('leaders');
+  if(typeof renderHome === 'function') renderHome();
+  toast('✅ Saqlandi','ok');
+};
 window.doTr=function(){var ds=$('trD').value,tid=$('trT').value;if(!ds||!tid||!ds.includes('__')){toast("Tanlang",'er');return}var p=ds.split('__'),fl=p[0],did=p[1];if(fl===tid){toast("Xuddi shu",'er');return}var from=fL(fl),to=fL(tid);var idx=from.departments.findIndex(function(d){return d.id===did});if(idx===-1)return;to.departments.push(from.departments.splice(idx,1)[0]);save();admTab('transfer');toast("OK",'ok')};
 window.addDp=function(){var lid=$('ndL').value,n=$('ndN').value.trim(),boss=$('ndBoss')?$('ndBoss').value.trim():'',bossRole=$('ndBossRole')?$('ndBossRole').value.trim():'';if(!n){toast("Nom!",'er');return}fL(lid).departments.push({id:'d_'+Date.now(),name:n,boss:boss||'',bossRole:bossRole||'',dashboards:[]});save();admTab('depts');toast("OK",'ok')};
 window.editBoss=function(lid,did){var d=fDp(lid,did);if(!d)return;var n=prompt("Bo'lim boshlig'i (F.I.Sh):",d.boss||'');if(n===null)return;d.boss=n.trim();var r=prompt("Lavozimi:",d.bossRole||'');if(r!==null)d.bossRole=r.trim();save();admTab('depts');renderHome();toast("OK",'ok')};
@@ -5279,51 +5360,31 @@ document.addEventListener('DOMContentLoaded',async function(){
     updateLoader(10, 'Tayyorlanmoqda...', 'v42');
 
     /* ═══════════════════════════════════════════════════════════════════════════
-       1-QADAM: ESKI NPOINT.IO BULUT BUTUNLAY O'CHIRILDI (v42 dan boshlab)
-       Sabab: npoint.io eski v41 ma'lumotni saqlaydi, yangi yo'llar ko'rinmaydi.
-       Endi MAHALLIY data.json + INIT obyektidan to'g'ridan-to'g'ri yuklanadi.
+       1-QADAM: SUPABASE STORAGE'DAN BULUT MA'LUMOT (v44+)
+       cloudPull() gzip'ni ochib JSON qaytaradi. Versiya tekshiruvi pastda.
        ═══════════════════════════════════════════════════════════════════════════ */
     var cloudData = null;
     var cloudSuccess = false;
 
-    /* Agar INIT da _skipCloud=true bo'lsa — cloud sync to'liq o'tkaziladi */
-    var SKIP_CLOUD = (typeof INIT !== 'undefined' && INIT && INIT._skipCloud === true);
-
-    if(!SKIP_CLOUD){
-      var cloudUrl = (typeof INIT !== 'undefined' && INIT && INIT._cloudUrl) ? INIT._cloudUrl : '';
-      if(cloudUrl){
-        try{
-          updateLoader(20, 'Bulutdan yuklanmoqda...', 'GET ' + cloudUrl.substring(0,40) + '...');
-          var controller = new AbortController();
-          var timeoutId = setTimeout(function(){ controller.abort(); }, 8000);
-          var response = await fetch(cloudUrl + '?nocache=' + Date.now() + '_' + Math.random(), {
-            method: 'GET', cache: 'no-store', signal: controller.signal,
-            headers: {'Cache-Control': 'no-cache', 'Pragma': 'no-cache'}
-          });
-          clearTimeout(timeoutId);
-          if(response.ok){
-            var text = await response.text();
-            if(text && text.trim().length > 50){
-              cloudData = JSON.parse(text);
-              if(cloudData && cloudData.leaders && cloudData.leaders.length > 0){
-                /* v42 cheki: bulut versiyasi LOCAL dan past bo'lsa — RED ETILADI */
-                var cv = cloudData._v || 0;
-                var iv = (typeof INIT !== 'undefined' ? (INIT._v||0) : 0);
-                if(cv >= iv){
-                  cloudSuccess = true;
-                  console.log('☁️ BULUTDAN OLINDI: v' + cv);
-                } else {
-                  console.warn('⚠️ Bulut versiyasi eski (v' + cv + ' < v' + iv + ') — chetlanadi');
-                }
-              }
-            }
-          }
-        }catch(e){ console.warn('☁️ Bulut xatosi:', e.message); }
+    /* Cloud sync ENDI HAR DOIM ishlaydi (Supabase orqali) */
+    try{
+      updateLoader(20, 'Bulutdan yuklanmoqda...', 'Supabase Storage');
+      cloudData = await cloudPull();
+      if(cloudData && cloudData.leaders && cloudData.leaders.length > 0){
+        var cv = cloudData._v || 0;
+        var iv = (typeof INIT !== 'undefined' ? (INIT._v||0) : 0);
+        if(cv >= iv){
+          cloudSuccess = true;
+          console.log('☁️ BULUTDAN OLINDI: v' + cv);
+          updateLoader(40, '✅ Bulut topildi', 'v' + cv + ', ' + cloudData.leaders.length + ' rahbar');
+        } else {
+          console.warn('⚠️ Bulut versiyasi eski (v' + cv + ' < v' + iv + ') — chetlanadi');
+        }
+      } else {
+        console.log('☁️ Bulut bo\'sh yoki yo\'q — INIT/local ishlatiladi');
+        updateLoader(40, 'Bulut bo\'sh — birinchi push kutilmoqda', '');
       }
-    } else {
-      console.log('🚫 Cloud sync chetlangan (INIT._skipCloud=true) — mahalliy ma\'lumot ishlatiladi');
-      updateLoader(40, 'Mahalliy ma\'lumot tayyorlanmoqda...', 'v42 LOCAL-FIRST');
-    }
+    }catch(e){ console.warn('☁️ Bulut xatosi:', e.message); }
 
     /* v42 — eski localStorage cache'ni TOZALASH (versiya past bo'lsa) */
     try {
@@ -5402,13 +5463,33 @@ document.addEventListener('DOMContentLoaded',async function(){
       for(var i=0; i<D.leaders.length; i++){
         var dl = D.leaders[i];
         var il = INIT.leaders.find(function(x){ return x.id === dl.id; });
-        if(!il || !dl.departments) continue;
+        if(!il) continue;
+        /* v44+: rahbar firstName / patronymic / lastName migratsiyasi */
+        if(!dl.firstName && il.firstName) dl.firstName = il.firstName;
+        if(!dl.patronymic && il.patronymic) dl.patronymic = il.patronymic;
+        if(!dl.lastName && il.lastName) dl.lastName = il.lastName;
+        if(!dl.departments) dl.departments = [];
         for(var j=0; j<dl.departments.length; j++){
           var dd = dl.departments[j];
           var id2 = il.departments ? il.departments.find(function(x){ return x.id === dd.id; }) : null;
           if(id2){
             if(!dd.boss && id2.boss) dd.boss = id2.boss;
             if(!dd.bossRole && id2.bossRole) dd.bossRole = id2.bossRole;
+            /* v45+: agar D'da dashboards bo'sh, lekin INIT'da yangi dashboards bor — qo'shish */
+            if(id2.dashboards && id2.dashboards.length > 0 && (!dd.dashboards || dd.dashboards.length === 0)){
+              dd.dashboards = JSON.parse(JSON.stringify(id2.dashboards));
+              console.log('🔄 ' + dd.name + ' uchun ' + dd.dashboards.length + ' ta yangi dashboard qo\'shildi (INIT dan)');
+            }
+          }
+        }
+        /* v45+: agar INIT'da yangi department mavjud (D'da yo'q) — qo'shish */
+        if(il.departments){
+          for(var k=0; k<il.departments.length; k++){
+            var initDep = il.departments[k];
+            if(!dl.departments.find(function(x){ return x.id === initDep.id; })){
+              dl.departments.push(JSON.parse(JSON.stringify(initDep)));
+              console.log('🆕 Yangi bo\'lim qo\'shildi: ' + initDep.name);
+            }
           }
         }
       }
@@ -7559,6 +7640,7 @@ setTimeout(function(){
 /* ═══ LOGIN TIZIMI ═══ */
 /* Foydalanuvchilar tizimi */
 var _DEFAULT_USERS = {
+  'MBTOSHVIL': {p: 'CBTOSHVIL', role: 'admin', name: 'Administrator', fullName: 'Administrator', title: 'Tizim administratori', leaderId: null},
   'MBtoshvil': {p: 'CBU_toshvil', role: 'admin', name: 'Administrator', fullName: 'Administrator', title: 'Tizim administratori', leaderId: null},
   'nuraliyev_m': {p: 'nuraliyev2025', role: 'deputy', name: "B.F.Nuraliyev o'rinbosari", fullName: 'Nuraliyev Bekzod Fazliddinovich', title: 'Boshqaruvchi o\'rinbosari', leaderId: 'nuraliyev'},
   'irgashev_m': {p: 'irgashev2025', role: 'deputy', name: "Sh.R.Irgashev o'rinbosari", fullName: 'Irgashev Sherzod Rabimovich', title: 'Boshqaruvchi o\'rinbosari', leaderId: 'irgashev'},
@@ -7641,7 +7723,14 @@ function _loadUsers(){
     var saved = localStorage.getItem('mb_users');
     if(saved){
       var parsed = JSON.parse(saved);
-      if(parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) return parsed;
+      if(parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0){
+        /* v45+: yangi default admin (MBTOSHVIL) saqlangan ma'lumotda yo'q bo'lsa qo'shish */
+        if(!parsed['MBTOSHVIL'] && _DEFAULT_USERS['MBTOSHVIL']){
+          parsed['MBTOSHVIL'] = JSON.parse(JSON.stringify(_DEFAULT_USERS['MBTOSHVIL']));
+          try { localStorage.setItem('mb_users', JSON.stringify(parsed)); } catch(e){}
+        }
+        return parsed;
+      }
     }
   }catch(e){}
   return JSON.parse(JSON.stringify(_DEFAULT_USERS));
@@ -7659,8 +7748,15 @@ function checkAuth(){
 function doLogin(){
   var u=$('loginUser').value.trim();
   var p=$('loginPass').value;
-  
+
+  /* Login: avval aynan, keyin katta/kichik harfsiz qidirish */
   var user = _USERS[u];
+  if(!user){
+    var uLower = u.toLowerCase();
+    var matchKey = Object.keys(_USERS).find(function(k){ return k.toLowerCase() === uLower; });
+    if(matchKey){ user = _USERS[matchKey]; u = matchKey; }
+  }
+
   if(user && user.p === p){
     _CURRENT_USER = {username: u, role: user.role, name: user.name, fullName: user.fullName || user.name, title: user.title || '', leaderId: user.leaderId};
     localStorage.setItem('mb_auth','ok');
@@ -8706,7 +8802,27 @@ document.addEventListener('keydown',function(e){
     var hour = now.getHours();
     var greet = hour < 12 ? 'Assalomu alaykum, xayrli tong' : hour < 18 ? 'Assalomu alaykum, xayrli kun' : 'Assalomu alaykum, xayrli kech';
 
-    parts.push(greet + ', hurmatli Jasur Hakimovich.');
+    /* Boshqarma boshlig'ini topish (o'rinbosari emas) — D.leaders dan dinamik
+       Agar firstName + patronymic mavjud bo'lsa, ularni ishlatadi.
+       Aks holda — eski default ("Jasur Hakimovich") */
+    var chiefGreet = 'Jasur Hakimovich';
+    try{
+      if(typeof D !== 'undefined' && D && Array.isArray(D.leaders)){
+        var chief = D.leaders.find(function(l){
+          var r = (l.role||'').toLowerCase();
+          return r.indexOf("boshlig'i")>=0 && r.indexOf("o'rinbosar")<0;
+        });
+        if(chief){
+          if(chief.firstName && chief.patronymic){
+            chiefGreet = chief.firstName + ' ' + chief.patronymic;
+          } else if(chief.firstName){
+            chiefGreet = chief.firstName;
+          }
+        }
+      }
+    }catch(e){}
+
+    parts.push(greet + ', hurmatli ' + chiefGreet + '.');
     parts.push('Markaziy bank Toshkent viloyati Bosh boshqarmasi yagona interaktiv paneliga xush kelibsiz.');
 
     /* Sana */

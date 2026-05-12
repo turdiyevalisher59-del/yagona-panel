@@ -4,6 +4,12 @@
   "functions": {
     "api/file.js": {
       "includeFiles": "**/*.{html,xlsx,xls,csv,json,png,jpg,jpeg,svg,pdf}"
+    },
+    "api/tts.js": {
+      "maxDuration": 60
+    },
+    "api/stt.js": {
+      "maxDuration": 60
     }
   },
   "headers": [
@@ -13,6 +19,18 @@
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/(.*\\.html)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
     }
   ]

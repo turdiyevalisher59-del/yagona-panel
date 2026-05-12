@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toshkent Viloyati · Moliyaviy Infratuzilma 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07111f;--bg2:#0b1a2e;--bg3:#0f2040;
+  --panel:rgba(11,26,46,0.92);
+  --border:rgba(183,150,75,0.18);--border2:rgba(255,255,255,0.06);
+  --gold:#c9a84c;--gold-lt:#e2c27a;--gold-dim:rgba(201,168,76,0.14);
+  --teal:#0e90a8;--teal-lt:#22b5cc;--teal-dim:rgba(14,144,168,0.14);
+  --red:#c94c3a;--red-lt:#e07060;--red-dim:rgba(201,76,58,0.14);
+  --green:#2a9e72;--green-lt:#42c992;--green-dim:rgba(42,158,114,0.14);
+  --purple:#7c5cbf;--purple-lt:#a887e8;--purple-dim:rgba(124,92,191,0.14);
+  --orange:#c9762a;--orange-lt:#e8a04b;--orange-dim:rgba(201,118,42,0.14);
+  --cyan:#1a7fa0;--cyan-lt:#3ab8d8;--cyan-dim:rgba(26,127,160,0.14);
+  --text:#dde4f0;--text-dim:#7a8fae;--text-faint:#435570;
+  --sw:220px;--hh:64px;--r:10px;--rsm:6px;
+}
+html,body{height:100%}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  opacity:0.4;pointer-events:none}
+.shell{position:relative;z-index:1;display:grid;grid-template-columns:var(--sw) 1fr;grid-template-rows:var(--hh) 1fr;height:100vh;width:100vw}
+
+/* ── HEADER ── */
+.hdr{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:16px;padding:0 28px;background:var(--bg2);border-bottom:1px solid var(--border);position:relative}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45}
+.hdr-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),#8a6020);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 18px rgba(201,168,76,.28)}
+.hdr-logo svg{width:18px;height:18px}
+.hdr-title{font-family:'DM Serif Display',serif;font-size:17px;color:#fff;letter-spacing:.2px}
+.hdr-title span{color:var(--gold-lt)}
+.hdr-sub{font-size:11px;color:var(--text-dim);font-weight:300;letter-spacing:.5px}
+.hdr-spacer{flex:1}
+.hdr-chip{background:var(--gold-dim);border:1px solid rgba(201,168,76,.3);color:var(--gold-lt);font-size:10.5px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:5px 12px;border-radius:4px}
+.hdr-date{font-size:11px;color:var(--text-dim);font-weight:500;text-align:right}
+.hdr-date small{display:block;color:var(--text-faint);font-size:10px;font-weight:300}
+
+/* ── SIDEBAR ── */
+.sidebar{grid-column:1;grid-row:2;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 0;gap:1px;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bg3)}
+.sb-sec{padding:8px 18px 4px;font-size:9px;letter-spacing:1.8px;font-weight:700;text-transform:uppercase;color:var(--text-faint)}
+.ni{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .18s;color:var(--text-dim);font-size:12px;font-weight:400}
+.ni:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.ni.active{background:var(--gold-dim);border-left-color:var(--gold);color:var(--gold-lt);font-weight:600}
+.ni.g.active{background:var(--green-dim);border-left-color:var(--green-lt);color:var(--green-lt)}
+.ni.c.active{background:var(--cyan-dim);border-left-color:var(--cyan-lt);color:var(--cyan-lt)}
+.ni.p.active{background:var(--purple-dim);border-left-color:var(--purple-lt);color:var(--purple-lt)}
+.ni.o.active{background:var(--orange-dim);border-left-color:var(--orange-lt);color:var(--orange-lt)}
+.nav-icon{width:15px;height:15px;opacity:.7;flex-shrink:0}
+.ni.active .nav-icon{opacity:1}
+.nb{margin-left:auto;background:var(--bg3);color:var(--text-dim);font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;border:1px solid var(--border2)}
+.ni.active .nb{background:rgba(201,168,76,.2);color:var(--gold)}
+.ni.g.active .nb{background:rgba(42,158,114,.2);color:var(--green-lt)}
+.ni.c.active .nb{background:rgba(26,127,160,.2);color:var(--cyan-lt)}
+.ni.p.active .nb{background:rgba(124,92,191,.2);color:var(--purple-lt)}
+.ni.o.active .nb{background:rgba(201,118,42,.2);color:var(--orange-lt)}
+.sb-footer{margin-top:auto;padding:12px 16px;font-size:10px;color:var(--text-faint);line-height:1.6;border-top:1px solid var(--border2)}
+
+/* ── CONTENT ── */
+.content{grid-column:2;grid-row:2;overflow-y:auto;padding:20px 22px;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(14,144,168,.07) 0%,transparent 60%)}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+.page{display:none;animation:fu .28s ease}
+.page.active{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.ph h1{font-family:'DM Serif Display',serif;font-size:21px;color:#fff;font-weight:400}
+.ph h1 em{font-style:italic;color:var(--gold-lt)}
+.ph h1 em.g{color:var(--green-lt)}
+.ph h1 em.c{color:var(--cyan-lt)}
+.ph h1 em.p{color:var(--purple-lt)}
+.ph h1 em.o{color:var(--orange-lt)}
+.ph p{font-size:11px;color:var(--text-dim);font-weight:300;margin-top:3px}
+
+/* ── KPI ── */
+.kr{display:grid;gap:11px;margin-bottom:14px}
+.kr-5{grid-template-columns:repeat(5,1fr)}
+.kr-4{grid-template-columns:repeat(4,1fr)}
+.kr-3{grid-template-columns:repeat(3,1fr)}
+.kpi{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s}
+.kpi:hover{border-color:var(--border);transform:translateY(-1px)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.gold::before{background:linear-gradient(90deg,var(--gold),var(--gold-lt))}
+.kpi.teal::before{background:linear-gradient(90deg,var(--teal),var(--teal-lt))}
+.kpi.green::before{background:linear-gradient(90deg,var(--green),var(--green-lt))}
+.kpi.red::before{background:linear-gradient(90deg,var(--red),var(--red-lt))}
+.kpi.blue::before{background:linear-gradient(90deg,#3a7bd5,#6db8f0)}
+.kpi.purple::before{background:linear-gradient(90deg,var(--purple),var(--purple-lt))}
+.kpi.orange::before{background:linear-gradient(90deg,var(--orange),var(--orange-lt))}
+.kpi.cyan::before{background:linear-gradient(90deg,var(--cyan),var(--cyan-lt))}
+.ki{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;font-size:13px}
+.kpi.gold .ki{background:var(--gold-dim)}.kpi.teal .ki{background:var(--teal-dim)}
+.kpi.green .ki{background:var(--green-dim)}.kpi.red .ki{background:var(--red-dim)}
+.kpi.blue .ki{background:rgba(58,123,213,.15)}.kpi.purple .ki{background:var(--purple-dim)}
+.kpi.orange .ki{background:var(--orange-dim)}.kpi.cyan .ki{background:var(--cyan-dim)}
+.kl{font-size:9.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px}
+.kv{font-family:'DM Serif Display',serif;font-size:24px;line-height:1;color:#fff}
+.kpi.gold .kv{color:var(--gold-lt)}.kpi.teal .kv{color:var(--teal-lt)}
+.kpi.green .kv{color:var(--green-lt)}.kpi.red .kv{color:var(--red-lt)}
+.kpi.blue .kv{color:#6db8f0}.kpi.purple .kv{color:var(--purple-lt)}
+.kpi.orange .kv{color:var(--orange-lt)}.kpi.cyan .kv{color:var(--cyan-lt)}
+.km{margin-top:5px;font-size:10.5px;color:var(--text-dim);font-weight:300}
+
+/* ── CARDS ── */
+.card{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r);padding:16px 18px;transition:border-color .2s}
+.card:hover{border-color:var(--border)}
+.ct{font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.ct.g{color:var(--green-lt)}.ct.c{color:var(--cyan-lt)}.ct.p{color:var(--purple-lt)}.ct.o{color:var(--orange-lt)}
+.cs{font-size:11px;color:var(--text-dim);font-weight:300;margin-bottom:12px}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:11px}
+.gf{margin-bottom:11px}
+
+/* ── INSIGHT ── */
+.ins{border-left:3px solid var(--teal);border-radius:0 var(--rsm) var(--rsm) 0;padding:10px 14px;font-size:12px;line-height:1.65;color:var(--text);margin-bottom:12px}
+.ins{background:linear-gradient(90deg,rgba(14,144,168,.12),transparent)}
+.ins.g{background:linear-gradient(90deg,rgba(42,158,114,.12),transparent);border-left-color:var(--green-lt)}
+.ins.o{background:linear-gradient(90deg,rgba(201,118,42,.12),transparent);border-left-color:var(--orange-lt)}
+.ins strong{color:var(--gold-lt)}
+.ins.g strong{color:var(--green-lt)}.ins.o strong{color:var(--orange-lt)}
+
+/* ── CHANNEL LEGEND ── */
+.ch-leg{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.ch-leg-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim)}
+.ch-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── EFF LIST ── */
+.erow{display:grid;grid-template-columns:144px 1fr 52px 64px;align-items:center;gap:7px;padding:4px 5px;border-radius:4px;transition:background .13s}
+.erow:hover{background:rgba(255,255,255,.03)}
+.en{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et{height:6px;background:rgba(255,255,255,.07);border-radius:3px}
+.ef{height:6px;border-radius:3px}
+.ev{font-size:11px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;text-align:center;white-space:nowrap}
+.tg{background:rgba(42,158,114,.2);color:var(--green-lt)}
+.ty{background:rgba(201,168,76,.18);color:var(--gold-lt)}
+.tr{background:rgba(201,76,58,.2);color:var(--red-lt)}
+.tc{background:rgba(26,127,160,.2);color:var(--cyan-lt)}
+.tp{background:rgba(124,92,191,.2);color:var(--purple-lt)}
+
+/* ── OPP CARDS ── */
+.owrap{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
+.ocard{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;transition:transform .15s,border-color .2s}
+.ocard:hover{transform:translateY(-2px)}
+.ocard.r{border-top:2px solid var(--red)}.ocard.y{border-top:2px solid var(--gold)}.ocard.g{border-top:2px solid var(--green)}
+.od{font-size:12px;font-weight:600;margin-bottom:5px}
+.ov{font-family:'DM Serif Display',serif;font-size:24px;line-height:1}
+.ocard.r .ov{color:var(--red-lt)}.ocard.y .ov{color:var(--gold-lt)}.ocard.g .ov{color:var(--green-lt)}
+.om{font-size:10px;color:var(--text-dim);margin-top:2px}
+.odets{margin-top:7px;padding-top:7px;border-top:1px solid var(--border2);font-size:10px;color:var(--text-dim);line-height:1.7}
+
+/* ── 3-CHANNEL BARS ── */
+.ch3row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:5px 4px;border-radius:4px;transition:background .13s}
+.ch3row:hover{background:rgba(255,255,255,.03)}
+.ch3name{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch3bars{display:flex;flex-direction:column;gap:2px}
+.ch3bar-row{display:flex;align-items:center;gap:5px}
+.ch3bar-wrap{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px}
+.ch3bar-fill{height:5px;border-radius:3px}
+.ch3val{font-size:9.5px;font-variant-numeric:tabular-nums;width:38px;text-align:right;color:var(--text-dim)}
+
+/* ── SCORE ROW ── */
+.srow{display:grid;grid-template-columns:130px 1fr 46px 72px;align-items:center;gap:7px;padding:4px 5px;border-radius:4px;transition:background .13s}
+.srow:hover{background:rgba(255,255,255,.03)}
+.sn{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st{height:7px;background:rgba(255,255,255,.07);border-radius:3px}
+.sf{height:7px;border-radius:3px}
+.sv{font-size:11.5px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+
+/* ── METHOD NOTE ── */
+.mnote{background:rgba(124,92,191,.07);border:1px solid rgba(124,92,191,.2);border-radius:var(--rsm);padding:9px 13px;font-size:11px;color:var(--text-dim);margin-bottom:12px;line-height:1.65}
+.mnote strong{color:var(--purple-lt)}
+
+/* ── ANOMALY ── */
+.anote{font-size:10px;color:var(--text-faint);background:rgba(255,255,255,.025);border:1px dashed rgba(255,255,255,.07);border-radius:4px;padding:5px 10px;margin-bottom:10px}
+
+/* ── DATA TABLE ── */
+.dtw{overflow-x:auto}.dtw::-webkit-scrollbar{height:5px}.dtw::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+table.dt{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap}
+table.dt thead th{background:rgba(201,168,76,.08);color:var(--gold);font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2}
+table.dt thead th.r{text-align:right}
+table.dt tbody tr{border-bottom:1px solid var(--border2);transition:background .13s}
+table.dt tbody tr:hover{background:rgba(255,255,255,.022)}
+table.dt tbody td{padding:7px 10px}
+table.dt tbody td.r{text-align:right;font-variant-numeric:tabular-nums}
+table.dt tfoot tr{background:rgba(201,168,76,.07);border-top:1px solid var(--border)}
+table.dt tfoot td{padding:8px 10px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+table.dt tfoot td:first-child{text-align:left;color:var(--gold-lt)}
+
+/* ── SEC LABEL ── */
+.slbl{display:flex;align-items:center;gap:9px;margin:12px 0 8px}
+.slbl span{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);white-space:nowrap}
+.slbl::after{content:'';flex:1;height:1px;background:var(--border2)}
+
+/* ── QUADRANT ── */
+.qwrap{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border2);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;margin-bottom:11px}
+.quad{padding:12px 14px}
+.quad.q1{background:rgba(201,76,58,.07)}.quad.q2{background:rgba(201,168,76,.05)}
+.quad.q3{background:rgba(42,158,114,.05)}.quad.q4{background:rgba(14,144,168,.06)}
+.qt{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;margin-bottom:4px}
+.q1 .qt{color:var(--red-lt)}.q2 .qt{color:var(--gold-lt)}.q3 .qt{color:var(--green-lt)}.q4 .qt{color:var(--cyan-lt)}
+.qdesc{font-size:10.5px;color:var(--text-dim);line-height:1.5;margin-bottom:5px}
+.qdists{font-size:11px;font-weight:600;color:var(--text);line-height:1.6}
+
+/* ── CHART HEIGHTS ── */
+.h180{height:180px}.h200{height:200px}.h240{height:240px}.h280{height:280px}
+.h320{height:320px}.h360{height:360px}.h380{height:380px}.h400{height:400px}
+canvas{display:block;width:100%!important}
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(7,17,31,.85);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:min(600px,92vw);max-height:80vh;overflow-y:auto;padding:28px 28px 24px;position:relative;transform:translateY(12px);transition:transform .22s;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.modal-overlay.open .modal-box{transform:translateY(0)}
+.modal-box::-webkit-scrollbar{width:4px}.modal-box::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;line-height:1;padding:4px 8px;border-radius:4px;transition:color .15s}
+.modal-close:hover{color:var(--text)}
+.modal-title{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--text-faint);margin-bottom:18px;font-weight:300}
+.modal-section{margin-bottom:14px}
+.modal-section-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-bottom:7px}
+.modal-formula{background:rgba(124,92,191,.1);border:1px solid rgba(124,92,191,.25);border-radius:7px;padding:11px 14px;font-family:'Sora',monospace;font-size:12px;line-height:2;color:var(--text);margin-bottom:10px}
+.modal-row{display:flex;justify-content:space-between;align-items:center;padding:7px 11px;background:rgba(255,255,255,.03);border-radius:5px;font-size:12px;margin-bottom:4px}
+.modal-row span{color:var(--text-dim)}.modal-row strong{color:var(--text)}
+.modal-hint{background:rgba(201,168,76,.07);border:1px dashed rgba(201,168,76,.2);border-radius:6px;padding:9px 13px;font-size:11.5px;color:var(--text-dim);line-height:1.7}
+.modal-hint strong{color:var(--gold-lt)}
+.kpi-click{cursor:pointer;transition:transform .15s,border-color .2s}
+.kpi-click:hover{transform:translateY(-2px);border-color:var(--gold)!important}
+.kpi-click::after{content:'ℹ';position:absolute;top:8px;right:10px;font-size:11px;color:var(--text-faint);opacity:.6}
+.card-click{cursor:pointer;transition:border-color .2s}.card-click:hover{border-color:var(--border)!important}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+    </svg>
+  </div>
+  <div>
+    <div class="hdr-title">Toshkent Viloyati · <span>Moliyaviy Infratuzilma Tahlili</span></div>
+    <div class="hdr-sub">O'zbekiston Markaziy Banki · Toshkent Viloyati Bosh Boshqarmasi · Bank raislariga seminar materiallari</div>
+  </div>
+  <div class="hdr-spacer"></div>
+  <div class="hdr-chip">Seminar · 2026</div>
+  <div class="hdr-date">22 Aprel 2026<small>Ma'lumot sanasi</small></div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-sec">Asosiy tahlil</div>
+  
+  
+  
+  <div class="ni" onclick="go('banks',this)">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="14" x2="4" y2="6"/><line x1="8" y1="14" x2="8" y2="4"/><line x1="12" y1="14" x2="12" y2="8"/><line x1="1" y1="14" x2="15" y2="14"/></svg>
+    Banklar reytingi<span class="nb">4</span>
+  </div>
+  <div class="sb-sec">To'lov kanallari</div>
+  
+  
+  
+  
+  <div class="sb-sec">Qo'shimcha</div>
+  <div class="ni p" onclick="go('forecast',this)">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13l4-5 3 3 5-7"/></svg>
+    Shahar banklari prognoz<span class="nb">9</span>
+  </div>
+  <div class="ni" onclick="go('opportunity',this)">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="5" x2="8" y2="8.5"/><circle cx="8" cy="11" r=".7" fill="currentColor" stroke="none"/></svg>
+    Bozor imkoniyatlari<span class="nb">10</span>
+  </div>
+  
+  
+  
+  <div class="sb-footer">Manba: O'zMB ma'lumotlar bazasi<br>22 shahar/tuman · 31 bank<br>2026 yil I chorak (Yan–Mar)</div>
+</nav>
+
+<!-- CONTENT -->
+<main class="content">
+
+<!-- ▌4 BANKLAR -->
+<div class="page" id="page-banks">
+  <div class="ph"><div><h1>Banklar <em>Reytingi</em></h1><p>31 tijorat banki · Toshkent viloyatida Bankomat taqsimoti</p></div></div>
+  <div class="kr kr-4">
+    <div class="kpi gold"><div class="ki">🏦</div><div class="kl">Viloyat banklari Bankomat</div><div class="kv">1 240</div><div class="km">75.3% · 16 bank</div></div>
+    <div class="kpi teal"><div class="ki">🏙️</div><div class="kl">Shahar banklari Bankomat</div><div class="kv">406</div><div class="km">24.7% · 15 bank</div></div>
+    <div class="kpi green"><div class="ki">🥇</div><div class="kl">Lider (viloyat)</div><div class="kv">Халқ банки</div><div class="km">342 ta · 27.6%</div></div>
+    <div class="kpi blue"><div class="ki">🥇</div><div class="kl">Lider (shahar)</div><div class="kv">Капиталбанк</div><div class="km">224 ta · 55.2%</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Viloyat tijorat banklari — Bankomat soni</div><div class="cs">16 bank · kamayish tartibida</div><div class="h320"><canvas id="c_vbanks"></canvas></div></div>
+    <div class="card"><div class="ct">Shahar tijorat banklari — Bankomat soni</div><div class="cs">15 bank · kamayish tartibida</div><div class="h320"><canvas id="c_sbanks"></canvas></div></div>
+  </div>
+  <div class="gf card"><div class="ct">Tumanlar kesimida banklar raqobati</div><div class="cs">Viloyat banklari (oltin) vs Shahar banklari (ko'k)</div><div class="h200"><canvas id="c_stacked"></canvas></div></div>
+</div>
+
+<!-- ▌4 KARTALAR -->
+
+<!-- ▌8 SHAHAR BANKLARI PROGNOZ -->
+<div class="page" id="page-forecast">
+  <div class="ph"><div><h1>Shahar Banklari <em class="p">Prognozi</em></h1><p>406 ta Toshkent shahar tijorat banklari bankomatlari orqali echilayotgan mablag' taxmini</p></div></div>
+  <div class="mnote"><strong>Metodologiya:</strong> Proporsional taqsim — Shahar Bankomat / Jami Bankomat × Jami naqd pul. Shahar Bankomat mavjud bo'lmagan tumanlarda prognoz = 0.</div>
+  <div class="kr kr-4">
+    <div class="kpi purple"><div class="ki">🏙️</div><div class="kl">Shahar banklari prognoz</div><div class="kv">~1 025 mlrd</div><div class="km">I chorak (Yan–Mar)</div></div>
+    <div class="kpi gold"><div class="ki">🏦</div><div class="kl">Viloyat banklari hissasi</div><div class="kv">~3 118 mlrd</div><div class="km">I chorak</div></div>
+    <div class="kpi teal"><div class="ki">📊</div><div class="kl">Shahar Bankomat ulushi</div><div class="kv">24.7%</div><div class="km">406 / 1 646 ta</div></div>
+    <div class="kpi orange"><div class="ki">⚡</div><div class="kl">Shahar Bankomat unumdorligi</div><div class="kv">~841 mln</div><div class="km">Bankomat boshiga oylik (prognoz)</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct p">Shahar banklari Bankomat prognozi vs Viloyat banklari</div><div class="cs">I chorak 2026 · mlrd so'm · proporsional hisob</div><div class="h320"><canvas id="c_fc_bar"></canvas></div></div>
+    <div class="card"><div class="ct p">Jami naqd pul taqsimoti</div><div class="cs">Viloyat banklari vs Shahar banklari prognoz</div><div class="h320"><canvas id="c_fc_donut"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ▌9 IMKONIYATLAR -->
+
+<!-- ▌9 IMKONIYATLAR -->
+<div class="page" id="page-opportunity">
+  <div class="ph"><div><h1>Bozor <em>Imkoniyatlari</em></h1><p>Aniq ma'lumotlar asosida Bankomat o'rnatish ustuvorligi · Defitsit · Daromad potensiali · Asoslanish</p></div></div>
+
+  <!-- UMUMIY STATISTIKA -->
+  <div class="slbl"><span>📊 Umumiy statistik ko'rinish — Toshkent viloyati 2026 yil I chorak</span></div>
+
+  <!-- 5 ta asosiy KPI -->
+  <div class="kr" style="grid-template-columns:repeat(5,1fr);margin-bottom:11px">
+    <div class="kpi purple kpi-click" onclick="openModal('mfy')"><div class="ki">🏦</div><div class="kl">MFY soni</div><div class="kv">883</div><div class="km">Mahalla fuqarolar yig'ini</div></div>
+    <div class="kpi teal kpi-click" onclick="openModal('aholi')"><div class="ki">👥</div><div class="kl">Aholi</div><div class="kv">3 108 500</div><div class="km">Jami viloyat aholisi</div></div>
+    <div class="kpi gold kpi-click" onclick="openModal('bankomat')"><div class="ki">🏧</div><div class="kl">Jami Bankomat</div><div class="kv">1 646</div><div class="km">22 tuman · 31 bank</div></div>
+    <div class="kpi cyan kpi-click" onclick="openModal('terminal')"><div class="ki">🖥️</div><div class="kl">Terminallar</div><div class="kv">31 054</div><div class="km">POS terminallar</div></div>
+    <div class="kpi green kpi-click" onclick="openModal('karta')"><div class="ki">💳</div><div class="kl">Bank kartalari</div><div class="kv">3 630 760</div><div class="km">Muomaladagi kartalar</div></div>
+  </div>
+
+  <!-- Moliyaviy hajm -->
+  <div class="g2" style="margin-bottom:11px">
+    <div class="card">
+      <div class="ct">💰 3 ta to'lov kanali — I chorak 2026</div>
+      <div class="cs">Bu 3 kanal <strong style="color:var(--gold)">qo'shilmaydi</strong> — har biri alohida ko'rsatkich · <span style="color:var(--gold);font-size:10px">▶ Bosing — batafsil</span></div>
+
+      <!-- Tushuntirish bloki -->
+      <div style="margin-top:10px;padding:10px 13px;background:rgba(201,168,76,.07);border-radius:7px;border-left:3px solid rgba(201,168,76,.4);font-size:11.5px;color:var(--text-dim);line-height:1.8;margin-bottom:10px">
+        <strong style="color:var(--gold-lt)">Nima uchun qo'shib bo'lmaydi?</strong><br>
+        Karta kirim — bu <em>pulning kirimi</em>. Terminal va Bankomat — o'sha pulning <em>xarajati</em>.
+        Bir xil pul ikki marta hisobga olingan bo'ladi.
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <!-- Karta kirim -->
+        <div onclick="openModal('karta_kirim')" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(42,158,114,.08);border-radius:7px;border-left:3px solid var(--green-lt);cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(42,158,114,.15)'" onmouseout="this.style.background='rgba(42,158,114,.08)'">
+          <span style="font-size:20px">💳</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;color:var(--text)">Karta kirim mablag'lari</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">Ish haqi, pensiya, nafaqa, o'tkazma — kartaga tushgan barcha pul</div>
+          </div>
+          <div style="text-align:right;min-width:100px">
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--green-lt)">11 207 mlrd</div>
+            <div style="font-size:10px;color:var(--text-faint)">so'm · I chorak · ℹ</div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div style="display:flex;align-items:center;gap:8px;padding:0 4px">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>
+          <span style="font-size:10px;color:var(--text-faint)">Karta kirimdan qanday sarflandi ↓</span>
+          <div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div>
+        </div>
+
+        <!-- Terminal -->
+        <div onclick="openModal('terminal_tushum')" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(26,127,160,.08);border-radius:7px;border-left:3px solid var(--cyan-lt);cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(26,127,160,.15)'" onmouseout="this.style.background='rgba(26,127,160,.08)'">
+          <span style="font-size:20px">🖥️</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;color:var(--text)">Terminal orqali to'landi</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">Do'kon, restoran, xizmat — karta bilan to'langan pul</div>
+            <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:5px">
+              <div style="width:27.6%;height:5px;background:var(--cyan-lt);border-radius:3px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--cyan-lt);margin-top:2px">Karta kirimning 27.6% i terminlda sarflandi</div>
+          </div>
+          <div style="text-align:right;min-width:100px">
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--cyan-lt)">3 092 mlrd</div>
+            <div style="font-size:10px;color:var(--text-faint)">so'm · I chorak · ℹ</div>
+          </div>
+        </div>
+
+        <!-- Bankomat -->
+        <div onclick="openModal('naqd_pul')" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(201,168,76,.08);border-radius:7px;border-left:3px solid var(--gold-lt);cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,168,76,.15)'" onmouseout="this.style.background='rgba(201,168,76,.08)'">
+          <span style="font-size:20px">🏧</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;color:var(--text)">Bankomatdan naqd pul olindi</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">Aholi kartasini bankomatga solib naqd pul qilgan miqdor</div>
+            <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:5px">
+              <div style="width:36.9%;height:5px;background:var(--gold-lt);border-radius:3px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--gold-lt);margin-top:2px">Karta kirimning 36.9% i naqd qilindi</div>
+          </div>
+          <div style="text-align:right;min-width:100px">
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--gold-lt)">4 143 mlrd</div>
+            <div style="font-size:10px;color:var(--text-faint)">so'm · I chorak · ℹ</div>
+          </div>
+        </div>
+
+        <!-- Xulosa -->
+        <div style="padding:10px 13px;background:rgba(255,255,255,.03);border-radius:7px;font-size:11px;color:var(--text-dim);line-height:1.9">
+          <strong style="color:var(--text)">Xulosa:</strong> Karta kirimning
+          <strong style="color:var(--cyan-lt)">27.6%</strong> terminal orqali sarflandi,
+          <strong style="color:var(--gold-lt)">36.9%</strong> naqd qilindi,
+          qolgan <strong style="color:var(--purple-lt)">35.5%</strong> online to'lov, o'tkazma va boshqalar.
+          <br>Naqd pul ulushi yuqori — bankomat zarurligining asosiy ko'rsatkichi.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">📍 Bankomat qamrovi statistikasi</div>
+      <div class="cs">Xalqaro me'yor (15/10k) bilan taqqoslash · <span style="color:var(--gold);font-size:10px">▶ Har bir kartochkaga bosing</span></div>
+      <div style="margin-top:11px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div onclick="openModal('eng_yuqori')" style="background:rgba(42,158,114,.08);border:1px solid rgba(42,158,114,.2);border-radius:7px;padding:11px 13px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(42,158,114,.18)'" onmouseout="this.style.background='rgba(42,158,114,.08)'">
+            <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Eng yuqori qamrov ℹ</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--green-lt)">12.0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">Nurafshon sh</div>
+            <div style="font-size:10px;color:var(--text-faint)">10k kishiga Bankomat</div>
+          </div>
+          <div onclick="openModal('eng_past')" style="background:rgba(201,76,58,.08);border:1px solid rgba(201,76,58,.2);border-radius:7px;padding:11px 13px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,58,.18)'" onmouseout="this.style.background='rgba(201,76,58,.08)'">
+            <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Eng past qamrov ℹ</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--red-lt)">1.78</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">Bekobod t</div>
+            <div style="font-size:10px;color:var(--text-faint)">10k kishiga Bankomat</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div onclick="openModal('viloyat_ortacha')" style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);border-radius:7px;padding:11px 13px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,168,76,.18)'" onmouseout="this.style.background='rgba(201,168,76,.07)'">
+            <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Viloyat o'rtachasi ℹ</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--gold-lt)">5.30</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">10k kishiga Bankomat</div>
+            <div style="font-size:10px;color:var(--text-faint)">Me'yordan 2.8x past</div>
+          </div>
+          <div onclick="openModal('xalqaro_meyor')" style="background:rgba(124,92,191,.08);border:1px solid rgba(124,92,191,.2);border-radius:7px;padding:11px 13px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(124,92,191,.18)'" onmouseout="this.style.background='rgba(124,92,191,.08)'">
+            <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Xalqaro me'yor ℹ</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--purple-lt)">15.0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">10k kishiga Bankomat</div>
+            <div style="font-size:10px;color:var(--text-faint)">Jahon banki standarti</div>
+          </div>
+        </div>
+        <div onclick="openModal('unumdorlik')" style="background:rgba(201,76,58,.08);border:1px solid rgba(201,76,58,.2);border-radius:7px;padding:10px 13px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,58,.16)'" onmouseout="this.style.background='rgba(201,76,58,.08)'">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text)">Bankomat unumdorligi (viloyat o'rtachasi) ℹ</div>
+              <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">4 143 153 mln ÷ 1 646 ta ÷ 3 oy</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--orange-lt)">838 mln</div>
+              <div style="font-size:10px;color:var(--text-faint)">Bankomat boshiga / oyiga</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Defitsit va potensial -->
+  <div class="gf card" style="margin-bottom:12px">
+    <div class="ct">🎯 Bankomat Defitsiti va Potensial Daromad — Umumiy ko'rinish</div>
+    <div class="cs">Xalqaro me'yor (15/10k) va amaliy maqsad (10/10k) bo'yicha · <span style="color:var(--gold);font-size:10px">▶ Har bir kartochkaga bosing</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px">
+      <div onclick="openModal('def15')" style="background:rgba(201,76,58,.1);border:1px solid rgba(201,76,58,.28);border-radius:8px;padding:14px 16px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,58,.2)'" onmouseout="this.style.background='rgba(201,76,58,.1)'">
+        <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px">Xalqaro me'yorga yetish uchun<br>yetishmayotgan bankomatlar ℹ</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;color:var(--red-lt)">3 029</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">ta yangi bankomat kerak (Jahon banki me'yori)</div>
+        <div style="margin-top:6px;font-size:10.5px;color:var(--text-faint)">Me'yor bo'yicha: 4 675 ta · Hozir mavjud: 1 646 ta</div>
+      </div>
+      <div onclick="openModal('def10')" style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:14px 16px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,168,76,.18)'" onmouseout="this.style.background='rgba(201,168,76,.08)'">
+        <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px">Yaqin 2–3 yilda o'rnatish kerak<br>bo'lgan bankomatlar ℹ</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;color:var(--gold-lt)">1 525</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">ta yangi bankomat kerak (yaqin maqsad)</div>
+        <div style="margin-top:6px;font-size:10.5px;color:var(--text-faint)">2–3 yillik maqsad: 3 171 ta bankomat</div>
+      </div>
+      <div onclick="openModal('pot_oylik')" style="background:rgba(42,158,114,.08);border:1px solid rgba(42,158,114,.22);border-radius:8px;padding:14px 16px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(42,158,114,.18)'" onmouseout="this.style.background='rgba(42,158,114,.08)'">
+        <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px">Yangi bankomatlar o'rnatilsa<br>oylik qo'shimcha aylanma ℹ</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;color:var(--green-lt)">2 538</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">mlrd so'm — har oyda qo'shimcha aylanma</div>
+        <div style="margin-top:6px;font-size:10.5px;color:var(--text-faint)">3 029 ta yangi bankomat × 838 mln (1 ta oylik o'rtacha)</div>
+      </div>
+      <div onclick="openModal('pot_yillik')" style="background:rgba(124,92,191,.08);border:1px solid rgba(124,92,191,.22);border-radius:8px;padding:14px 16px;text-align:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(124,92,191,.18)'" onmouseout="this.style.background='rgba(124,92,191,.08)'">
+        <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px">Yangi bankomatlar o'rnatilsa<br>yillik qo'shimcha aylanma ℹ</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-lt)">30 456</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">mlrd so'm — yiliga qo'shimcha aylanma</div>
+        <div style="margin-top:6px;font-size:10.5px;color:var(--text-faint)">Oylik 2 538 mlrd × 12 oy (taxminiy hisob)</div>
+      </div>
+    </div>
+    <!-- Qamrov darajalari -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:9px">
+      <div onclick="openModal('qamrov_past')" style="background:rgba(201,76,58,.07);border-radius:7px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,58,.15)'" onmouseout="this.style.background='rgba(201,76,58,.07)'">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--red-lt)">🔴 Bankomat juda kam — zudlik kerak ℹ</div>
+          <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">10 000 kishiga 4 tadan kam bankomat</div>
+        </div>
+        <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--red-lt)">9 ta</div>
+      </div>
+      <div onclick="openModal('qamrov_orta')" style="background:rgba(201,168,76,.06);border-radius:7px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,168,76,.14)'" onmouseout="this.style.background='rgba(201,168,76,.06)'">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--gold-lt)">🟡 Bankomat yetarli emas — rejalashtirish kerak ℹ</div>
+          <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">10 000 kishiga 4–8 ta bankomat</div>
+        </div>
+        <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--gold-lt)">9 ta</div>
+      </div>
+      <div onclick="openModal('qamrov_yaxshi')" style="background:rgba(42,158,114,.06);border-radius:7px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(42,158,114,.14)'" onmouseout="this.style.background='rgba(42,158,114,.06)'">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--green-lt)">🟢 Bankomat qamrovi yaxshi — kuzatuv ℹ</div>
+          <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px">10 000 kishiga 8 va undan ko'p bankomat</div>
+        </div>
+        <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--green-lt)">4 ta</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PRIORITY SECTIONS -->
+  <div class="slbl"><span>🔴 BIRINCHI USTUVORLIK — Bankomat qamrovi kritik past (10k kishiga &lt;4 Bankomat) va naqd pul talabi yuqori (&gt;35%)</span></div>
+  <div id="opp_p1" style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px"></div>
+
+  <div class="slbl"><span>🟡 IKKINCHI USTUVORLIK — Bankomat qamrovi o'rta (4–8 Bankomat/10k) yoki kesh talabi yuqori</span></div>
+  <div id="opp_p2" style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px"></div>
+
+  <div class="slbl"><span>🟢 KUZATUV — Qamrov yaxshi (≥8 Bankomat/10k) · Naqd pul talabi past</span></div>
+  <div id="opp_p3" style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px"></div>
+
+  <!-- SHAHAR/TUMAN TO'LIQ TAHLIL -->
+  <div class="slbl" style="display:flex;justify-content:space-between;align-items:center">
+    <span>📊 Shahar va tumanlar kesimida — to'liq tahliliy jadval</span>
+    <button onclick="exportToExcel()" style="padding:6px 16px;background:rgba(42,158,114,.15);border:1px solid rgba(42,158,114,.4);border-radius:20px;color:var(--green-lt);font-size:11px;cursor:pointer;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:6px;transition:background .15s" onmouseover="this.style.background='rgba(42,158,114,.28)'" onmouseout="this.style.background='rgba(42,158,114,.15)'">
+      📥 Excel yuklab olish
+    </button>
+  </div>
+
+  <!-- SOLISHTIRISH BLOKI -->
+  <div class="gf card" style="margin-bottom:12px">
+    <div class="ct">⚖️ Ikki hududni solishtirish</div>
+    <div class="cs">Istalgan 2 ta shahar/tumanni tanlang — moliyaviy imkoniyatlarini taqqoslang</div>
+
+    <!-- Tanlov -->
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:14px 0">
+      <div>
+        <div style="font-size:10px;color:var(--text-faint);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">1-Hudud</div>
+        <select id="cmpA" onchange="renderCmp()" style="width:100%;padding:8px 10px;background:#1a2744;border:1px solid rgba(42,158,114,.35);border-radius:7px;color:#e2e8f0;font-family:'Sora',sans-serif;font-size:12px;cursor:pointer">
+        </select>
+      </div>
+      <div style="text-align:center;font-size:20px;color:var(--text-faint);padding-top:18px">VS</div>
+      <div>
+        <div style="font-size:10px;color:var(--text-faint);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">2-Hudud</div>
+        <select id="cmpB" onchange="renderCmp()" style="width:100%;padding:8px 10px;background:#1a2744;border:1px solid rgba(201,76,58,.35);border-radius:7px;color:#e2e8f0;font-family:'Sora',sans-serif;font-size:12px;cursor:pointer">
+        </select>
+      </div>
+    </div>
+
+    <!-- Natija -->
+    <div id="cmp_result"></div>
+  </div>
+  <div class="gf card" style="margin-bottom:12px">
+    <div class="ct">22 shahar/tuman · Barcha ko'rsatkichlar · 2026 yil I chorak</div>
+    <div class="cs">Har bir qatorga bosing — batafsil tahlil · Ustun sarlavhasiga bosing — tartiblash</div>
+
+    <!-- FILTER TABS -->
+    <div style="display:flex;gap:8px;margin:12px 0 10px;flex-wrap:wrap">
+      <button onclick="filterDistrict('all')" id="fAll" class="ftab active" style="padding:5px 14px;border-radius:20px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.15);color:var(--gold-lt);font-size:11px;cursor:pointer;font-family:'Sora',sans-serif">Barchasi (22)</button>
+      <button onclick="filterDistrict('red')" id="fRed" class="ftab" style="padding:5px 14px;border-radius:20px;border:1px solid rgba(201,76,58,.3);background:transparent;color:var(--red-lt);font-size:11px;cursor:pointer;font-family:'Sora',sans-serif">🔴 Birinchi ustuvorlik</button>
+      <button onclick="filterDistrict('yellow')" id="fYellow" class="ftab" style="padding:5px 14px;border-radius:20px;border:1px solid rgba(201,168,76,.3);background:transparent;color:var(--gold-lt);font-size:11px;cursor:pointer;font-family:'Sora',sans-serif">🟡 Ikkinchi ustuvorlik</button>
+      <button onclick="filterDistrict('green')" id="fGreen" class="ftab" style="padding:5px 14px;border-radius:20px;border:1px solid rgba(42,158,114,.3);background:transparent;color:var(--green-lt);font-size:11px;cursor:pointer;font-family:'Sora',sans-serif">🟢 Kuzatuv</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="dtw" style="overflow-x:auto">
+      <table class="dt" id="district_full_tbl" style="min-width:900px">
+        <thead>
+          <tr>
+            <th style="text-align:left;cursor:pointer" onclick="sortDT('n',this)">Shahar / Tuman ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('e10k',this)">10 000 kishiga<br><small style="font-weight:400;color:var(--text-faint)">nechta bankomat</small> ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('ppa',this)">1 bankomatga<br><small style="font-weight:400;color:var(--text-faint)">necha kishi navbat turadi</small> ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('cashRatio3',this)">Naqd pul talabi<br><small style="font-weight:400;color:var(--text-faint)">kartadan naqd qilingan %</small> ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('termRatio',this)">Terminal faolligi<br><small style="font-weight:400;color:var(--text-faint)">kartadan terminlda sarflangan %</small> ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('card1k',this)">Kartalar<br><small style="font-weight:400;color:var(--text-faint)">1 000 kishiga</small> ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('term1k',this)">Terminallar<br><small style="font-weight:400;color:var(--text-faint)">1 000 kishiga</small> ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('def15',this)">Yetishmovchilik<br><small style="font-weight:400;color:var(--text-faint)">nechta yangi bankomat kerak</small> ↕</th>
+            <th class="r" style="cursor:pointer" onclick="sortDT('pot15',this)">Oylik potensial<br><small style="font-weight:400;color:var(--text-faint)">yangi bkomatdan mlrd so'm</small> ↕</th>
+            <th style="text-align:center">Ustuvorlik</th>
+          </tr>
+        </thead>
+        <tbody id="district_tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- SUMMARY BAR -->
+    <div id="district_summary" style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:7px;font-size:11.5px;color:var(--text-dim);display:flex;gap:20px;flex-wrap:wrap"></div>
+  </div>
+
+  <!-- 3 GRAFIKLI TAHLIL -->
+  <div class="g2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="ct">📈 Kesh ulushi va Bankomat qamrovi</div>
+      <div class="cs">Har bir to'rt burchak bir tuman — joylashuviga qarab ustuvorlik aniq</div>
+      <div class="h360"><canvas id="c_scatter_new"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">💰 Potensial oylik daromad — Top 10 tuman</div>
+      <div class="cs">Yangi bankomat o'rnatilsa kutilayotgan oylik naqd pul aylanmasi</div>
+      <div class="h360"><canvas id="c_pot_bar"></canvas></div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+
+<script>
+
+
+/* ═══════════════════════════════════════════════════
+   UNIFIED DATASET — barcha 3 kanal birlashtirilgan
+   Fields: n, p, m, cards, ci, terms, tr, t, v, c, cash
+═══════════════════════════════════════════════════ */
+const D=[
+  {n:'Angren sh',        p:185500,m:41,  cards:283847, ci:1033561.97, terms:3089, tr:311592.95, t:99, v:73,c:26,cash:276821.35},
+  {n:'Bekobod t',        p:168300,m:51,  cards:109978, ci:192941.73,  terms:642,  tr:39129.27,  t:30, v:30,c:0, cash:128631.64},
+  {n:'Bekobod sh',       p:106100,m:33,  cards:222922, ci:680703.67,  terms:1959, tr:154012.66, t:95, v:72,c:23,cash:207129.84},
+  {n:"Bo'ka t",          p:136700,m:38,  cards:72345,  ci:171201.97,  terms:370,  tr:47130.62,  t:45, v:34,c:11,cash:153841.61},
+  {n:"Bo'stonliq t",     p:178100,m:55,  cards:133801, ci:314372.45,  terms:1804, tr:98900.99,  t:106,v:84,c:22,cash:236311.75},
+  {n:'Zangiota t',       p:175600,m:60,  cards:236182, ci:890478.19,  terms:3700, tr:397513.91, t:153,v:75,c:78,cash:147604.01},
+  {n:'Qibray t',         p:178700,m:60,  cards:182636, ci:385681.64,  terms:1819, tr:197382.06, t:91, v:58,c:33,cash:138065.54},
+  {n:'Quyichirchiq t',   p:117700,m:34,  cards:103542, ci:125917.99,  terms:560,  tr:41541.46,  t:33, v:33,c:0, cash:140970.67},
+  {n:'Nurafshon sh',     p:57500, m:16,  cards:475735, ci:2212415.33, terms:3061, tr:271692.97, t:69, v:61,c:8, cash:200624.13},
+  {n:"Oqqo'rg'on t",    p:114000,m:29,  cards:53456,  ci:146786.18,  terms:633,  tr:47053.73,  t:40, v:40,c:0, cash:176731.02},
+  {n:'Olmaliq sh',       p:148900,m:41,  cards:379343, ci:1115159.69, terms:2932, tr:356017.52, t:166,v:126,c:40,cash:428165.12},
+  {n:'Ohangaron t',      p:113000,m:31,  cards:124023, ci:397919.18,  terms:684,  tr:85939.45,  t:24, v:24,c:0, cash:92962.49},
+  {n:'Ohangaron sh',     p:42000, m:18,  cards:54109,  ci:192294.44,  terms:555,  tr:45853.04,  t:30, v:26,c:4, cash:129310.89},
+  {n:'Parkent t',        p:181900,m:53,  cards:115258, ci:184507.08,  terms:1370, tr:76526.36,  t:53, v:43,c:10,cash:177407.96},
+  {n:'Piskent t',        p:103400,m:23,  cards:72172,  ci:161044.40,  terms:555,  tr:41648.60,  t:36, v:32,c:4, cash:123290.60},
+  {n:'Toshkent t',       p:204100,m:63,  cards:68889,  ci:195709.14,  terms:885,  tr:76925.05,  t:89, v:37,c:52,cash:86728.66},
+  {n:"O'rtachirchiq t",  p:140400,m:46,  cards:0,      ci:383.94,     terms:0,    tr:3242.70,   t:41, v:36,c:5, cash:90399.90},
+  {n:'Chinoz t',         p:148200,m:40,  cards:134259, ci:366573.73,  terms:884,  tr:66459.80,  t:58, v:40,c:18,cash:178374.76},
+  {n:'Chirchiq sh',      p:175500,m:39,  cards:355808, ci:1609954.84, terms:2107, tr:376949.70, t:189,v:163,c:26,cash:465029.73},
+  {n:'Yuqorichirchiq t', p:141700,m:40,  cards:106706, ci:231190.08,  terms:640,  tr:73120.72,  t:52, v:37,c:15,cash:160934.47},
+  {n:"Yangiyo'l t",      p:203900,m:51,  cards:254628, ci:447325.02,  terms:1233, tr:174540.88, t:47, v:32,c:15,cash:108494.88},
+  {n:"Yangiyo'l sh",     p:87300, m:21,  cards:91121,  ci:151230.01,  terms:1572, tr:109084.29, t:100,v:84,c:16,cash:295322.21},
+];
+
+/* ── COMPUTED ── */
+const E=D.map(d=>{
+  const e10k=+(d.t/d.p*10000).toFixed(2);
+  const mfyR=+(d.t/d.m).toFixed(2);
+  const valid=d.cards>0&&d.ci>1000&&d.terms>0;
+  const totalFin=d.ci+d.tr+d.cash;
+  const cashRatio3=d.ci>1000?+(d.cash/d.ci*100).toFixed(1):0;
+  const digitalRatio=totalFin>1000?+((d.ci+d.tr)/totalFin*100).toFixed(1):0;
+  const card1k=d.p>0?+(d.cards/d.p*1000).toFixed(0):0;
+  const term1k=d.p>0?+(d.terms/d.p*1000).toFixed(1):0;
+  const termPerBankomat=d.t>0?+(d.terms/d.t).toFixed(1):0;
+  const cashPerATM=+(d.cash/d.t/3).toFixed(1);
+  const termPerMon=d.terms>0?+(d.tr/d.terms/3).toFixed(1):0;
+  const termRatio=d.ci>1000?+(d.tr/d.ci*100).toFixed(1):0;
+  // Zarurlik indeksi
+  const cashSc=Math.min(100,cashRatio3*1.0);
+  const covSc=Math.max(0,100-e10k/15*100);
+  const termSc=Math.max(0,100-term1k/20*100);
+  const cardSc=Math.max(0,100-card1k/2000*100);
+  const needScore=valid?+(cashSc*0.35+covSc*0.30+termSc*0.20+cardSc*0.15).toFixed(1):null;
+  // Forecast
+  const vFrac=d.v/d.t; const cFrac=d.c/d.t;
+  const cashV=d.cash*vFrac; const cashC=d.cash*cFrac;
+  return{...d,e10k,mfyR,valid,totalFin,cashRatio3,digitalRatio,card1k,term1k,termPerBankomat,cashPerATM,termPerMon,termRatio,needScore,cashV,cashC};
+});
+
+/* ── TOTALS ── */
+const totalP=D.reduce((s,d)=>s+d.p,0);
+const totalT=D.reduce((s,d)=>s+d.t,0);
+const totalCash=D.reduce((s,d)=>s+d.cash,0);
+const totalCI=D.filter(d=>d.ci>1000).reduce((s,d)=>s+d.ci,0);
+const totalTR=D.reduce((s,d)=>s+d.tr,0);
+const totalTerms=D.reduce((s,d)=>s+d.terms,0);
+const totalFin=totalCash+totalCI+totalTR;
+const totalCashV=E.reduce((s,d)=>s+d.cashV,0);
+const totalCashC=E.reduce((s,d)=>s+d.cashC,0);
+
+/* ── SORTED ARRAYS ── */
+const srtEff=[...E].sort((a,b)=>b.e10k-a.e10k);
+const srtTot=[...E].sort((a,b)=>b.t-a.t);
+const srtCash=[...E].sort((a,b)=>b.cash-a.cash);
+const srtCI=[...E].filter(d=>d.ci>1000).sort((a,b)=>b.ci-a.ci);
+const srtTerm=[...E].filter(d=>d.terms>0).sort((a,b)=>b.terms-a.terms);
+const srtTR=[...E].filter(d=>d.terms>0).sort((a,b)=>b.tr-a.tr);
+const srtNeed=[...E].filter(d=>d.needScore!==null).sort((a,b)=>b.needScore-a.needScore);
+const srt3=[...E].filter(d=>d.valid).sort((a,b)=>b.totalFin-a.totalFin);
+const srtCR3=[...E].filter(d=>d.valid).sort((a,b)=>b.cashRatio3-a.cashRatio3);
+const srtCard1k=[...E].filter(d=>d.valid).sort((a,b)=>b.card1k-a.card1k);
+const srtTerm1k=[...E].filter(d=>d.terms>0).sort((a,b)=>b.term1k-a.term1k);
+const srtTPA=[...E].filter(d=>d.terms>0&&d.t>0).sort((a,b)=>b.termPerBankomat-a.termPerBankomat);
+const srtTPM=[...E].filter(d=>d.terms>0).sort((a,b)=>b.termPerMon-a.termPerMon);
+const srtPC=[...E].filter(d=>d.valid).sort((a,b)=>(b.totalFin/b.p)-(a.totalFin/a.p));
+const srtAPM=[...E].sort((a,b)=>b.cashPerATM-a.cashPerATM);
+
+/* ── CHART BASE OPTIONS ── */
+const B={
+  responsive:true,maintainAspectRatio:false,animation:{duration:420},
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(7,17,31,0.96)',borderColor:'rgba(201,168,76,0.3)',borderWidth:1,titleColor:'#e2c27a',bodyColor:'#dde4f0',padding:10,cornerRadius:6}},
+  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8fae',font:{family:'Sora',size:10.5}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8fae',font:{family:'Sora',size:10.5}}}}
+};
+const tip=(cb)=>({...B.plugins.tooltip,callbacks:{label:cb}});
+const hbar=(canvas,labels,data,colors,tipCb)=>new Chart(canvas,{type:'bar',data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:4}]},options:{...B,indexAxis:'y',plugins:{...B.plugins,tooltip:tip(tipCb)},scales:{x:{...B.scales.x},y:{...B.scales.y,ticks:{...B.scales.y.ticks,font:{family:'Sora',size:10.5}}}}}});
+
+const col3=v=>v>=8?'rgba(42,158,114,0.85)':v>=4?'rgba(201,168,76,0.85)':'rgba(201,76,58,0.85)';
+const colCash=v=>v>=40?'rgba(201,76,58,0.87)':v>=25?'rgba(232,160,75,0.87)':v>=15?'rgba(201,168,76,0.8)':'rgba(42,158,114,0.8)';
+const colTerm=v=>v>=15?'rgba(26,127,160,0.88)':v>=7?'rgba(34,181,204,0.75)':'rgba(201,76,58,0.78)';
+const colCard=v=>v>=1000?'rgba(42,158,114,0.85)':v>=600?'rgba(201,168,76,0.85)':'rgba(201,76,58,0.85)';
+const colNeed=v=>v>=70?'rgba(201,76,58,0.88)':v>=55?'rgba(232,160,75,0.88)':v>=40?'rgba(201,168,76,0.85)':'rgba(42,158,114,0.82)';
+const PAL=['rgba(201,168,76,.87)','rgba(34,181,204,.87)','rgba(42,158,114,.87)','rgba(201,76,58,.87)','rgba(58,123,213,.87)','rgba(171,71,188,.85)','rgba(255,152,60,.87)','rgba(92,195,100,.87)','rgba(255,213,80,.87)','rgba(244,100,90,.87)','rgba(90,188,220,.87)','rgba(200,100,160,.87)','rgba(130,200,80,.87)','rgba(220,140,60,.87)','rgba(80,160,240,.87)','rgba(180,80,80,.87)'];
+
+/* ═══ P4 BANKLAR ═══ */
+const VB=[{n:"Халқ банки",v:342},{n:"Инфин банк",v:186},{n:"Ипотека банк",v:156},{n:"Саноатқурилишбанк",v:80},{n:"Агробанк",v:74},{n:"Миллий банк",v:72},{n:"Микрокредитбанк",v:61},{n:"Ҳамкор банк",v:60},{n:"Гарант банк",v:59},{n:"Ипак Йўли банк",v:43},{n:"Бизнес Ривожлантириш",v:36},{n:"Марказий банк",v:15},{n:"Асакабанк",v:12},{n:"Алоқабанк",v:7},{n:"Универсал банк",v:18},{n:"Турон банк",v:19}].sort((a,b)=>b.v-a.v);
+const SB=[{n:"Капиталбанк",v:224},{n:"Апех банк",v:88},{n:"Ориент Финанс",v:27},{n:"Ипотека банк",v:16},{n:"Инфинбанк",v:14},{n:"Траст банк",v:12},{n:"Ипак Йўли банк",v:8},{n:"Миллий банк",v:5},{n:"Тенге банк",v:3},{n:"Агробанк",v:3},{n:"Гарант банк",v:2},{n:"Азия Альянс",v:2},{n:"Асакабанк",v:2},{n:"Турон банк",v:1},{n:"Ҳамкор банк",v:1}].sort((a,b)=>b.v-a.v);
+hbar(document.getElementById('c_vbanks'),VB.map(b=>b.n),VB.map(b=>b.v),PAL,c=>`${c.parsed.x} ta bankomat`);
+hbar(document.getElementById('c_sbanks'),SB.map(b=>b.n),SB.map(b=>b.v),PAL.slice().reverse(),c=>`${c.parsed.x} ta bankomat`);
+const stk=[...D].sort((a,b)=>b.t-a.t);
+new Chart(document.getElementById('c_stacked'),{type:'bar',
+  data:{labels:stk.map(d=>d.n),datasets:[{label:'Viloyat banklari',data:stk.map(d=>d.v),backgroundColor:'rgba(201,168,76,0.82)',stack:'s',borderRadius:2},{label:'Shahar banklari',data:stk.map(d=>d.c),backgroundColor:'rgba(14,144,168,0.82)',stack:'s',borderRadius:2}]},
+  options:{...B,plugins:{...B.plugins,legend:{display:true,position:'top',align:'end',labels:{color:'#7a8fae',font:{family:'Sora',size:11},boxWidth:10,boxHeight:10,padding:12}}},
+    scales:{x:{stacked:true,...B.scales.x,ticks:{...B.scales.x.ticks,maxRotation:38,font:{family:'Sora',size:10}}},y:{stacked:true,...B.scales.y}}}
+});
+
+/* ═══ P8 PROGNOZ ═══ */
+const fcD=E.filter(d=>d.c>0).sort((a,b)=>b.cashC-a.cashC);
+new Chart(document.getElementById('c_fc_bar'),{type:'bar',
+  data:{labels:fcD.map(d=>d.n),datasets:[
+    {label:'Shahar (prognoz)',data:fcD.map(d=>+(d.cashC/1000).toFixed(2)),backgroundColor:'rgba(168,135,232,0.85)',borderRadius:4},
+    {label:'Viloyat banklari', data:fcD.map(d=>+(d.cashV/1000).toFixed(2)),backgroundColor:'rgba(201,168,76,0.65)',borderRadius:4}
+  ]},
+  options:{...B,indexAxis:'y',plugins:{...B.plugins,legend:{display:true,position:'top',align:'end',labels:{color:'#7a8fae',font:{family:'Sora',size:11},boxWidth:10,boxHeight:10,padding:12}},
+    tooltip:tip(c=>`${c.dataset.label}: ${c.parsed.x.toFixed(2)} mlrd so'm`)},
+    scales:{x:{...B.scales.x},y:{...B.scales.y,ticks:{...B.scales.y.ticks,font:{family:'Sora',size:10.5}}}}}
+});
+new Chart(document.getElementById('c_fc_donut'),{type:'doughnut',
+  data:{labels:[`Viloyat banklari  ${(totalCashV/1000).toFixed(0)} mlrd`,`Shahar banklari  ${(totalCashC/1000).toFixed(0)} mlrd`],
+    datasets:[{data:[+(totalCashV/1000).toFixed(0),+(totalCashC/1000).toFixed(0)],backgroundColor:['rgba(201,168,76,0.88)','rgba(124,92,191,0.88)'],borderColor:['rgba(201,168,76,0.2)','rgba(124,92,191,0.2)'],borderWidth:2,hoverOffset:4}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'66%',animation:{duration:420},
+    plugins:{legend:{display:true,position:'bottom',labels:{color:'#7a8fae',font:{family:'Sora',size:11},boxWidth:10,padding:12}},tooltip:{...B.plugins.tooltip}}}
+});
+
+/* ═══ P9 IMKONIYATLAR — boyitilgan ═══ */
+/* OPP — global, openDistrictModal uchun kerak */
+const AVG_ATM=838;
+const OPP_DATA=E.map(d=>{
+  const T15=15,T10=10;
+  const def15=Math.max(0,Math.ceil(d.p*T15/10000)-d.t);
+  const def10=Math.max(0,Math.ceil(d.p*T10/10000)-d.t);
+  const pot15=+(def15*AVG_ATM/1000).toFixed(1);
+  const pot10=+(def10*AVG_ATM/1000).toFixed(1);
+  const ppa=Math.round(d.p/d.t);
+  const cashPA=+(d.cash/d.t/3).toFixed(1);
+  const pri=d.e10k<4&&(d.cashRatio3>55||!d.valid)?1:d.e10k<8?2:3;
+  return{...d,def15,def10,pot15,pot10,ppa,cashPA,pri};
+});
+
+(()=>{
+  const OPP=OPP_DATA;
+
+  // District modal opener — OPP ga kirish uchun IIFE ichida
+  function openDistrictModalInner(idx){
+    const d=OPP[idx];
+    if(!d)return;
+    const hasCard=d.ci>1000;
+    const termPct=hasCard?+(d.tr/d.ci*100).toFixed(1):0;
+    const atmPct=hasCard?+(d.cash/d.ci*100).toFixed(1):0;
+    const cashClr=d.cashRatio3>=70?'var(--red-lt)':d.cashRatio3>=45?'var(--orange-lt)':'var(--green-lt)';
+    const termClr=termPct>=40?'var(--green-lt)':termPct>=25?'var(--cyan-lt)':termPct>=10?'var(--gold-lt)':'var(--red-lt)';
+    const ppaClr=d.ppa>=3500?'var(--red-lt)':d.ppa>=2000?'var(--orange-lt)':'var(--green-lt)';
+    const priLbl=d.pri===1?'BIRINCHI USTUVORLIK':d.pri===2?'IKKINCHI USTUVORLIK':'KUZATUV';
+    const priClr=d.pri===1?'var(--red-lt)':d.pri===2?'var(--gold-lt)':'var(--green-lt)';
+    const priDesc=d.pri===1
+      ?"Bankomat ham yetishmaydi, naqd pul talabi ham yuqori. Zudlik bilan yangi bankomat o'rnatish kerak."
+      :d.pri===2
+      ?"Qisman muammo bor. Bankomat va terminal infratuzilmasini parallel rivojlantirish tavsiya etiladi."
+      :"Bankomat qamrovi yetarli, naqd pul talabi past. Hozircha kuzatish rejimi.";
+    const pot_monthly=d.def15*838;
+    const pot_yearly=Math.round(pot_monthly*12/1000);
+    const covClr=d.e10k>=8?'var(--green-lt)':d.e10k>=4?'var(--gold-lt)':'var(--red-lt)';
+    const covLvl=d.e10k>=8?"YAXSHI":d.e10k>=4?"O'RTA":"PAST";
+    const demandClr=d.cashRatio3>=70?'var(--red-lt)':d.cashRatio3>=45?'var(--orange-lt)':d.cashRatio3>=25?'var(--gold-lt)':'var(--green-lt)';
+    const demandLvl=d.cashRatio3>=70?"JUDA YUQORI":d.cashRatio3>=45?"YUQORI":d.cashRatio3>=25?"O'RTA":"PAST";
+
+    // Terminal commentary
+    const termComment=termPct>=40
+      ?"Aholi karta bilan do'konda, restorada to'layapti. Raqamli iqtisod yaxshi rivojlangan."
+      :termPct>=25
+      ?"Terminal ishlatilyapti, lekin naqd pulga moyillik saqlanmoqda."
+      :termPct>=10
+      ?"Terminal kam ishlatilmoqda. Aholi asosan naqd pul orqali xarid qiladi."
+      :"Terminal deyarli ishlatilmayapti — aholi naqd pulga to'liq qaramli.";
+    const termIcon=termPct>=40?"✅":termPct>=25?"🟡":termPct>=10?"⚠️":"❌";
+
+    // Why people still use cash
+    const cashWhy=d.cashRatio3>=70
+      ?"bozor savdogarlari va fermerlar terminalni qabul qilmaydi, kichik xaridlar naqd pul bilan osonroq, odatlar hali o'zgarmagan"
+      :d.cashRatio3>=45
+      ?"bir qismi bozorda naqd pul bilan xarid qiladi, transport va xizmat sektorida terminal kam"
+      :"asosan bozor va transport sohalarida naqd pul ishlatilmoqda";
+
+    // Comparison with best district
+    const bestTermPct=47.5; // Zangiota t ~ leader
+    const myTermBar=Math.min(100,termPct);
+    const bestBar=Math.min(100,bestTermPct);
+
+    let html=`
+      <div style="background:rgba(7,17,31,.6);border-radius:10px;padding:14px 16px;margin-bottom:14px;border-left:4px solid ${priClr}">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:${priClr};margin-bottom:4px">${priLbl}</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff;margin-bottom:6px">${d.n}</div>
+        <div style="font-size:12px;color:var(--text-dim);line-height:1.7">${priDesc}</div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">1. Aholi bankomatga qanchaga navbat turadi?</div>
+        <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:14px;font-size:12px;line-height:2;color:var(--text-dim);margin-bottom:8px">
+          <strong style="color:var(--text)">${d.t} ta bankomat</strong> —
+          <strong style="color:var(--text)">${d.p.toLocaleString('ru')} nafar</strong> aholiga xizmat qiladi.<br>
+          ${d.p.toLocaleString('ru')} &divide; ${d.t} =
+          <strong style="color:${ppaClr};font-size:15px">${d.ppa.toLocaleString('ru')} kishi</strong> — 1 ta bankomatga to'g'ri keladi.<br><br>
+          ${d.ppa>=3500
+            ?"Tasavvur: 10 soatlik ish kunida har bir bankomat <strong style='color:var(--red-lt)'>"+Math.round(d.ppa/10)+" kishiga</strong> xizmat ko'rsatishi kerak. Navbat uzoq, odamlar vaqt yo'qotadi."
+            :d.ppa>=2000
+            ?"Tasavvur: ish kuni ichida har bir bankomat <strong style='color:var(--orange-lt)'>"+Math.round(d.ppa/10)+" kishiga</strong> xizmat ko'rsatishi kerak. Talabi bor."
+            :"Hozircha bankomat navbati muammosi katta emas."}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:rgba(255,255,255,.04);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--text-faint);margin-bottom:4px">Hozirgi qamrov</div>
+            <div style="font-size:22px;font-family:'DM Serif Display',serif;color:${covClr}">${d.e10k}</div>
+            <div style="font-size:10px;color:var(--text-faint)">/10 000 kishi</div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--text-faint);margin-bottom:4px">Jahon banki me'yori</div>
+            <div style="font-size:22px;font-family:'DM Serif Display',serif;color:var(--purple-lt)">15.0</div>
+            <div style="font-size:10px;color:var(--text-faint)">${Math.round(15/d.e10k*10)/10}x kam</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">2. Aholi to'lov terminalidan foydalanayaptimi?</div>
+        <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:14px;margin-bottom:10px;font-size:12px;line-height:1.9;color:var(--text-dim)">
+          ${termIcon} <strong style="color:var(--text)">${termComment}</strong>
+        </div>
+        ${hasCard?`
+        <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:14px;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:10px">
+            Kartaga tushgan har 100 so'm qayga ketdi? (${(d.ci/1000).toFixed(0)} mlrd so'm jami)
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="color:var(--cyan-lt)">🖥️ Terminal (do'kon, restoran, xizmat)</span>
+              <strong style="color:var(--cyan-lt)">${termPct}%</strong>
+            </div>
+            <div style="height:10px;background:rgba(255,255,255,.06);border-radius:5px">
+              <div style="width:${myTermBar}%;height:10px;background:var(--cyan-lt);border-radius:5px;transition:width .5s"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-faint);margin-top:2px">${(d.tr/1000).toFixed(1)} mlrd so'm</div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="color:${cashClr}">🏧 Bankomat (naqd pulga aylantirish)</span>
+              <strong style="color:${cashClr}">${atmPct}%${atmPct>100?' (!)':''}</strong>
+            </div>
+            <div style="height:10px;background:rgba(255,255,255,.06);border-radius:5px">
+              <div style="width:${Math.min(100,atmPct)}%;height:10px;background:${cashClr};border-radius:5px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-faint);margin-top:2px">${(d.cash/1000).toFixed(1)} mlrd so'm${atmPct>100?' — boshqa hududlardan pul o\'tkazilib naqd qilinmoqda':''}</div>
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px;font-size:12px;line-height:1.9;color:var(--text-dim);margin-bottom:8px">
+          <strong style="color:var(--text)">Nima uchun terminal kam ishlatiladi?</strong><br>
+          ${d.cashRatio3>=45?'Chunki '+cashWhy+'.':'Umumiy holat: '+cashWhy+'.'}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:rgba(26,127,160,.08);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--text-faint);margin-bottom:2px">Terminal ulushi</div>
+            <div style="font-size:20px;font-family:'DM Serif Display',serif;color:${termClr}">${termPct}%</div>
+            <div style="font-size:10px;color:${termClr}">${termIcon} ${termPct>=40?"Yaxshi":termPct>=25?"O'rtacha":termPct>=10?"Kam":"Juda kam"}</div>
+          </div>
+          <div style="background:rgba(201,168,76,.07);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--text-faint);margin-bottom:2px">Naqd pul ulushi</div>
+            <div style="font-size:20px;font-family:'DM Serif Display',serif;color:${cashClr}">${d.cashRatio3}%</div>
+            <div style="font-size:10px;color:${demandClr}">${demandLvl}</div>
+          </div>
+        </div>`:'<div class="modal-hint">Bu tuman uchun karta va terminal ma\'lumoti mavjud emas.</div>'}
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">3. Eng yaxshi tuman bilan taqqos</div>
+        <div style="background:rgba(0,0,0,.15);border-radius:8px;padding:14px;font-size:12px;color:var(--text-dim)">
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span>${d.n} (siz)</span><strong style="color:${termClr}">${termPct}% terminal</strong>
+            </div>
+            <div style="height:8px;background:rgba(255,255,255,.06);border-radius:4px">
+              <div style="width:${myTermBar}%;height:8px;background:${termClr};border-radius:4px"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span>Zangiota t (yetakchi)</span><strong style="color:var(--green-lt)">${bestTermPct}% terminal</strong>
+            </div>
+            <div style="height:8px;background:rgba(255,255,255,.06);border-radius:4px">
+              <div style="width:${bestBar}%;height:8px;background:var(--green-lt);border-radius:4px"></div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;line-height:1.8;color:var(--text-dim)">
+            ${termPct<bestTermPct
+              ?"Zangiota t da aholi kartasini asosan terminallarda ishlatadi (do'kon, restoran). "+d.n+"da esa ko'pchilik naqd pul oladi. Terminal infratuzilmasini rivojlantirilsa, bankomatlarga bosim kamayadi."
+              :"Bu tuman terminal foydalanishda yetakchi tumanlar qatorida."}
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">4. Yangi bankomat o'rnatilsa qancha foyda?</div>
+        <div style="background:rgba(42,158,114,.08);border:1px solid rgba(42,158,114,.2);border-radius:8px;padding:14px;font-size:12px;line-height:2;color:var(--text-dim);margin-bottom:8px">
+          Me'yor uchun <strong style="color:var(--red-lt)">${d.def15} ta yangi bankomat</strong> kerak.<br>
+          1 ta bankomat oyiga o'rtacha <strong style="color:var(--orange-lt)">838 mln so'm</strong> naqd pul beradi.<br>
+          ${d.def15} &times; 838 mln =
+          <strong style="color:var(--green-lt);font-size:16px">${(pot_monthly/1000).toFixed(1)} mlrd so'm / oyiga</strong><br>
+          Yillik potensial: <strong style="color:var(--green-lt)">${pot_yearly} mlrd so'm</strong>
+        </div>
+        <div style="background:rgba(201,168,76,.07);border-radius:7px;padding:12px;font-size:11.5px;color:var(--text-dim);line-height:1.8">
+          <strong style="color:var(--gold-lt)">Bank rahbariyati uchun xulosa:</strong><br>
+          ${d.pri===1
+            ?"🔴 Birinchi navbat. Ham bankomat yetishmaydi, ham terminal az ishlatiladi. Har oy kechiktirilsa — "+((pot_monthly/1000).toFixed(1))+" mlrd so'm boy beriladi."
+            :d.pri===2
+            ?"🟡 Rejalashtiring. "+d.def15+" ta yangi bankomat o'rnating va terminal tarmog'ini kengaytiring."
+            :"🟢 Barqaror holat. "+d.def15+" ta bankomat qo'shish bilan xalqaro me'yorga to'liq yetiladi."}
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">5. Qisqacha xulosa</div>
+        <div class="modal-row"><span>Mavjud bankomat</span><strong style="color:var(--gold-lt)">${d.t} ta</strong></div>
+        <div class="modal-row"><span>Yetishmovchilik (15/10k)</span><strong style="color:var(--red-lt)">${d.def15} ta</strong></div>
+        <div class="modal-row"><span>Terminal ulushi</span><strong style="color:${termClr}">${termIcon} ${termPct}% — ${termPct>=40?"Yaxshi":termPct>=25?"O'rtacha":termPct>=10?"Kam":"Juda kam"}</strong></div>
+        <div class="modal-row"><span>Naqd pul talabi</span><strong style="color:${demandClr}">${demandLvl} (${d.cashRatio3}%)</strong></div>
+        <div class="modal-row"><span>1 bankomatga aholi</span><strong style="color:${ppaClr}">${d.ppa.toLocaleString('ru')} kishi</strong></div>
+        <div class="modal-row"><span>Oylik potensial</span><strong style="color:var(--green-lt)">${(pot_monthly/1000).toFixed(1)} mlrd so'm</strong></div>
+        <div class="modal-row"><span>Ustuvorlik</span><strong style="color:${priClr}">${priLbl}</strong></div>
+      </div>
+    `;
+    document.getElementById('modal-content').innerHTML=html;
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+    window.openDistrictModal=openDistrictModalInner;
+
+  // Opportunity cards builder
+  function mkCard(d,cls){
+    const priTag=d.pri===1?'<span class="tag tr">BIRINCHI</span>':d.pri===2?'<span class="tag ty">IKKINCHI</span>':'<span class="tag tg">KUZATUV</span>';
+    const cashClr=d.cashRatio3>=70?'var(--red-lt)':d.cashRatio3>=45?'var(--orange-lt)':'var(--green-lt)';
+    const ppaClr=d.ppa>=3500?'var(--red-lt)':d.ppa>=2000?'var(--orange-lt)':'var(--green-lt)';
+    const termPct=d.ci>1000?+(d.tr/d.ci*100).toFixed(1):0;
+    const atmPct=d.ci>1000?+(d.cash/d.ci*100).toFixed(1):0;
+    const termClr=termPct>=40?'var(--green-lt)':termPct>=25?'var(--gold-lt)':'var(--orange-lt)';
+    const atmClr=atmPct>=80?'var(--red-lt)':atmPct>=40?'var(--orange-lt)':'var(--green-lt)';
+    const termW=Math.min(100,termPct).toFixed(0);
+    const atmW=Math.min(100,atmPct).toFixed(0);
+    const hasCard=d.ci>1000;
+    return`<div class="ocard ${cls}" style="font-size:11px;cursor:pointer;transition:transform .15s" onclick="openDistrictModal(${OPP.indexOf(d)})" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div class="od" style="font-size:12.5px">${d.n}</div>
+        <div style="display:flex;gap:4px;align-items:center">${priTag}<span style="font-size:10px;color:var(--text-faint)">&#x24D8;</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px">
+        <div style="background:rgba(255,255,255,.04);border-radius:5px;padding:5px 7px">
+          <div style="font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px">10k/Bankomat</div>
+          <div style="font-size:16px;font-family:'DM Serif Display',serif;color:${d.e10k<4?'var(--red-lt)':d.e10k<8?'var(--gold-lt)':'var(--green-lt)'}">${d.e10k}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:5px;padding:5px 7px">
+          <div style="font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px">Kesh ulushi</div>
+          <div style="font-size:16px;font-family:'DM Serif Display',serif;color:${cashClr}">${d.cashRatio3}%</div>
+        </div>
+      </div>
+      ${hasCard?`<div style="background:rgba(255,255,255,.03);border-radius:6px;padding:8px 10px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:9.5px;color:var(--text-faint);font-weight:600;letter-spacing:.8px;text-transform:uppercase">Karta puli qayga ketdi?</div>
+          <div style="font-size:10px;color:var(--cyan-lt);font-weight:700">${(d.ci/1000).toFixed(1)} mlrd kirim</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:9.5px;color:var(--text-faint);width:42px">Term</span>
+            <div style="flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px"><div style="width:${termW}%;height:5px;background:${termClr};border-radius:3px"></div></div>
+            <span style="font-size:10.5px;font-weight:700;color:${termClr};width:32px;text-align:right">${termPct}%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:9.5px;color:var(--text-faint);width:42px">ATM</span>
+            <div style="flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px"><div style="width:${Math.min(100,atmW)}%;height:5px;background:${atmClr};border-radius:3px"></div></div>
+            <span style="font-size:10.5px;font-weight:700;color:${atmClr};width:32px;text-align:right">${atmPct}%</span>
+          </div>
+        </div>
+      </div>`:''}
+      <div style="padding-top:7px;border-top:1px solid var(--border2);display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Defitsit (15/10k)</span><strong style="color:var(--red-lt)">${d.def15} ta</strong></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Defitsit (10/10k)</span><strong style="color:var(--gold-lt)">${d.def10} ta</strong></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">1 Bankomatga aholi</span><strong style="color:${ppaClr}">${d.ppa.toLocaleString('ru')} kishi</strong></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text-faint)">Unumdorlik</span><strong style="color:var(--purple-lt)">${d.cashPA} mln/oy</strong></div>
+        <div style="display:flex;justify-content:space-between;margin-top:3px;padding-top:5px;border-top:1px solid var(--border2)">
+          <span style="color:var(--text-faint)">Potensial daromad/oy</span>
+          <strong style="color:var(--green-lt);font-size:12px">${d.pot15} mlrd so'm</strong>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const p1=OPP.filter(d=>d.pri===1).sort((a,b)=>b.def15-a.def15);
+  const p2=OPP.filter(d=>d.pri===2).sort((a,b)=>b.def15-a.def15);
+  const p3=OPP.filter(d=>d.pri===3).sort((a,b)=>b.def15-a.def15);
+  document.getElementById('opp_p1').innerHTML=p1.map(d=>mkCard(d,'r')).join('');
+  document.getElementById('opp_p2').innerHTML=p2.map(d=>mkCard(d,'y')).join('');
+  document.getElementById('opp_p3').innerHTML=p3.map(d=>mkCard(d,'g')).join('');
+
+  /* ── DISTRICT COMPARISON ── */
+  (()=>{
+    const selA=document.getElementById('cmpA');
+    const selB=document.getElementById('cmpB');
+    OPP.forEach((d,i)=>{
+      selA.innerHTML+=`<option value="${i}">${d.n}</option>`;
+      selB.innerHTML+=`<option value="${i}">${d.n}</option>`;
+    });
+    // Default: Bekobod t vs Zangiota t
+    selA.value=OPP.findIndex(d=>d.n==="Bekobod t");
+    selB.value=OPP.findIndex(d=>d.n==="Zangiota t");
+
+    window.renderCmp=function(){
+      const a=OPP[+selA.value];
+      const b=OPP[+selB.value];
+      if(!a||!b){document.getElementById('cmp_result').innerHTML='';return;}
+
+      const row=(label,va,vb,unit='',reverse=false)=>{
+        const na=parseFloat(String(va).replace(/[^0-9.-]/g,''));
+        const nb=parseFloat(String(vb).replace(/[^0-9.-]/g,''));
+        let winA=false,winB=false;
+        if(!isNaN(na)&&!isNaN(nb)&&na!==nb){
+          winA=reverse?na<nb:na>nb;
+          winB=reverse?nb<na:nb>na;
+        }
+        const ga=winA?'color:var(--green-lt);font-weight:700':'color:var(--text)';
+        const gb=winB?'color:var(--green-lt);font-weight:700':'color:var(--text)';
+        const ia=winA?'✅':'';
+        const ib=winB?'✅':'';
+        return`<tr>
+          <td style="${ga}">${ia} ${va}${unit}</td>
+          <td style="color:var(--text-dim);font-size:11px;text-align:center;padding:6px 8px">${label}</td>
+          <td style="${gb};text-align:right">${vb}${unit} ${ib}</td>
+        </tr>`;
+      };
+
+      const priTag=p=>p===1?'<span class="tag tr">BIRINCHI</span>':p===2?'<span class="tag ty">IKKINCHI</span>':'<span class="tag tg">KUZATUV</span>';
+      const cashClrA=a.cashRatio3>=70?'var(--red-lt)':a.cashRatio3>=45?'var(--orange-lt)':'var(--green-lt)';
+      const cashClrB=b.cashRatio3>=70?'var(--red-lt)':b.cashRatio3>=45?'var(--orange-lt)':'var(--green-lt)';
+      const covClrA=a.e10k>=8?'var(--green-lt)':a.e10k>=4?'var(--gold-lt)':'var(--red-lt)';
+      const covClrB=b.e10k>=8?'var(--green-lt)':b.e10k>=4?'var(--gold-lt)':'var(--red-lt)';
+
+      document.getElementById('cmp_result').innerHTML=`
+        <!-- Sarlavha -->
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-bottom:12px;text-align:center">
+          <div style="background:rgba(42,158,114,.1);border-radius:8px;padding:10px">
+            <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--green-lt)">${a.n}</div>
+            <div style="margin-top:4px">${priTag(a.pri)}</div>
+          </div>
+          <div style="font-size:12px;color:var(--text-faint);display:flex;align-items:center">VS</div>
+          <div style="background:rgba(201,76,58,.1);border-radius:8px;padding:10px">
+            <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--red-lt)">${b.n}</div>
+            <div style="margin-top:4px">${priTag(b.pri)}</div>
+          </div>
+        </div>
+
+        <!-- Asosiy ko'rsatkichlar jadvali -->
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border)">
+              <th style="color:var(--green-lt);padding:6px 8px;text-align:left;font-weight:600">${a.n}</th>
+              <th style="color:var(--text-faint);text-align:center;padding:6px 8px;font-size:10px;font-weight:400">Ko'rsatkich</th>
+              <th style="color:var(--red-lt);padding:6px 8px;text-align:right;font-weight:600">${b.n}</th>
+            </tr>
+          </thead>
+          <tbody style="border-bottom:1px solid var(--border2)">
+            <tr><td colspan="3" style="padding:8px 8px 4px;font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px">📍 Bankomat qamrovi</td></tr>
+            ${row('10 000 kishiga bankomat',a.e10k,b.e10k,'')}
+            ${row('1 bankomatga necha kishi (kam yaxshi)',a.ppa.toLocaleString('ru'),b.ppa.toLocaleString('ru'),'',true)}
+            ${row('Yetishmovchilik (15/10k)',a.def15,b.def15,'ta',true)}
+            ${row('Oylik potensial daromad',a.pot15,b.pot15,' mlrd')}
+            <tr><td colspan="3" style="padding:8px 8px 4px;font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px">💳 Moliyaviy faollik</td></tr>
+            ${row('Naqd pul talabi (kam yaxshi)',a.cashRatio3,b.cashRatio3,'%',true)}
+            ${row('Terminal faolligi',a.termRatio||0,b.termRatio||0,'%')}
+            ${row('1 000 kishiga karta',a.card1k||0,b.card1k||0,'ta')}
+            ${row('1 000 kishiga terminal',a.term1k||0,b.term1k||0,'ta')}
+            <tr><td colspan="3" style="padding:8px 8px 4px;font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px">👥 Aholi va infratuzilma</td></tr>
+            ${row('Aholi soni',a.p.toLocaleString('ru'),b.p.toLocaleString('ru'),'')}
+            ${row('Mavjud bankomatlar',a.t,b.t,'ta')}
+          </tbody>
+        </table>
+
+        <!-- Vizual taqqos -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+          <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:12px">
+            <div style="font-size:10px;color:var(--text-faint);margin-bottom:8px;text-transform:uppercase">Naqd pul talabi</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                  <span style="color:var(--green-lt)">${a.n.split(' ')[0]}</span>
+                  <span style="color:${cashClrA}">${a.cashRatio3}%</span>
+                </div>
+                <div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px">
+                  <div style="width:${Math.min(100,a.cashRatio3)}%;height:7px;background:${cashClrA};border-radius:4px"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                  <span style="color:var(--red-lt)">${b.n.split(' ')[0]}</span>
+                  <span style="color:${cashClrB}">${b.cashRatio3}%</span>
+                </div>
+                <div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px">
+                  <div style="width:${Math.min(100,b.cashRatio3)}%;height:7px;background:${cashClrB};border-radius:4px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:12px">
+            <div style="font-size:10px;color:var(--text-faint);margin-bottom:8px;text-transform:uppercase">Bankomat qamrovi</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                  <span style="color:var(--green-lt)">${a.n.split(' ')[0]}</span>
+                  <span style="color:${covClrA}">${a.e10k}/10k</span>
+                </div>
+                <div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px">
+                  <div style="width:${Math.min(100,a.e10k/15*100)}%;height:7px;background:${covClrA};border-radius:4px"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                  <span style="color:var(--red-lt)">${b.n.split(' ')[0]}</span>
+                  <span style="color:${covClrB}">${b.e10k}/10k</span>
+                </div>
+                <div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px">
+                  <div style="width:${Math.min(100,b.e10k/15*100)}%;height:7px;background:${covClrB};border-radius:4px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Xulosa -->
+        <div style="margin-top:10px;padding:12px 14px;background:rgba(201,168,76,.07);border-radius:8px;font-size:12px;color:var(--text-dim);line-height:1.8">
+          <strong style="color:var(--gold-lt)">Taqqoslash xulosasi:</strong><br>
+          ${(()=>{
+            const msgs=[];
+            if(a.e10k<b.e10k) msgs.push(`<strong style="color:var(--green-lt)">${b.n}</strong> bankomat qamrovi bo'yicha yaxshiroq (${b.e10k} vs ${a.e10k}/10k)`);
+            else msgs.push(`<strong style="color:var(--green-lt)">${a.n}</strong> bankomat qamrovi bo'yicha yaxshiroq (${a.e10k} vs ${b.e10k}/10k)`);
+            if(a.cashRatio3<b.cashRatio3) msgs.push(`<strong style="color:var(--green-lt)">${a.n}</strong> naqd pul talabi pastroq — terminal ko'proq ishlatilmoqda`);
+            else msgs.push(`<strong style="color:var(--green-lt)">${b.n}</strong> naqd pul talabi pastroq — terminal ko'proq ishlatilmoqda`);
+            if(a.pot15>b.pot15) msgs.push(`<strong style="color:var(--green-lt)">${a.n}</strong> da yangi bankomat o'rnatish ko'proq foyda beradi (${a.pot15} vs ${b.pot15} mlrd/oy)`);
+            else msgs.push(`<strong style="color:var(--green-lt)">${b.n}</strong> da yangi bankomat o'rnatish ko'proq foyda beradi (${b.pot15} vs ${a.pot15} mlrd/oy)`);
+            return msgs.join('<br>');
+          })()}
+        </div>
+      `;
+    };
+    renderCmp();
+  })();
+
+  /* ── DISTRICT FULL TABLE ── */
+  const DT_DATA=OPP.map((d,idx)=>({...d,idx}));
+  let DT_SORT={col:'def15',asc:false};
+  let DT_FILTER='all';
+
+  function renderDT(){
+    let rows=[...DT_DATA];
+    // Filter
+    if(DT_FILTER==='red')    rows=rows.filter(d=>d.pri===1);
+    if(DT_FILTER==='yellow') rows=rows.filter(d=>d.pri===2);
+    if(DT_FILTER==='green')  rows=rows.filter(d=>d.pri===3);
+    // Sort
+    rows.sort((a,b)=>{
+      const va=a[DT_SORT.col], vb=b[DT_SORT.col];
+      if(typeof va==='string') return DT_SORT.asc?(va>vb?1:-1):(va<vb?1:-1);
+      return DT_SORT.asc?va-vb:vb-va;
+    });
+
+    const priTag=p=>p===1?'<span class="tag tr">1-USTA</span>':p===2?'<span class="tag ty">2-USTA</span>':'<span class="tag tg">KUZATUV</span>';
+    const covClr=v=>v>=8?'var(--green-lt)':v>=4?'var(--gold-lt)':'var(--red-lt)';
+    const cshClr=v=>v>=70?'var(--red-lt)':v>=45?'var(--orange-lt)':v>=25?'var(--gold-lt)':'var(--green-lt)';
+    const trmClr=v=>v>=40?'var(--green-lt)':v>=25?'var(--cyan-lt)':v>=10?'var(--gold-lt)':'var(--red-lt)';
+
+    document.getElementById('district_tbody').innerHTML=rows.map(d=>`<tr style="cursor:pointer" onclick="openDistrictModal(${d.idx})" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background=''">
+      <td style="font-weight:600;color:var(--text)">${d.n}</td>
+      <td class="r" style="color:${covClr(d.e10k)};font-weight:700">${d.e10k}</td>
+      <td class="r" style="color:${d.ppa>=3500?'var(--red-lt)':d.ppa>=2000?'var(--orange-lt)':'var(--green-lt)'}">${d.ppa.toLocaleString('ru')}</td>
+      <td class="r" style="color:${cshClr(d.cashRatio3)};font-weight:700">${d.cashRatio3}%</td>
+      <td class="r" style="color:${trmClr(d.termRatio)}">${d.termRatio||'—'}%</td>
+      <td class="r" style="color:var(--text-dim)">${d.card1k||'—'}</td>
+      <td class="r" style="color:var(--text-dim)">${d.term1k||'—'}</td>
+      <td class="r" style="color:var(--red-lt);font-weight:700">${d.def15}</td>
+      <td class="r" style="color:var(--green-lt);font-weight:600">${d.pot15}</td>
+      <td style="text-align:center">${priTag(d.pri)}</td>
+    </tr>`).join('');
+
+    // Summary
+    const tot=rows.length;
+    const totDef=rows.reduce((s,d)=>s+d.def15,0);
+    const totPot=rows.reduce((s,d)=>s+d.pot15,0).toFixed(1);
+    const avgCash=(rows.filter(d=>d.cashRatio3>0).reduce((s,d)=>s+d.cashRatio3,0)/rows.filter(d=>d.cashRatio3>0).length).toFixed(1);
+    document.getElementById('district_summary').innerHTML=`
+      <span>📍 Ko'rsatilgan: <strong style="color:var(--gold-lt)">${tot} ta tuman</strong></span>
+      <span>📉 Jami defitsit: <strong style="color:var(--red-lt)">${totDef} ta bankomat</strong></span>
+      <span>💰 Oylik potensial: <strong style="color:var(--green-lt)">${totPot} mlrd so'm</strong></span>
+      <span>💵 O'rtacha kesh ulushi: <strong style="color:var(--orange-lt)">${avgCash}%</strong></span>
+      <span style="color:var(--text-faint);font-size:10px">· Qatorga bosing — batafsil tahlil</span>`;
+  }
+
+  window.filterDistrict=function(f){
+    DT_FILTER=f;
+    ['all','red','yellow','green'].forEach(id=>{
+      const btn=document.getElementById('f'+id.charAt(0).toUpperCase()+id.slice(1));
+      if(btn) btn.style.background=id===f?'rgba(201,168,76,.15)':'transparent';
+    });
+    renderDT();
+  };
+  window.sortDT=function(col,th){
+    DT_SORT={col, asc: DT_SORT.col===col?!DT_SORT.asc:false};
+    renderDT();
+  };
+  renderDT();
+
+  /* ── SCATTER: Kesh ulushi vs Bankomat qamrovi ── */
+  const scData=OPP.filter(d=>d.cashRatio3>0).map(d=>({
+    x:d.e10k, y:d.cashRatio3, label:d.n,
+    r:Math.max(6,Math.min(18,d.def15/15)),
+    bg:d.pri===1?'rgba(201,76,58,.8)':d.pri===2?'rgba(201,168,76,.75)':'rgba(42,158,114,.75)'
+  }));
+  new Chart(document.getElementById('c_scatter_new'),{type:'bubble',
+    data:{datasets:[{
+      data:scData, backgroundColor:scData.map(d=>d.bg),
+      borderColor:scData.map(d=>d.bg.replace('.8','1').replace('.75','1')),
+      borderWidth:1
+    }]},
+    options:{...B,
+      plugins:{...B.plugins,
+        legend:{display:false},
+        tooltip:{...B.plugins.tooltip,callbacks:{
+          label:c=>{
+            const d=scData[c.dataIndex];
+            return[d.label, `Qamrov: ${d.x}/10k`, `Kesh ulushi: ${d.y}%`];
+          }
+        }},
+        annotation:{annotations:{
+          hLine:{type:'line',yMin:55,yMax:55,borderColor:'rgba(201,76,58,.4)',borderDash:[5,5],borderWidth:1},
+          vLine:{type:'line',xMin:4,xMax:4,borderColor:'rgba(201,76,58,.4)',borderDash:[5,5],borderWidth:1}
+        }}
+      },
+      scales:{
+        x:{...B.scales.x,title:{display:true,text:"10k kishiga bankomat",color:'#7a8fae',font:{family:'Sora',size:10}}},
+        y:{...B.scales.y,title:{display:true,text:"Kesh ulushi (%)",color:'#7a8fae',font:{family:'Sora',size:10}}}
+      }
+    }
+  });
+
+  /* ── BAR: Top 10 potensial ── */
+  const srtPot=[...OPP].sort((a,b)=>b.pot15-a.pot15).slice(0,10);
+  hbar(document.getElementById('c_pot_bar'),
+    srtPot.map(d=>d.n),
+    srtPot.map(d=>d.pot15),
+    srtPot.map(d=>d.pri===1?'rgba(201,76,58,.85)':d.pri===2?'rgba(201,168,76,.8)':'rgba(42,158,114,.75)'),
+    c=>`${c.parsed.x.toFixed(1)} mlrd so'm/oyiga potensial`
+  );
+})();
+
+/* ═══ EXCEL EXPORT ═══ */
+window.exportToExcel=function(){
+  const rows=OPP_DATA.map(d=>({
+    ...d,
+    termRatio:d.ci>1000?+(d.tr/d.ci*100).toFixed(1):0
+  }));
+  // CSV with BOM for Excel UTF-8
+  const headers=[
+    'Shahar/Tuman','Aholi','MFY soni','Mavjud bankomat',
+    '10k kishiga bankomat','1 bankomatga aholi (kishi)',
+    'Bank kartalari','Kartalar / 1000 kishiga',
+    'POS terminallar','Terminallar / 1000 kishiga',
+    'Karta kirim (mln som)','Terminal tushum (mln som)',
+    'Bankomat naqd pul (mln som)',
+    'Naqd pul talabi (karta kirimdan %)',
+    'Terminal faolligi (karta kirimdan %)',
+    'Defitsit 15/10k (ta)','Defitsit 10/10k (ta)',
+    'Oylik potensial (mlrd som)','Ustuvorlik'
+  ];
+  const priName=p=>p===1?"Birinchi ustuvorlik":p===2?"Ikkinchi ustuvorlik":"Kuzatuv";
+  const data=rows.map(d=>[
+    d.n, d.p, d.m, d.t,
+    d.e10k, d.ppa,
+    d.cards||0, d.card1k||0,
+    d.terms||0, d.term1k||0,
+    Math.round(d.ci||0), Math.round(d.tr||0),
+    Math.round(d.cash||0),
+    d.cashRatio3||0, d.termRatio||0,
+    d.def15, d.def10,
+    d.pot15,
+    priName(d.pri)
+  ]);
+
+  // Build CSV
+  const esc=v=>typeof v==='string'&&v.includes(',')? `"${v}"`:v;
+  let csv='\uFEFF'; // BOM
+  csv+=headers.map(esc).join(',')+'\n';
+  data.forEach(row=>{csv+=row.map(esc).join(',')+'\n';});
+
+  // Add summary row
+  csv+='\n';
+  csv+='JAMI / VILOYAT,'+
+    rows.reduce((s,d)=>s+d.p,0)+','+
+    rows.reduce((s,d)=>s+d.m,0)+','+
+    rows.reduce((s,d)=>s+d.t,0)+','+
+    '5.30,1889,'+
+    rows.reduce((s,d)=>s+(d.cards||0),0)+','+
+    '1168,'+
+    rows.reduce((s,d)=>s+(d.terms||0),0)+','+
+    '9.99,'+
+    Math.round(rows.reduce((s,d)=>s+(d.ci||0),0))+','+
+    Math.round(rows.reduce((s,d)=>s+(d.tr||0),0))+','+
+    Math.round(rows.reduce((s,d)=>s+(d.cash||0),0))+','+
+    '36.9,27.6,'+
+    rows.reduce((s,d)=>s+d.def15,0)+','+
+    rows.reduce((s,d)=>s+d.def10,0)+','+
+    rows.reduce((s,d)=>s+d.pot15,0).toFixed(1)+
+    ',—\n';
+
+  // Download
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='Toshkent_viloyati_bankomat_tahlili_2026_I_chorak.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+/* ═══ NAV ═══ */
+function go(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+}
+
+
+</script>
+<script>
+
+
+const MODALS={
+  bankomat:{
+    title:"🏧 Jami Bankomat — 1 646 ta",
+    sub:"Toshkent viloyatidagi barcha bankomatlar soni · 2026 yil I chorak",
+    sections:[
+      {title:"Nima degani?",content:`<div class="modal-hint" style="margin-bottom:10px"><strong>Bankomat</strong> — siz kartangizni solib naqd pul oladigan qurilma. Viloyatdagi barcha bankomatlar soni: <strong style="color:var(--gold-lt);font-size:15px">1 646 ta</strong></div><div class="modal-row"><span>🏦 Viloyat (tuman) banklari</span><strong style="color:var(--gold-lt)">1 240 ta</strong></div><div class="modal-row"><span>🏙️ Shahar banklari</span><strong style="color:var(--cyan-lt)">406 ta</strong></div><div class="modal-row"><span>📍 Xizmat qiluvchi hududlar</span><strong>22 ta shahar/tuman</strong></div><div class="modal-row"><span>🏦 Banklarning umumiy soni</span><strong>31 ta bank</strong></div>`},
+      {title:"Misol — Kundalik hayot",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim);margin-bottom:8px">Toshkent viloyatida <strong style="color:var(--text)">3 108 500 nafar</strong> odam yashaydi.<br>Ularga <strong style="color:var(--gold-lt)">1 646 ta</strong> bankomat xizmat qiladi.<br>Demak: har bir bankomatga <strong style="color:var(--red-lt)">1 889 nafar odam</strong> to'g'ri keladi!</div><div class="modal-row"><span>1 bankomatga necha kishi?</span><strong style="color:var(--red-lt)">1 889 kishi</strong></div><div class="modal-row"><span>10 000 kishiga necha bankomat?</span><strong style="color:var(--orange-lt)">5.30 ta</strong></div><div class="modal-row"><span>Xalqaro me'yor (15/10k)</span><strong style="color:var(--green-lt)">15.0 ta bo'lishi kerak</strong></div>`},
+      {title:"Xulosa — Qancha yetishmayapti?",content:`<div style="background:rgba(201,76,58,.1);border:1px solid rgba(201,76,58,.25);border-radius:7px;padding:12px 14px;font-family:'Sora',monospace;font-size:12px;line-height:2.2;color:var(--text)">Xalqaro me'yor bo'yicha kerakli: <strong style="color:var(--green-lt)">4 675 ta</strong><br>Hozir mavjud: <strong style="color:var(--gold-lt)">1 646 ta</strong><br><span style="border-top:1px solid rgba(255,255,255,.1);display:block;margin-top:4px;padding-top:4px">Yetishmovchilik: <strong style="color:var(--red-lt);font-size:16px">3 029 ta bankomat!</strong></span></div>`}
+    ]
+  },
+  aholi:{
+    title:"👥 Aholi — 3 108 500 nafar",
+    sub:"Toshkent viloyatining 22 shahar/tuman bo'yicha jami aholisi",
+    sections:[
+      {title:"Nima degani?",content:`<div class="modal-hint" style="margin-bottom:10px">Aholi soni — barcha ko'rsatkichlarni hisoblashda <strong>asosiy bo'luvchi</strong>. Masalan: barcha qamrov ko'rsatkichlari shu raqamga bo'linadi.</div><div class="modal-row"><span>Jami aholi</span><strong style="color:var(--teal-lt)">3 108 500 nafar</strong></div><div class="modal-row"><span>Tumanlar soni</span><strong>22 ta shahar/tuman</strong></div><div class="modal-row"><span>MFY soni</span><strong>883 ta mahalla</strong></div>`},
+      {title:"Misol — Aholi hisoblarda qanday ishlatiladi?",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim)">Bankomat qamrovi: 1 646 ÷ 3 108 500 × 10 000 = <strong style="color:var(--orange-lt)">5.30 ta/10k</strong><br>Karta qamrovi: 3 630 760 ÷ 3 108 500 × 1000 = <strong style="color:var(--green-lt)">1 168 ta/1k</strong><br>Terminal qamrovi: 31 054 ÷ 3 108 500 × 1000 = <strong style="color:var(--cyan-lt)">9.99 ta/1k</strong></div>`},
+      {title:"Eng ko'p va eng kam aholili tumanlar",content:`<div class="modal-row"><span>🥇 Eng ko'p aholi</span><strong>Toshkent t — 204 100 nafar</strong></div><div class="modal-row"><span>🥈 Yangiyo'l t</span><strong>203 900 nafar</strong></div><div class="modal-row"><span>🔻 Eng kam aholi</span><strong>Ohangaron sh — 42 000 nafar</strong></div>`}
+    ]
+  },
+  karta:{
+    title:"💳 Bank kartalari — 3 630 760 ta",
+    sub:"Muomaladagi plastik kartalar soni · 2026 yil I chorak",
+    sections:[
+      {title:"Oddiy tushuntirish",content:`<div class="modal-hint" style="margin-bottom:10px"><strong>Bank kartasi</strong> — bankda ochilgan hisobingizga bog'langan plastik karta. Ish haqi, pensiya, nafaqa shu kartaga tushadi. Kartangizni <strong>terminalda</strong> ishlatsangiz — raqamli to'lov. <strong>Bankomatga</strong> solsangiz — naqd pul.</div><div class="modal-row"><span>Jami kartalar</span><strong style="color:var(--green-lt)">3 630 760 ta</strong></div><div class="modal-row"><span>1000 kishiga</span><strong>1 168 ta karta</strong></div><div class="modal-row"><span>I chorak kirim</span><strong style="color:var(--green-lt)">11 207 mlrd so'm</strong></div><div class="modal-row"><span>Karta boshiga oylik kirim</span><strong>1.03 mln so'm</strong></div>`},
+      {title:"Misol — Karta kirim ulushi qanday hisoblanadi?",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim);margin-bottom:8px">Karta kirim — bu pul qayerdan sarflandi?<br>Terminal: 3 092 ÷ 11 207 × 100 = <strong style="color:var(--cyan-lt)">27.6%</strong> do'konda to'landi<br>Bankomat: 4 143 ÷ 11 207 × 100 = <strong style="color:var(--gold-lt)">36.9%</strong> naqd qilindi<br>Qolgan <strong style="color:var(--purple-lt)">35.5%</strong> online, o'tkazma, boshqa.</div>`},
+      {title:"Eng ko'p va eng kam kartali tumanlar",content:`<div class="modal-row"><span>🥇 Eng ko'p karta</span><strong>Nurafshon sh — 475 735 ta</strong></div><div class="modal-row"><span>🥈 Olmaliq sh</span><strong>379 343 ta</strong></div><div class="modal-row"><span>🔻 Eng kam karta</span><strong>Oqqo'rg'on t — 53 456 ta</strong></div><div class="modal-hint" style="margin-top:8px"><strong>Eslatma:</strong> O'rtachirchiq tumani (0 ta karta) anomal — tahlildan chiqarilgan.</div>`}
+    ]
+  },
+  terminal:{
+    title:"🖥️ Terminallar — 31 054 ta",
+    sub:"POS terminallar soni · do'kon, restoran, xizmat joylari",
+    sections:[
+      {title:"Oddiy tushuntirish",content:`<div class="modal-hint" style="margin-bottom:10px"><strong>Terminal (POS)</strong> — do'konda, restorada, aptekada kartangizni qo'yadigan kichik qurilma. Terminalda to'lash — raqamli to'lov.</div><div class="modal-row"><span>Jami terminallar</span><strong style="color:var(--cyan-lt)">31 054 ta</strong></div><div class="modal-row"><span>1000 kishiga</span><strong>9.99 ta terminal</strong></div><div class="modal-row"><span>I chorak tushum</span><strong style="color:var(--cyan-lt)">3 092 mlrd so'm</strong></div><div class="modal-row"><span>Terminal boshiga oylik</span><strong>33.2 mln so'm</strong></div>`},
+      {title:"Misol — Terminal/Bankomat nisbati",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim)"><strong style="color:var(--green-lt)">Zangiota t:</strong> 3 700 terminal, 153 bankomat → 24.2 terminal/bankomat → raqamli<br><strong style="color:var(--red-lt)">Bekobod t:</strong> 642 terminal, 30 bankomat → 21.4 terminal/bankomat → kam infratuzilma</div>`},
+      {title:"Rekord ko'rsatkichlar",content:`<div class="modal-row"><span>🥇 Eng ko'p terminal</span><strong>Zangiota t — 3 700 ta</strong></div><div class="modal-row"><span>🏆 Eng yuqori Terminal/ATM</span><strong>Nurafshon sh — 44x</strong></div><div class="modal-row"><span>🔻 Eng kam terminal</span><strong>Bo'ka t — 370 ta</strong></div>`}
+    ]
+  },
+  mfy:{
+    title:"🏦 MFY — 883 ta",
+    sub:"Mahalla Fuqarolar Yig'ini · eng kichik ma'muriy birlik",
+    sections:[
+      {title:"Oddiy tushuntirish",content:`<div class="modal-hint" style="margin-bottom:10px"><strong>MFY</strong> — qishloq yoki ko'cha darajasidagi eng kichik ma'muriy birlik. Bir tuman bir nechta MFYdan iborat.</div><div class="modal-row"><span>Jami MFY soni</span><strong style="color:var(--purple-lt)">883 ta</strong></div><div class="modal-row"><span>1 MFYga o'rtacha aholi</span><strong>~3 520 kishi</strong></div><div class="modal-row"><span>1 MFYga o'rtacha bankomat</span><strong>1.86 ta</strong></div>`},
+      {title:"Misol",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim)">Toshkent t: 89 bankomat ÷ 63 MFY = <strong style="color:var(--green-lt)">1.41 bankomat/MFY</strong><br>Bekobod t: 30 bankomat ÷ 51 MFY = <strong style="color:var(--red-lt)">0.59 bankomat/MFY</strong> — har 2 mahallada 1 ta ham yo'q!</div>`},
+      {title:"Eng ko'p va eng kam MFYli tumanlar",content:`<div class="modal-row"><span>🥇 Eng ko'p MFY</span><strong>Toshkent t — 63 ta</strong></div><div class="modal-row"><span>🔻 Eng kam MFY</span><strong>Nurafshon sh — 16 ta</strong></div>`}
+    ]
+  },
+  karta_kirim:{
+    title:"💳 Karta kirim mablag'lari — 11 207 mlrd so'm",
+    sub:"Kartaga tushgan ish haqi, pensiya, o'tkazma — jami I chorak 2026",
+    sections:[
+      {title:"Oddiy tushuntirish",content:`<div class="modal-hint" style="margin-bottom:10px"><strong>Karta kirim</strong> — ish haqi, pensiya, nafaqa, do'stingiz o'tkazmasi — kartangizga tushgan barcha pul.</div><div class="modal-row"><span>I chorak jami kirim</span><strong style="color:var(--green-lt)">11 207 mlrd so'm</strong></div><div class="modal-row"><span>Oylik o'rtacha</span><strong>3 736 mlrd so'm</strong></div><div class="modal-row"><span>Jami aylanmadagi ulushi</span><strong style="color:var(--green-lt)">60.8%</strong></div></div>`},
+      {title:"Misol — 60.8% qanday hisoblanadi?",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim)">Karta kirim: <strong style="color:var(--green-lt)">11 207 mlrd</strong> — bu asosiy ko'rsatkich<br>Terminal: 3 092 mlrd → 3 092 ÷ 11 207 × 100 = <strong style="color:var(--cyan-lt)">27.6%</strong> terminlda sarflandi<br>Bankomat: 4 143 mlrd → 4 143 ÷ 11 207 × 100 = <strong style="color:var(--gold-lt)">36.9%</strong> naqd qilindi<br>Qolgan <strong style="color:var(--purple-lt)">35.5%</strong> online va boshqa kanallar orqali</div>`},
+      {title:"Eng yuqori va eng past",content:`<div class="modal-row"><span>🥇 Nurafshon sh</span><strong style="color:var(--green-lt)">2 212 mlrd</strong></div><div class="modal-row"><span>🥈 Chirchiq sh</span><strong>1 610 mlrd</strong></div><div class="modal-row"><span>🔻 Quyichirchiq t</span><strong style="color:var(--red-lt)">126 mlrd</strong></div>`}
+    ]
+  },
+  terminal_tushum:{
+    title:"🖥️ Terminal tushum — 3 092 mlrd so'm",
+    sub:"Do'konlarda karta bilan to'langan summalar jami · I chorak 2026",
+    sections:[
+      {title:"Oddiy tushuntirish",content:`<div class="modal-hint" style="margin-bottom:10px"><strong>Terminal tushum</strong> — do'kon, restoran, dorixonada kartangizni terminalga qo'yib to'laganingizda bankka tushgan pul.</div><div class="modal-row"><span>I chorak jami tushum</span><strong style="color:var(--cyan-lt)">3 092 mlrd so'm</strong></div><div class="modal-row"><span>Jami aylanmadagi ulushi</span><strong style="color:var(--cyan-lt)">16.8%</strong></div><div class="modal-row"><span>Terminal boshiga oylik</span><strong>33.2 mln so'm</strong></div>`},
+      {title:"Misol",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim)">Supermarketda 150 000 so'm to'ladingiz → terminal → bank → sotuvchiga.<br>Shu 150 000 so'm <strong style="color:var(--cyan-lt)">terminal tushum</strong> hisoblanadi.</div>`},
+      {title:"Rekordlar",content:`<div class="modal-row"><span>🥇 Zangiota t</span><strong style="color:var(--cyan-lt)">398 mlrd</strong></div><div class="modal-row"><span>🥈 Chirchiq sh</span><strong>377 mlrd</strong></div><div class="modal-row"><span>🔻 Bekobod t</span><strong style="color:var(--red-lt)">39 mlrd</strong></div>`}
+    ]
+  },
+  naqd_pul:{
+    title:"🏧 Bankomat orqali naqd pul — 4 143 mlrd so'm",
+    sub:"Bankomatlardan echilgan naqd pul jami · I chorak 2026",
+    sections:[
+      {title:"Oddiy tushuntirish",content:`<div class="modal-hint" style="margin-bottom:10px"><strong>Bankomat naqd pul</strong> — odamlar kartalarini bankomatga solib olgan naqd pul. Bozorda, transport, kichik do'konlarda sarflanadi.</div><div class="modal-row"><span>I chorak jami</span><strong style="color:var(--gold-lt)">4 143 mlrd so'm</strong></div><div class="modal-row"><span>Jami aylanmadagi ulushi</span><strong style="color:var(--gold-lt)">22.5%</strong></div><div class="modal-row"><span>Bankomat boshiga oylik</span><strong style="color:var(--orange-lt)">838 mln so'm</strong></div>`},
+      {title:"838 mln so'm qanday hisoblanadi?",content:`<div class="modal-formula">4 143 153 mln ÷ 1 646 ta ÷ 3 oy = <strong style="color:var(--orange-lt)">838 mln so'm/bankomat/oy</strong></div><div class="modal-hint">Yangi bankomat o'rnatilsa, oyiga ~838 mln so'm berishi kutiladi — investitsiyani oqlash uchun asos.</div>`},
+      {title:"Rekordlar",content:`<div class="modal-row"><span>🥇 Chirchiq sh</span><strong style="color:var(--gold-lt)">465 mlrd</strong></div><div class="modal-row"><span>🥈 Olmaliq sh</span><strong>428 mlrd</strong></div><div class="modal-row"><span>⚡ Yangiyo'l sh</span><strong>295 mlrd (karta kirimdan 2x ko'p!)</strong></div><div class="modal-row"><span>🔻 Ohangaron t</span><strong style="color:var(--red-lt)">93 mlrd</strong></div>`}
+    ]
+  },
+  eng_yuqori:{
+    title:"🟢 Eng yuqori qamrov — Nurafshon sh: 12.0",
+    sub:"10 000 kishiga 12 ta bankomat — viloyatda eng yaxshi ko'rsatkich",
+    sections:[
+      {title:"Qanday hisoblanadi?",content:`<div class="modal-formula">10k/Bankomat = Bankomat soni ÷ Aholi × 10 000<br><strong style="color:var(--green-lt)">69 ÷ 57 500 × 10 000 = 12.0</strong></div><div class="modal-row"><span>Bankomat soni</span><strong style="color:var(--gold-lt)">69 ta</strong></div><div class="modal-row"><span>Aholi soni</span><strong>57 500 nafar</strong></div><div class="modal-row"><span>1 bankomatga necha kishi?</span><strong style="color:var(--green-lt)">833 kishi — yaxshi</strong></div>`},
+      {title:"Nima uchun Nurafshon birinchi?",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:1.9;color:var(--text-dim)">Nurafshon shahri kichik (57 500 aholi), lekin moliyaviy operatsion markaz.<br>8 273 karta/1k aholi · 3 061 ta terminal · karta kirim 2 212 mlrd<br>Aholi kam, bankomat ko'p — qamrov yuqori.</div>`},
+      {title:"Xalqaro me'yor bilan taqqos",content:`<div class="modal-row"><span>Nurafshon sh hozir</span><strong style="color:var(--green-lt)">12.0 ta/10k</strong></div><div class="modal-row"><span>Xalqaro me'yor</span><strong style="color:var(--purple-lt)">15.0 ta/10k</strong></div><div class="modal-row"><span>Yetishmovchilik</span><strong style="color:var(--gold-lt)">3 ta bankomat</strong></div><div class="modal-hint" style="margin-top:8px">5 ta yangi bankomat o'rnatilsa me'yorga yetadi.</div>`}
+    ]
+  },
+  eng_past:{
+    title:"🔴 Eng past qamrov — Bekobod t: 1.78",
+    sub:"10 000 kishiga 1.78 ta bankomat — viloyatda eng past ko'rsatkich",
+    sections:[
+      {title:"Qanday hisoblanadi?",content:`<div class="modal-formula">30 ÷ 168 300 × 10 000 = <strong style="color:var(--red-lt)">1.78</strong></div><div class="modal-row"><span>Bankomat soni</span><strong style="color:var(--gold-lt)">30 ta</strong></div><div class="modal-row"><span>Aholi soni</span><strong>168 300 nafar</strong></div><div class="modal-row"><span>1 bankomatga necha kishi?</span><strong style="color:var(--red-lt)">5 610 kishi!</strong></div>`},
+      {title:"Muammo nima?",content:`<div style="background:rgba(201,76,58,.1);border:1px solid rgba(201,76,58,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:1.9;color:var(--text-dim)">168 300 nafar aholiga faqat 30 ta bankomat.<br>Har bankomatga <strong style="color:var(--red-lt)">5 610 kishi</strong> to'g'ri keladi.<br>Viloyat o'rtachasi: 1 889 kishi/bankomat — Bekobod 3x og'irroq.</div>`},
+      {title:"Qancha yangi bankomat kerak?",content:`<div class="modal-row"><span>Hozir mavjud</span><strong style="color:var(--red-lt)">30 ta</strong></div><div class="modal-row"><span>10/10k maqsad uchun</span><strong style="color:var(--gold-lt)">169 ta</strong></div><div class="modal-row"><span>15/10k me'yor uchun</span><strong style="color:var(--purple-lt)">253 ta</strong></div><div class="modal-row"><span>Defitsit (15/10k)</span><strong style="color:var(--red-lt)">223 ta!</strong></div><div class="modal-hint" style="margin-top:8px">223 × 838 mln = <strong style="color:var(--green-lt)">186.9 mlrd so'm/oy</strong> potensial.</div>`}
+    ]
+  },
+  viloyat_ortacha:{
+    title:"🟡 Viloyat o'rtachasi — 5.30 ta/10k",
+    sub:"Xalqaro me'yordan 2.8 marta past — yaxshilash uchun katta imkoniyat",
+    sections:[
+      {title:"Qanday hisoblanadi?",content:`<div class="modal-formula">1 646 ÷ 3 108 500 × 10 000 = <strong style="color:var(--gold-lt)">5.30</strong></div>`},
+      {title:"Uch me'yor bilan taqqos",content:`<div style="display:flex;flex-direction:column;gap:6px"><div style="background:rgba(201,76,58,.08);border-radius:6px;padding:9px 12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text-dim)">Viloyat hozir</span><strong style="color:var(--gold-lt)">5.30</strong></div><div style="height:7px;background:rgba(255,255,255,.07);border-radius:4px"><div style="width:35%;height:7px;background:var(--gold-lt);border-radius:4px"></div></div></div><div style="background:rgba(201,168,76,.07);border-radius:6px;padding:9px 12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text-dim)">Amaliy maqsad (10/10k)</span><strong style="color:var(--orange-lt)">10.0</strong></div><div style="height:7px;background:rgba(255,255,255,.07);border-radius:4px"><div style="width:66%;height:7px;background:var(--orange-lt);border-radius:4px"></div></div></div><div style="background:rgba(124,92,191,.08);border-radius:6px;padding:9px 12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text-dim)">Xalqaro me'yor (15/10k)</span><strong style="color:var(--purple-lt)">15.0</strong></div><div style="height:7px;background:rgba(255,255,255,.07);border-radius:4px"><div style="width:100%;height:7px;background:var(--purple-lt);border-radius:4px"></div></div></div></div>`},
+      {title:"Me'yorga yetish uchun",content:`<div class="modal-row"><span>Amaliy maqsad (+1 525 ta)</span><strong style="color:var(--gold-lt)">1 278 mlrd so'm/oy qo'shimcha</strong></div><div class="modal-row"><span>Xalqaro me'yor (+3 029 ta)</span><strong style="color:var(--red-lt)">2 538 mlrd so'm/oy qo'shimcha</strong></div>`}
+    ]
+  },
+  xalqaro_meyor:{
+    title:"🟣 Xalqaro me'yor — 15.0 ta/10k",
+    sub:"Jahon banki va xalqaro moliya institutlari tavsiya etgan minimal standart",
+    sections:[
+      {title:"Nima uchun aynan 15?",content:`<div class="modal-hint" style="margin-bottom:10px">Jahon banki tadqiqotlariga ko'ra, 10 000 kishiga 15 ta bankomat bo'lganida aholi bankomatga <strong>5–7 daqiqa ichida</strong> yetib boradi.</div><div class="modal-row"><span>Xalqaro me'yor</span><strong style="color:var(--purple-lt)">15 ta / 10 000 kishi</strong></div><div class="modal-row"><span>Viloyat hozir</span><strong style="color:var(--gold-lt)">5.30 ta / 10 000 kishi</strong></div><div class="modal-row"><span>Farq</span><strong style="color:var(--red-lt)">2.83 marta past</strong></div>`},
+      {title:"Bekobod t misoli",content:`<div class="modal-formula">Kerakli = 168 300 × 15 ÷ 10 000 = <strong style="color:var(--purple-lt)">253 ta</strong><br>Mavjud: 30 → Defitsit: <strong style="color:var(--red-lt)">223 ta</strong></div>`},
+      {title:"Viloyat bo'yicha jami",content:`<div class="modal-row"><span>Kerakli</span><strong style="color:var(--purple-lt)">4 675 ta</strong></div><div class="modal-row"><span>Mavjud</span><strong style="color:var(--gold-lt)">1 646 ta</strong></div><div class="modal-row"><span>Defitsit</span><strong style="color:var(--red-lt)">3 029 ta</strong></div><div class="modal-hint" style="margin-top:8px">3 029 × 838 mln = <strong style="color:var(--green-lt)">2 538 mlrd so'm/oy</strong> qo'shimcha aylanma.</div>`}
+    ]
+  },
+  unumdorlik:{
+    title:"⚡ Bankomat unumdorligi — 838 mln so'm/oy",
+    sub:"Har 1 ta bankomat oyda o'rtacha qancha naqd pul beradi",
+    sections:[
+      {title:"Hisob",content:`<div class="modal-formula">Unumdorlik = Jami naqd pul ÷ Bankomat soni ÷ 3 oy<br>= 4 143 153 mln ÷ 1 646 ÷ 3<br>= <strong style="color:var(--orange-lt)">838 mln so'm / bankomat / oy</strong></div>`},
+      {title:"O'zini oqlaydimi?",content:`<div style="background:rgba(42,158,114,.08);border:1px solid rgba(42,158,114,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:1.9;color:var(--text-dim)">Yangi bankomat narxi: ~<strong style="color:var(--text)">50 mln so'm</strong><br>Oylik beradigan naqd pul: ~<strong style="color:var(--orange-lt)">838 mln so'm</strong><br>50 ÷ 838 = <strong style="color:var(--green-lt)">~2 haftada o'zini qoplaydi!</strong></div>`},
+      {title:"Tumanlar reytingi",content:`<div class="modal-row"><span>🥇 Yangiyo'l sh</span><strong style="color:var(--green-lt)">2 953 mln/oy</strong></div><div class="modal-row"><span>🥈 Chirchiq sh</span><strong>2 462 mln/oy</strong></div><div class="modal-row"><span>Viloyat o'rtachasi</span><strong style="color:var(--orange-lt)">838 mln/oy</strong></div><div class="modal-row"><span>🔻 Ohangaron t</span><strong style="color:var(--red-lt)">387 mln/oy</strong></div>`}
+    ]
+  },
+  def15:{
+    title:"🔴 Bankomat Defitsiti (15/10k) — 3 029 ta",
+    sub:"Xalqaro me'yor asosida viloyatda yetishmaydigan bankomatlar soni",
+    sections:[
+      {title:"Qanday hisoblanadi?",content:`<div class="modal-formula">Defitsit = Kerakli − Mavjud<br>Kerakli = Aholi × 15 ÷ 10 000<br>= 3 108 500 × 15 ÷ 10 000 = <strong style="color:var(--purple-lt)">4 675 ta</strong><br>Defitsit = 4 675 − 1 646 = <strong style="color:var(--red-lt);font-size:16px">3 029 ta!</strong></div>`},
+      {title:"Misol — Bekobod t uchun",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim)">Aholi: 168 300<br>Kerakli: 168 300 × 15 ÷ 10 000 = <strong style="color:var(--purple-lt)">253 ta</strong><br>Mavjud: <strong style="color:var(--gold-lt)">30 ta</strong><br>Defitsit: <strong style="color:var(--red-lt)">223 ta bankomat!</strong></div><div class="modal-hint" style="margin-top:8px">223 × 838 mln = <strong style="color:var(--green-lt)">186.9 mlrd so'm/oy</strong> potensial daromad.</div>`},
+      {title:"Eng yuqori defisitli 5 tuman",content:`<div class="modal-row"><span>🥇 Yangiyo'l t</span><strong style="color:var(--red-lt)">259 ta</strong></div><div class="modal-row"><span>🥈 Toshkent t</span><strong style="color:var(--red-lt)">257 ta</strong></div><div class="modal-row"><span>🥉 Bekobod t</span><strong style="color:var(--red-lt)">223 ta</strong></div><div class="modal-row"><span>4️⃣ Parkent t</span><strong style="color:var(--red-lt)">220 ta</strong></div><div class="modal-row"><span>5️⃣ Bo'stonliq t</span><strong style="color:var(--red-lt)">161 ta</strong></div>`}
+    ]
+  },
+  def10:{
+    title:"🟡 Bankomat Defitsiti (10/10k) — 1 525 ta",
+    sub:"Yaqin muddatli amaliy maqsad — 2–3 yil ichida erishish mumkin",
+    sections:[
+      {title:"15/10k va 10/10k farqi nima?",content:`<div style="display:flex;flex-direction:column;gap:7px"><div style="background:rgba(201,76,58,.1);border-radius:6px;padding:10px 13px"><div style="font-size:12px;font-weight:600;color:var(--red-lt);margin-bottom:4px">Xalqaro me'yor (15/10k)</div><div style="font-size:11.5px;color:var(--text-dim)">Jahon banki standarti. Erishish uchun <strong>3 029 ta</strong> yangi bankomat kerak. Uzoq muddatli maqsad.</div></div><div style="background:rgba(201,168,76,.08);border-radius:6px;padding:10px 13px"><div style="font-size:12px;font-weight:600;color:var(--gold-lt);margin-bottom:4px">Amaliy maqsad (10/10k)</div><div style="font-size:11.5px;color:var(--text-dim)">Viloyat o'rtachasini 2x oshirish. Erishish uchun <strong>1 525 ta</strong> yangi bankomat kerak. Yaqin 2–3 yil maqsadi.</div></div></div>`},
+      {title:"Hisob",content:`<div class="modal-formula">Kerakli (10/10k) = 3 108 500 × 10 ÷ 10 000 = <strong style="color:var(--gold-lt)">3 109 ta</strong><br>Mavjud: 1 646 ta<br>Defitsit: <strong style="color:var(--gold-lt);font-size:16px">~1 525 ta</strong></div>`},
+      {title:"Buning ahamiyati",content:`<div class="modal-row"><span>Hozir 10/10k dan yuqori tumanlar</span><strong>faqat 4 ta</strong></div><div class="modal-row"><span>Qolgan 18 ta tuman</span><strong style="color:var(--red-lt)">me'yordan past</strong></div><div class="modal-hint" style="margin-top:8px">1 525 ta yangi bankomat o'rnatilsa: <strong style="color:var(--green-lt)">1 525 × 838 mln = 1 278 mlrd so'm/oy</strong> qo'shimcha.</div>`}
+    ]
+  },
+  pot_oylik:{
+    title:"💰 Oylik Potensial Daromad — 2 538 mlrd so'm/oy",
+    sub:"Xalqaro me'yor (15/10k) bo'yicha yangi bankomatlardan kutilayotgan oylik aylanma",
+    sections:[
+      {title:"Qanday hisoblanadi?",content:`<div class="modal-formula">Potensial = Defitsit × Viloyat o'rtacha unumdorligi<br>= 3 029 ta × 838 mln so'm<br>= <strong style="color:var(--green-lt);font-size:16px">2 538 mlrd so'm/oy</strong></div>`},
+      {title:"838 mln qayerdan keldi?",content:`<div style="background:rgba(0,0,0,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:2;color:var(--text-dim);margin-bottom:8px">Mavjud 1 646 ta bankomatning oylik o'rtacha unumdorligi:<br>4 143 153 mln ÷ 1 646 ta ÷ 3 oy = <strong style="color:var(--orange-lt)">838 mln so'm/bankomat/oy</strong></div><div class="modal-hint"><strong>Muhim eslatma:</strong> Bu taxminiy ko'rsatkich. Haqiqiy daromad joylashuv va bank xarajatlariga bog'liq.</div>`},
+      {title:"Misol — 1 yangi bankomat o'rnatilsa",content:`<div class="modal-row"><span>Bankomat narxi</span><strong>~50 mln so'm</strong></div><div class="modal-row"><span>Oylik aylanma</span><strong style="color:var(--orange-lt)">838 mln so'm</strong></div><div class="modal-row"><span>O'zini qoplash muddati</span><strong style="color:var(--green-lt)">~2 hafta!</strong></div><div class="modal-row"><span>Yillik aylanma</span><strong style="color:var(--green-lt)">838 × 12 = 10 056 mln</strong></div>`}
+    ]
+  },
+  pot_yillik:{
+    title:"📅 Yillik Potensial — 30 456 mlrd so'm/yil",
+    sub:"Barcha defitsit bankomatlar o'rnatilsa kutilayotgan yillik qo'shimcha aylanma",
+    sections:[
+      {title:"Qanday hisoblanadi?",content:`<div class="modal-formula">Yillik potensial = Oylik potensial × 12 oy<br>= 2 538 mlrd × 12<br>= <strong style="color:var(--purple-lt);font-size:16px">30 456 mlrd so'm/yil</strong></div>`},
+      {title:"Bu qancha katta raqam?",content:`<div style="background:rgba(124,92,191,.08);border:1px solid rgba(124,92,191,.2);border-radius:7px;padding:12px 14px;font-size:12px;line-height:1.9;color:var(--text-dim)">30 456 mlrd so'm = 30.5 trillion so'm<br>Bu — viloyatdagi mavjud bankomatlar yillik aylanmasidan (16 572 mlrd) <strong style="color:var(--purple-lt)">1.8 marta ko'proq!</strong></div>`},
+      {title:"Muhim eslatma",content:`<div class="modal-hint"><strong>Bu taxminiy raqam.</strong> Haqiqiy ko'rsatkich joylashuv, aholi zichligi, raqobat va bank xarajatlariga bog'liq. Aniq investitsiya qarorlari uchun qo'shimcha tahlil zarur.</div>`}
+    ]
+  },
+  qamrov_past:{
+    title:"🔴 Qamrov past — 9 ta tuman (4 ta dan kam/10k)",
+    sub:"10 000 kishiga 4 tadan kam bankomat — birinchi ustuvorlik tumanlari",
+    sections:[
+      {title:"Muammo nima?",content:`<div class="modal-hint" style="margin-bottom:10px">10 000 kishiga 4 tadan kam bankomat — <strong>2 500+ kishi bitta bankomatga navbat turadi</strong>. Juda og'ir holat.</div><div class="modal-row"><span>Tumanlar soni</span><strong style="color:var(--red-lt)">9 ta</strong></div><div class="modal-row"><span>Jami aholi</span><strong>~1 400 000 nafar</strong></div>`},
+      {title:"9 ta tuman ro'yxati",content:`<div class="modal-row"><span>1. Bekobod t</span><strong style="color:var(--red-lt)">1.78 ta/10k</strong></div><div class="modal-row"><span>2. Yangiyo'l t</span><strong style="color:var(--red-lt)">2.30 ta/10k</strong></div><div class="modal-row"><span>3. Ohangaron t</span><strong style="color:var(--red-lt)">2.12 ta/10k</strong></div><div class="modal-row"><span>4. Quyichirchiq t</span><strong style="color:var(--red-lt)">2.80 ta/10k</strong></div><div class="modal-row"><span>5. Bo'ka t</span><strong style="color:var(--red-lt)">3.29 ta/10k</strong></div><div class="modal-row"><span>6. Piskent t</span><strong style="color:var(--red-lt)">3.48 ta/10k</strong></div><div class="modal-row"><span>7. Oqqo'rg'on t</span><strong style="color:var(--red-lt)">3.51 ta/10k</strong></div><div class="modal-row"><span>8. Parkent t</span><strong style="color:var(--red-lt)">2.91 ta/10k</strong></div><div class="modal-row"><span>9. Yuqorichirchiq t</span><strong style="color:var(--red-lt)">3.67 ta/10k</strong></div><div class="modal-hint" style="margin-top:8px">Bu tumanlarga <strong>zudlik bilan</strong> yangi bankomat o'rnatish kerak.</div>`}
+    ]
+  },
+  qamrov_orta:{
+    title:"🟡 Qamrov o'rta — 9 ta tuman (4–8/10k)",
+    sub:"10 000 kishiga 4–8 ta bankomat — ikkinchi ustuvorlik tumanlari",
+    sections:[
+      {title:"Ahvol qanday?",content:`<div class="modal-hint" style="margin-bottom:10px">10 000 kishiga 4–8 ta bankomat — viloyat o'rtachasiga (5.30) yaqin. Bankomat bor, lekin me'yorga yetmagan.</div><div class="modal-row"><span>Tumanlar soni</span><strong style="color:var(--gold-lt)">9 ta</strong></div><div class="modal-row"><span>Qamrov oralig'i</span><strong>4.00 – 7.99 ta/10k</strong></div>`},
+      {title:"9 ta tuman ro'yxati",content:`<div class="modal-row"><span>Angren sh</span><strong style="color:var(--gold-lt)">5.34 ta/10k</strong></div><div class="modal-row"><span>Bo'stonliq t</span><strong style="color:var(--gold-lt)">5.95 ta/10k</strong></div><div class="modal-row"><span>Zangiota t</span><strong style="color:var(--gold-lt)">8.71 ta/10k</strong></div><div class="modal-row"><span>Qibray t</span><strong style="color:var(--gold-lt)">5.09 ta/10k</strong></div><div class="modal-row"><span>Bekobod sh</span><strong style="color:var(--gold-lt)">8.95 ta/10k</strong></div><div class="modal-row"><span>Ohangaron sh</span><strong style="color:var(--gold-lt)">7.14 ta/10k</strong></div><div class="modal-row"><span>Chinoz t</span><strong style="color:var(--gold-lt)">3.91 ta/10k</strong></div><div class="modal-row"><span>Toshkent t</span><strong style="color:var(--gold-lt)">4.36 ta/10k</strong></div><div class="modal-row"><span>O'rtachirchiq t</span><strong style="color:var(--gold-lt)">2.92 ta/10k</strong></div>`}
+    ]
+  },
+  qamrov_yaxshi:{
+    title:"🟢 Qamrov yaxshi — 4 ta tuman (8 va undan yuqori/10k)",
+    sub:"10 000 kishiga 8 va undan ko'p bankomat — kuzatuv rejimidagi tumanlar",
+    sections:[
+      {title:"Nima uchun yaxshi?",content:`<div class="modal-hint" style="margin-bottom:10px">10 000 kishiga 8+ ta bankomat — viloyat o'rtachasidan (5.30) <strong>50% yuqori</strong>. Aholi bankomatga osonroq yetadi.</div><div class="modal-row"><span>Tumanlar soni</span><strong style="color:var(--green-lt)">4 ta</strong></div><div class="modal-row"><span>Qamrov oralig'i</span><strong>8.00 – 12.0 ta/10k</strong></div>`},
+      {title:"4 ta tuman ro'yxati",content:`<div class="modal-row"><span>🥇 Nurafshon sh</span><strong style="color:var(--green-lt)">12.0 ta/10k</strong></div><div class="modal-row"><span>🥈 Yangiyo'l sh</span><strong style="color:var(--green-lt)">11.45 ta/10k</strong></div><div class="modal-row"><span>🥉 Olmaliq sh</span><strong style="color:var(--green-lt)">11.15 ta/10k</strong></div><div class="modal-row"><span>4️⃣ Chirchiq sh</span><strong style="color:var(--green-lt)">10.77 ta/10k</strong></div><div class="modal-hint" style="margin-top:8px">Bu tumanlar kuzatish rejimida. Ammo hali xalqaro me'yor (15/10k) dan past — rivojlantirish zarur.</div>`}
+    ]
+  }
+};
+
+function openModal(key){
+  const m=MODALS[key];
+  if(!m)return;
+  let html=`<div class="modal-title">${m.title}</div><div class="modal-sub">${m.sub}</div>`;
+  m.sections.forEach(s=>{
+    html+=`<div class="modal-section"><div class="modal-section-title">${s.title}</div>${s.content}</div>`;
+  });
+  document.getElementById('modal-content').innerHTML=html;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+
+</script>
+</body>
+</html>
