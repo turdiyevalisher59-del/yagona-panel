@@ -5468,25 +5468,27 @@ document.addEventListener('DOMContentLoaded',async function(){
     updateLoader(85, 'Sozlamalar yuklanmoqda...', '');
     
     /* Migratsiya: boss va bossRole maydonlarini qo'shish */
+    var _migratedAny = false;
     if(D.leaders && INIT.leaders){
       for(var i=0; i<D.leaders.length; i++){
         var dl = D.leaders[i];
         var il = INIT.leaders.find(function(x){ return x.id === dl.id; });
         if(!il) continue;
         /* v44+: rahbar firstName / patronymic / lastName migratsiyasi */
-        if(!dl.firstName && il.firstName) dl.firstName = il.firstName;
-        if(!dl.patronymic && il.patronymic) dl.patronymic = il.patronymic;
-        if(!dl.lastName && il.lastName) dl.lastName = il.lastName;
+        if(!dl.firstName && il.firstName){ dl.firstName = il.firstName; _migratedAny = true; }
+        if(!dl.patronymic && il.patronymic){ dl.patronymic = il.patronymic; _migratedAny = true; }
+        if(!dl.lastName && il.lastName){ dl.lastName = il.lastName; _migratedAny = true; }
         if(!dl.departments) dl.departments = [];
         for(var j=0; j<dl.departments.length; j++){
           var dd = dl.departments[j];
           var id2 = il.departments ? il.departments.find(function(x){ return x.id === dd.id; }) : null;
           if(id2){
-            if(!dd.boss && id2.boss) dd.boss = id2.boss;
-            if(!dd.bossRole && id2.bossRole) dd.bossRole = id2.bossRole;
+            if(!dd.boss && id2.boss){ dd.boss = id2.boss; _migratedAny = true; }
+            if(!dd.bossRole && id2.bossRole){ dd.bossRole = id2.bossRole; _migratedAny = true; }
             /* v45+: agar D'da dashboards bo'sh, lekin INIT'da yangi dashboards bor — qo'shish */
             if(id2.dashboards && id2.dashboards.length > 0 && (!dd.dashboards || dd.dashboards.length === 0)){
               dd.dashboards = JSON.parse(JSON.stringify(id2.dashboards));
+              _migratedAny = true;
               console.log('🔄 ' + dd.name + ' uchun ' + dd.dashboards.length + ' ta yangi dashboard qo\'shildi (INIT dan)');
             }
           }
@@ -5497,11 +5499,32 @@ document.addEventListener('DOMContentLoaded',async function(){
             var initDep = il.departments[k];
             if(!dl.departments.find(function(x){ return x.id === initDep.id; })){
               dl.departments.push(JSON.parse(JSON.stringify(initDep)));
+              _migratedAny = true;
               console.log('🆕 Yangi bo\'lim qo\'shildi: ' + initDep.name);
             }
           }
         }
       }
+
+      /* v45+: Agar migratsiya HAQIQATAN biror narsa qo'shgan bo'lsa — saqlash va bulutga yuborish */
+      if(_migratedAny){
+        var dashCount = D.leaders.reduce(function(s,l){
+          return s + (l.departments||[]).reduce(function(s2,d){return s2 + (d.dashboards||[]).length;}, 0);
+        }, 0);
+        console.log('🔄 Migratsiya: ' + dashCount + ' dashboard jami');
+        /* _v ni bump qilish, shunda boshqa qurilmalar yangilanadi */
+        D._v = (D._v || 0) + 1;
+        D._lastSync = Date.now();
+        try { localStorage.setItem('cbNE', JSON.stringify(D)); console.log('💾 Migratsiya localStorage ga saqlandi (v'+D._v+')'); } catch(e){}
+        /* Bulutga ham yuborish (background, kechiktirilgan) */
+        setTimeout(function(){
+          if(typeof cloudPush === 'function'){
+            console.log('☁️ Migratsiyani bulutga yuborish...');
+            cloudPush();
+          }
+        }, 3000);
+      }
+    }
     }
     
     /* Kontaktlar migratsiyasi */
