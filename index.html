@@ -1321,7 +1321,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:73,_cloudUrl:"",_skipCloud:false,leaders:[
+var INIT={_v:75,_cloudUrl:"",_skipCloud:false,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",firstName:"Jasur",patronymic:"Hakimovich",lastName:"Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1348,7 +1348,7 @@ var INIT={_v:73,_cloudUrl:"",_skipCloud:false,leaders:[
   {id:"d9",name:"Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi",boss:"Karshibaev Ulugbek Baxodir o'g'li",bossRole:"Bo'lim boshlig'i",dashboards:[
     {id:"db13",name:"Tadbirkorlik monitoringi",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/index.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/eng_ohiri_dasturlar_2_lotin.xlsx"},
     {id:"db14",name:"Banklar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_dashboard_v6.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/23,05 режа Банк ва филиаллари.xlsx"},
-    {id:"db15",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v25_performance_optimized.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/mahallalar_compact.xlsx"}]}]},
+    {id:"db15",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v25_performance_optimized.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/++++энг охири дастурлар 01.05.xlsx"}]}]},
 {id:"jurayev",name:"A.A.Jurayev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"AJ",ci:3,departments:[
   {id:"d10",name:"Naqd pul muomalasini tashkil etish boshqarmasi",boss:"Sobirov Sobitxon Saidburxon o'g'li",bossRole:"Boshqarma boshlig'i",dashboards:[
     {id:"db16",name:"Naqd pullar dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar_v5_2026 (1).html",xl:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dastur uchun (3).xlsx"}]},
@@ -1831,7 +1831,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 73; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 75; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* v44+: Supabase Storage'dan cloudPull() orqali oladi (gzip ochib) */
@@ -2315,14 +2315,86 @@ function addBaseTag(html,filePath){
    <script> blokda o'zgaruvchi sifatida saqlanadi.
    Iframe yuklangach, XLSX kutadi, keyin inject qiladi.
    ═══════════════════════════════════════════════════════════ */
-function embedExcelInHtml(html,xlData,xlName){
+/* ═══ Katta fayllar uchun: base64 emas, runtime fetch'ga o'tadi ═══
+   Iframe ichida fetch('<filename>') chaqiriladi — <base href> orqali to'g'ri URL'ga resolve bo'ladi. */
+function embedExcelFetcherInHtml(html, xlName){
+  if(!html) return html;
+  if(html.indexOf('__XLEMBED__')>=0) return html;
+  var fnEsc = (xlName||'data.xlsx').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var sc = '\n<scr'+'ipt>\n'
+    + '/* __XLEMBED__ fetch-mode — katta fayllar uchun runtime URL fetch */\n'
+    + '(function(){\n'
+    + 'var FN = \'' + fnEsc + '\';\n'
+    + 'var _D=false, _tries=0;\n'
+    + 'function log(m,c){try{console.log("%c[XLEMBED-fetch]%c "+m,"color:#ff9b3a;font-weight:bold","color:"+(c||"#aaa"))}catch(e){}}\n'
+    + 'function getFile(arr){\n'
+    + '  var lo = FN.toLowerCase();\n'
+    + '  var mt = lo.match(/\\.xls$/) ? "application/vnd.ms-excel"\n'
+    + '         : lo.match(/\\.csv$/) ? "text/csv"\n'
+    + '         : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";\n'
+    + '  try { return new File([arr], FN, {type: mt}); }\n'
+    + '  catch(e){ var b = new Blob([arr],{type:mt}); b.name = FN; return b; }\n'
+    + '}\n'
+    + 'function inject(file){\n'
+    + '  /* Method 1: handleFile */\n'
+    + '  if(typeof handleFile === "function"){ try{ log("handleFile(file)","#4ade80"); handleFile(file); _D=true; return; }catch(e){ log("handleFile threw: "+e.message,"#ff4d6a") } }\n'
+    + '  /* Method 2: handleFileUpload */\n'
+    + '  if(typeof handleFileUpload === "function"){ try{ log("handleFileUpload","#4ade80"); handleFileUpload({target:{files:[file]}}); _D=true; return; }catch(e){} }\n'
+    + '  /* Method 3: file input dispatch */\n'
+    + '  var fi = document.getElementById("fileInput") || document.getElementById("excelInput") || document.querySelector("input[type=file]");\n'
+    + '  if(fi){ try{ var dt = new DataTransfer(); dt.items.add(file); fi.files = dt.files; fi.dispatchEvent(new Event("change",{bubbles:true})); log("dispatched change on input","#4ade80"); _D=true; return; }catch(e){ log("input dispatch err: "+e.message,"#ff4d6a") } }\n'
+    + '  log("no handler found yet, retry","#ff9b3a");\n'
+    + '}\n'
+    + 'function tryLoad(){\n'
+    + '  if(_D) return;\n'
+    + '  _tries++;\n'
+    + '  var hasHandler = typeof handleFile === "function" || typeof handleFileUpload === "function";\n'
+    + '  var hasInput = !!(document.getElementById("fileInput") || document.getElementById("excelInput") || document.querySelector("input[type=file]"));\n'
+    + '  if(!hasHandler && !hasInput){\n'
+    + '    if(_tries < 100) setTimeout(tryLoad, 200);\n'
+    + '    else log("no handler after 20s","#ff4d6a");\n'
+    + '    return;\n'
+    + '  }\n'
+    + '  /* Fetch the file from a relative URL — <base href> resolves to dashboard folder */\n'
+    + '  log("Fetching: " + FN);\n'
+    + '  var urls = [FN, encodeURI(FN)];\n'
+    + '  /* Per-segment encode as fallback */\n'
+    + '  urls.push(FN.split("/").map(function(s){return encodeURIComponent(s)}).join("/"));\n'
+    + '  function tryUrls(i){\n'
+    + '    if(_D) return;\n'
+    + '    if(i >= urls.length){ log("All URL variants failed","#ff4d6a"); return; }\n'
+    + '    fetch(urls[i]).then(function(r){\n'
+    + '      if(!r.ok) throw new Error("HTTP "+r.status);\n'
+    + '      return r.arrayBuffer();\n'
+    + '    }).then(function(ab){\n'
+    + '      var arr = new Uint8Array(ab);\n'
+    + '      log("loaded "+(arr.length/1024/1024).toFixed(2)+"MB","#4ade80");\n'
+    + '      inject(getFile(arr));\n'
+    + '    }).catch(function(e){\n'
+    + '      log("variant "+i+" ("+urls[i].slice(0,60)+") failed: "+e.message,"#ff9b3a");\n'
+    + '      tryUrls(i+1);\n'
+    + '    });\n'
+    + '  }\n'
+    + '  tryUrls(0);\n'
+    + '}\n'
+    + 'if(document.readyState === "complete" || document.readyState === "interactive") setTimeout(tryLoad, 600);\n'
+    + 'else document.addEventListener("DOMContentLoaded", function(){ setTimeout(tryLoad, 600); });\n'
+    + '})();\n'
+    + '</scr'+'ipt>\n';
+  var lastBody = html.lastIndexOf('</body>');
+  if(lastBody >= 0) return html.slice(0, lastBody) + sc + html.slice(lastBody);
+  return html + sc;
+}
+
+function embedExcelInHtml(html,xlData,xlName,xlRelPath){
   if(!xlData||!html)return html;
   if(html.indexOf('__XLEMBED__')>=0)return html;
   /* SAFETY: Juda katta fayllar (>8MB) browser'ni muzlatib qo'yadi.
-     Bunday hollarda base64 injection o'rniga fetch URL injection ishlatamiz. */
+     Bunday hollarda base64 emas, runtime'da fetch() orqali yuklash skriptini inject qilamiz.
+     Iframe'ning <base href> dashbord papkasiga ishora qiladi, shuning uchun fayl nomi nisbiy URL bo'ladi. */
   if(xlData.length > 8*1024*1024){
-    console.warn('[XLEMBED] Excel '+(xlData.length/1024/1024).toFixed(1)+'MB — too large for base64 injection, skipping. Dashboard will use its own loader.');
-    return html;
+    console.warn('[XLEMBED] Excel '+(xlData.length/1024/1024).toFixed(1)+'MB — base64 emas, fetch() rejimida inject qilinadi.');
+    return embedExcelFetcherInHtml(html, xlName);
   }
 
   /* Uint8Array → base64 (chunked — stack overflow oldini olish) */
@@ -2531,6 +2603,60 @@ function embedHRExtrasInHtml(html){
   if(lastBody >= 0) return html.slice(0, lastBody) + sc + html.slice(lastBody);
   return html + sc;
 }
+/* ═══ VASH AUTO-LOAD: CSV faylni iframe ichida to'g'ridan-to'g'ri fetch qilib yuklash ═══
+   XLEMBED'ga bog'liq emas — iframe'ning <base href> orqali nisbiy URL ishlatadi. */
+function embedVASHAutoLoadInHtml(html, csvFilename){
+  if(!html) return html;
+  if(html.indexOf('__VASH_AUTO__')>=0) return html;
+  var fnEsc = (csvFilename||'VASH 2024-2025.csv').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var sc = '\n<scr'+'ipt>\n'
+    + '/* __VASH_AUTO__ v1 — direct CSV fetch + handleFile */\n'
+    + '(function(){\n'
+    + 'var FN = \'' + fnEsc + '\';\n'
+    + 'var _loaded=false, _tries=0;\n'
+    + 'function log(m,c){try{console.log("%c[VASH_AUTO]%c "+m,"color:#00e5ff;font-weight:bold","color:"+(c||"#aaa"))}catch(e){}}\n'
+    + 'function tryLoad(){\n'
+    + '  if(_loaded) return;\n'
+    + '  _tries++;\n'
+    + '  if(typeof handleFile !== "function"){\n'
+    + '    if(_tries < 60) setTimeout(tryLoad, 300);\n'
+    + '    else log("handleFile not found after 18s","#ff4d6a");\n'
+    + '    return;\n'
+    + '  }\n'
+    + '  log("Fetching CSV: " + FN);\n'
+    + '  /* Try multiple URL encodings */\n'
+    + '  var urls = [FN, encodeURI(FN), encodeURIComponent(FN).replace(/%2F/g,"/")];\n'
+    + '  /* Direct same-folder fetch — relies on <base href> */\n'
+    + '  function tryUrls(i){\n'
+    + '    if(i >= urls.length){ log("All URL variants failed","#ff4d6a"); return; }\n'
+    + '    fetch(urls[i]).then(function(r){\n'
+    + '      if(!r.ok) throw new Error("HTTP "+r.status);\n'
+    + '      return r.arrayBuffer();\n'
+    + '    }).then(function(ab){\n'
+    + '      var arr = new Uint8Array(ab);\n'
+    + '      var file;\n'
+    + '      try{ file = new File([arr], FN, {type:"text/csv"}); }\n'
+    + '      catch(e){ file = new Blob([arr],{type:"text/csv"}); file.name = FN; }\n'
+    + '      log("CSV loaded ("+arr.length+" bytes), calling handleFile","#4ade80");\n'
+    + '      _loaded = true;\n'
+    + '      handleFile(file);\n'
+    + '    }).catch(function(e){\n'
+    + '      log("URL variant "+i+" failed: "+e.message,"#ff9b3a");\n'
+    + '      tryUrls(i+1);\n'
+    + '    });\n'
+    + '  }\n'
+    + '  tryUrls(0);\n'
+    + '}\n'
+    + 'if(document.readyState === "complete" || document.readyState === "interactive") setTimeout(tryLoad, 500);\n'
+    + 'else document.addEventListener("DOMContentLoaded", function(){ setTimeout(tryLoad, 500); });\n'
+    + '})();\n'
+    + '</scr'+'ipt>\n';
+  var lastBody = html.lastIndexOf('</body>');
+  if(lastBody >= 0) return html.slice(0, lastBody) + sc + html.slice(lastBody);
+  return html + sc;
+}
+
+
 
 
 async function renderDash(lid,did,dbid){
@@ -2577,8 +2703,28 @@ async function renderDash(lid,did,dbid){
         }
       }catch(e){console.warn('xlUrl xato:',e)}
     }
-    /* 1d: SmartLoad (XHR/fetch) */
+    /* 1d: HEAD probe — agar fayl >8MB bo'lsa, parent'da yuklamaymiz; iframe runtime fetch ishlatadi */
+    var skipParentLoad = false;
     if(!xlData){
+      try{
+        var headPaths = pathVariants(xlPath);
+        for(var hi=0; hi<headPaths.length; hi++){
+          try{
+            var hr = await fetch(headPaths[hi], {method:'HEAD'});
+            if(hr.ok){
+              var cl = parseInt(hr.headers.get('content-length')||'0', 10);
+              if(cl > 8*1024*1024){
+                console.log('[renderDash] Fayl '+(cl/1024/1024).toFixed(1)+'MB — parent yuklamaydi, iframe fetch qiladi');
+                skipParentLoad = true;
+              }
+              break;
+            }
+          }catch(_){}
+        }
+      }catch(e){}
+    }
+    /* 1e: SmartLoad (XHR/fetch) — faqat kichik fayllar uchun */
+    if(!xlData && !skipParentLoad){
       try{
         var ab=await smartLoad(xlPath,'arraybuffer');
         if(ab){xlData=new Uint8Array(ab instanceof ArrayBuffer?ab:ab.buffer||ab);db._xlCache=xlData}
@@ -2622,8 +2768,12 @@ async function renderDash(lid,did,dbid){
     if(htmlContent&&htmlContent.trim().length>10){
       var finalHtml=addBaseTag(htmlContent,db.path);
       if(xlData)finalHtml=embedExcelInHtml(finalHtml,xlData,xlName);
+      /* Agar xlData yo'q lekin xl yo'l mavjud bo'lsa — iframe runtime fetch'ga tushiramiz (mahalla 33MB uchun) */
+      else if(xlPath && xlName){ try{ finalHtml=embedExcelFetcherInHtml(finalHtml, xlName) }catch(e){ console.warn('Fetcher embed xato:',e) } }
       /* HR dashboard uchun resume + sertifikat avtomatik link'lash */
       if(db.id==='db_hr'){ try{ finalHtml=embedHRExtrasInHtml(finalHtml) }catch(e){ console.warn('HR extras embed xato:',e) } }
+      /* VASH dashboard uchun CSV ni iframe ichida to'g'ridan-to'g'ri fetch qilish */
+      if(db.id==='db_vash'){ try{ finalHtml=embedVASHAutoLoadInHtml(finalHtml, xlName||'VASH 2024-2025.csv') }catch(e){ console.warn('VASH auto-load embed xato:',e) } }
       fr.srcdoc=finalHtml;
       /* ═══ postMessage AUTO-LOAD: srcdoc hajm cheklovini bartaraf etish ═══
          Excel data'ni iframe'ga postMessage orqali yuborish (npl dashboard uchun)
@@ -9174,6 +9324,153 @@ document.addEventListener('keydown',function(e){
           },
           function(err){
             console.warn('Greeting TTS xato:', err);
+            _greetWithWebSpeech(greetingText);
+          }
+        );
+        return;
+      } catch(e){
+        console.warn('⚠ Direct Azure xato:', e.message);
+      }
+    }
+
+    /* Hech qanday Azure ishlamasa — Web Speech fallback */
+    _greetWithWebSpeech(greetingText);
+  }
+
+  /* Web Speech API fallback (agar Azure ishlamasa) */
+  function _greetWithWebSpeech(greetingText){
+    if(!window.speechSynthesis){
+      console.warn('🔇 Web Speech ham mavjud emas');
+      return;
+    }
+    console.log('🎙 Fallback: Web Speech API');
+    window.speechSynthesis.cancel();
+    var sentences = greetingText.match(/[^.!?]+[.!?]+/g) || [greetingText];
+    var i = 0;
+    function speakNext(){
+      if(i >= sentences.length) return;
+      var utt = new SpeechSynthesisUtterance(sentences[i].trim());
+      utt.lang = 'uz-UZ';
+      utt.rate = 1.0;
+      var voices = window.speechSynthesis.getVoices();
+      if(voices.length){
+        var pref = voices.find(function(v){return /uz/i.test(v.lang);}) ||
+                   voices.find(function(v){return /ru/i.test(v.lang);}) ||
+                   voices.find(function(v){return /en/i.test(v.lang);});
+        if(pref) utt.voice = pref;
+      }
+      utt.onend = function(){ i++; speakNext(); };
+      utt.onerror = function(){ i++; speakNext(); };
+      window.speechSynthesis.speak(utt);
+    }
+    speakNext();
+  }
+
+  /* ═══ Browser autoplay siyosati — speech faqat user click'dan keyin ishlaydi ═══
+     Strategiya: greeting'ni "ready" qilamiz, lekin haqiqiy speak() faqat
+     foydalanuvchi click qilganidan KEYIN (login Kirish, yoki sahifaning istalgan joyi). */
+  var _greetReady = false;
+  var _greetDone = false;
+
+  function tryGreet(){
+    if(_greetDone) return;
+    if(localStorage.getItem('mbb_no_greet') === '1'){
+      console.log('🔇 Auto-greet o\'chirilgan');
+      _greetDone = true;
+      return;
+    }
+    if(!window.speechSynthesis){
+      console.warn('🔇 speechSynthesis brauzerda yo\'q');
+      _greetDone = true;
+      return;
+    }
+    /* Voices yuklanganini kutamiz (ba'zi brauzerlarda async) */
+    var voices = window.speechSynthesis.getVoices();
+    if(voices.length === 0){
+      window.speechSynthesis.onvoiceschanged = function(){
+        if(!_greetDone) tryGreet();
+        window.speechSynthesis.onvoiceschanged = null;
+      };
+      setTimeout(function(){ if(!_greetDone) doGreet(); }, 1500);
+      return;
+    }
+    doGreet();
+  }
+
+  function doGreet(){
+    if(_greetDone) return;
+    _greetDone = true;
+    /* Login overlay hali ko'rinayotgan bo'lsa, kichik kechikish */
+    var loginOv = document.getElementById('loginOverlay');
+    if(loginOv && loginOv.style.display !== 'none' && getComputedStyle(loginOv).display !== 'none'){
+      console.log('🔇 Login overlay ko\'rinmoqda — kechiktiramiz');
+      _greetDone = false;
+      setTimeout(tryGreet, 2000);
+      return;
+    }
+    autoGreet();
+  }
+
+  /* 1) Foydalanuvchi sahifaning istalgan joyini click qilsa — speech ishga tushadi.
+        Bu autoplay policy'ni chetlab o'tadi. */
+  function onFirstClick(){
+    document.removeEventListener('click', onFirstClick, true);
+    document.removeEventListener('keydown', onFirstClick, true);
+    setTimeout(tryGreet, 800);
+  }
+  document.addEventListener('click', onFirstClick, true);
+  document.addEventListener('keydown', onFirstClick, true);
+
+  /* 2) Login muvaffaqiyatli bo'lsa — darhol salomlashish (login bosish "click" hisoblanadi) */
+  if(typeof window.doLogin === 'function'){
+    var _origDoLogin = window.doLogin;
+    window.doLogin = function(){
+      var r = _origDoLogin.apply(this, arguments);
+      /* Auth muvaffaqiyatli bo'lganda */
+      if(localStorage.getItem('mb_auth') === 'ok'){
+        setTimeout(tryGreet, 1500);
+      }
+      return r;
+    };
+  }
+
+  /* 3) Agar foydalanuvchi allaqachon login qilingan bo'lsa (qayta yuklash) — 3 soniyadan keyin */
+  if(localStorage.getItem('mb_auth') === 'ok'){
+    setTimeout(tryGreet, 3000);
+  }
+
+  /* "Ovozni o'chirish" tugmasi — chat botning headeriga kichik tugma qo'shiladi */
+  var hdr = panel.querySelector('.mbb-header');
+  if(hdr){
+    var muteBtn = document.createElement('button');
+    muteBtn.style.cssText = 'background:rgba(255,255,255,0.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;margin-right:4px';
+    muteBtn.title = 'Auto-salomlashishni o\'chirish/yoqish';
+    var muted = localStorage.getItem('mbb_no_greet') === '1';
+    muteBtn.textContent = muted ? '🔇' : '🔔';
+    muteBtn.onclick = function(){
+      var nowMuted = localStorage.getItem('mbb_no_greet') === '1';
+      if(nowMuted){
+        localStorage.removeItem('mbb_no_greet');
+        muteBtn.textContent = '🔔';
+        if(typeof toast === 'function') toast('Auto-salomlashish yoqildi','ok');
+      } else {
+        localStorage.setItem('mbb_no_greet','1');
+        muteBtn.textContent = '🔇';
+        if(window.speechSynthesis) window.speechSynthesis.cancel();
+        if(typeof toast === 'function') toast('Auto-salomlashish o\'chirildi','ok');
+      }
+    };
+    var closeBtn = hdr.querySelector('.mbb-close');
+    if(closeBtn) hdr.insertBefore(muteBtn, closeBtn);
+  }
+
+  console.log('🎙 Auto-greeting tizimi yuklandi (yagona panel ochilganda ovozli salomlashish)');
+})();
+
+</script>
+</body>
+</html>
+ xato:', err);
             _greetWithWebSpeech(greetingText);
           }
         );
