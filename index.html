@@ -1321,7 +1321,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:75,_cloudUrl:"",_skipCloud:false,leaders:[
+var INIT={_v:76,_cloudUrl:"",_skipCloud:false,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",firstName:"Jasur",patronymic:"Hakimovich",lastName:"Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1831,7 +1831,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 75; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 76; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* v44+: Supabase Storage'dan cloudPull() orqali oladi (gzip ochib) */
@@ -2316,11 +2316,18 @@ function addBaseTag(html,filePath){
    Iframe yuklangach, XLSX kutadi, keyin inject qiladi.
    ═══════════════════════════════════════════════════════════ */
 /* ═══ Katta fayllar uchun: base64 emas, runtime fetch'ga o'tadi ═══
-   Iframe ichida fetch('<filename>') chaqiriladi — <base href> orqali to'g'ri URL'ga resolve bo'ladi. */
-function embedExcelFetcherInHtml(html, xlName){
+   Iframe ichida fetch('<filename>') chaqiriladi — <base href> orqali to'g'ri URL'ga resolve bo'ladi.
+   xlFullPath berilsa, absolute URL ham per-segment encoded variant'da ishlatiladi (Vercel apostrof'larni xohlaydi). */
+function embedExcelFetcherInHtml(html, xlName, xlFullPath){
   if(!html) return html;
   if(html.indexOf('__XLEMBED__')>=0) return html;
   var fnEsc = (xlName||'data.xlsx').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  /* Vercel'dan to'g'ridan-to'g'ri ishlaydigan absolute URL: per-segment encodeURIComponent (apostrof'lar ham %27 ga) */
+  var absUrl = '';
+  if(xlFullPath){
+    absUrl = '/' + xlFullPath.split('/').map(function(s){return encodeURIComponent(s)}).join('/');
+  }
+  var absEsc = absUrl.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   var sc = '\n<scr'+'ipt>\n'
     + '/* __XLEMBED__ fetch-mode — katta fayllar uchun runtime URL fetch */\n'
     + '(function(){\n'
@@ -2341,7 +2348,7 @@ function embedExcelFetcherInHtml(html, xlName){
     + '  /* Method 2: handleFileUpload */\n'
     + '  if(typeof handleFileUpload === "function"){ try{ log("handleFileUpload","#4ade80"); handleFileUpload({target:{files:[file]}}); _D=true; return; }catch(e){} }\n'
     + '  /* Method 3: file input dispatch */\n'
-    + '  var fi = document.getElementById("fileInput") || document.getElementById("excelInput") || document.querySelector("input[type=file]");\n'
+    + '  var fi = document.getElementById("fileInput") || document.getElementById("excelInput") || document.querySelector(\'input[type=file][accept*=".xls"], input[type=file][accept*="xlsx"], input[type=file][accept*="csv"]\') || document.querySelector("input[type=file]");\n'
     + '  if(fi){ try{ var dt = new DataTransfer(); dt.items.add(file); fi.files = dt.files; fi.dispatchEvent(new Event("change",{bubbles:true})); log("dispatched change on input","#4ade80"); _D=true; return; }catch(e){ log("input dispatch err: "+e.message,"#ff4d6a") } }\n'
     + '  log("no handler found yet, retry","#ff9b3a");\n'
     + '}\n'
@@ -2349,17 +2356,22 @@ function embedExcelFetcherInHtml(html, xlName){
     + '  if(_D) return;\n'
     + '  _tries++;\n'
     + '  var hasHandler = typeof handleFile === "function" || typeof handleFileUpload === "function";\n'
-    + '  var hasInput = !!(document.getElementById("fileInput") || document.getElementById("excelInput") || document.querySelector("input[type=file]"));\n'
+    + '  var hasInput = !!(document.getElementById("fileInput") || document.getElementById("excelInput") || document.querySelector(\'input[type=file][accept*=".xls"], input[type=file][accept*="xlsx"], input[type=file][accept*="csv"]\') || document.querySelector("input[type=file]"));\n'
     + '  if(!hasHandler && !hasInput){\n'
     + '    if(_tries < 100) setTimeout(tryLoad, 200);\n'
     + '    else log("no handler after 20s","#ff4d6a");\n'
     + '    return;\n'
     + '  }\n'
-    + '  /* Fetch the file from a relative URL — <base href> resolves to dashboard folder */\n'
+    + '  /* Fetch the file — absolute Vercel URL birinchi (Vercel apostrof\\u0027larni encode qilmasa 404 beradi) */\n'
     + '  log("Fetching: " + FN);\n'
-    + '  var urls = [FN, encodeURI(FN)];\n'
-    + '  /* Per-segment encode as fallback */\n'
+    + '  var urls = [];\n'
+    + '  var ABS = \'' + absEsc + '\';\n'
+    + '  if(ABS) urls.push(window.location.origin + ABS);\n'
+    + '  /* Per-segment encode (nisbiy URL) */\n'
     + '  urls.push(FN.split("/").map(function(s){return encodeURIComponent(s)}).join("/"));\n'
+    + '  /* Fallback variantlar */\n'
+    + '  urls.push(FN);\n'
+    + '  urls.push(encodeURI(FN));\n'
     + '  function tryUrls(i){\n'
     + '    if(_D) return;\n'
     + '    if(i >= urls.length){ log("All URL variants failed","#ff4d6a"); return; }\n'
@@ -2394,7 +2406,7 @@ function embedExcelInHtml(html,xlData,xlName,xlRelPath){
      Iframe'ning <base href> dashbord papkasiga ishora qiladi, shuning uchun fayl nomi nisbiy URL bo'ladi. */
   if(xlData.length > 8*1024*1024){
     console.warn('[XLEMBED] Excel '+(xlData.length/1024/1024).toFixed(1)+'MB — base64 emas, fetch() rejimida inject qilinadi.');
-    return embedExcelFetcherInHtml(html, xlName);
+    return embedExcelFetcherInHtml(html, xlName, xlRelPath);
   }
 
   /* Uint8Array → base64 (chunked — stack overflow oldini olish) */
@@ -2465,7 +2477,7 @@ function embedExcelInHtml(html,xlData,xlName,xlRelPath){
   +'    catch(e){log("processExcelFile threw: "+e.message,"#ff4d6a")}\n'
   +'  }\n'
   +'  /* Method 4: file input with DataTransfer — bir nechta ID variantlarini sinash */\n'
-  +'  var fi=document.getElementById("fileInput")||document.getElementById("file-input")||document.getElementById("file_input")||document.getElementById("xlsxInput")||document.querySelector("input[type=file]");\n'
+  +'  var fi=document.getElementById("fileInput")||document.getElementById("excelInput")||document.getElementById("file-input")||document.getElementById("file_input")||document.getElementById("xlsxInput")||document.querySelector("input[type=file][accept*=\\".xls\\"], input[type=file][accept*=\\"xlsx\\"], input[type=file][accept*=\\"csv\\"]")||document.querySelector("input[type=file]");\n'
   +'  if(fi){\n'
   +'    try{\n'
   +'      var dt=new DataTransfer();dt.items.add(file);\n'
@@ -2769,7 +2781,7 @@ async function renderDash(lid,did,dbid){
       var finalHtml=addBaseTag(htmlContent,db.path);
       if(xlData)finalHtml=embedExcelInHtml(finalHtml,xlData,xlName);
       /* Agar xlData yo'q lekin xl yo'l mavjud bo'lsa — iframe runtime fetch'ga tushiramiz (mahalla 33MB uchun) */
-      else if(xlPath && xlName){ try{ finalHtml=embedExcelFetcherInHtml(finalHtml, xlName) }catch(e){ console.warn('Fetcher embed xato:',e) } }
+      else if(xlPath && xlName){ try{ finalHtml=embedExcelFetcherInHtml(finalHtml, xlName, xlPath) }catch(e){ console.warn('Fetcher embed xato:',e) } }
       /* HR dashboard uchun resume + sertifikat avtomatik link'lash */
       if(db.id==='db_hr'){ try{ finalHtml=embedHRExtrasInHtml(finalHtml) }catch(e){ console.warn('HR extras embed xato:',e) } }
       /* VASH dashboard uchun CSV ni iframe ichida to'g'ridan-to'g'ri fetch qilish */
