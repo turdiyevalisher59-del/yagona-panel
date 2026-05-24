@@ -1321,7 +1321,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:82,_cloudUrl:"",_skipCloud:false,leaders:[
+var INIT={_v:85,_cloudUrl:"",_skipCloud:false,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",firstName:"Jasur",patronymic:"Hakimovich",lastName:"Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1348,7 +1348,7 @@ var INIT={_v:82,_cloudUrl:"",_skipCloud:false,leaders:[
   {id:"d9",name:"Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi",boss:"Karshibaev Ulugbek Baxodir o'g'li",bossRole:"Bo'lim boshlig'i",dashboards:[
     {id:"db13",name:"Tadbirkorlik monitoringi",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/index.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/eng_ohiri_dasturlar_2_lotin.xlsx"},
     {id:"db14",name:"Banklar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_dashboard_v6.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/23,05 режа Банк ва филиаллари.xlsx"},
-    {id:"db15",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v25_performance_optimized.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/энг_охири_дастурлар_01_05_kichraytirilgan.xlsb"}]}]},
+    {id:"db15",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v25_performance_optimized.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/энг_охири_дастурлар_v2.xlsb"}]}]},
 {id:"jurayev",name:"A.A.Jurayev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"AJ",ci:3,departments:[
   {id:"d10",name:"Naqd pul muomalasini tashkil etish boshqarmasi",boss:"Sobirov Sobitxon Saidburxon o'g'li",bossRole:"Boshqarma boshlig'i",dashboards:[
     {id:"db16",name:"Naqd pullar dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar_v5_2026 (1).html",xl:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dastur uchun (3).xlsx"}]},
@@ -1831,7 +1831,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 82; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 85; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* v44+: Supabase Storage'dan cloudPull() orqali oladi (gzip ochib) */
@@ -2673,6 +2673,36 @@ function embedVASHAutoLoadInHtml(html, csvFilename){
 
 
 
+
+/* IndexedDB cache for mahalla — 1-marta parse, keyingi safarlar instant */
+function embedMahallaCacheInHtml(html, xlAbsUrl){
+  if(!html) return html;
+  if(html.indexOf('__MAHALLA_CACHE__')>=0) return html;
+  var urlEsc = (xlAbsUrl||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var sc = '\n<scr'+'ipt>\n'
+    + '/* __MAHALLA_CACHE__ v1 */\n'
+    + '(function(){\n'
+    + 'var XL_URL = \'' + urlEsc + '\';\n'
+    + 'var DB_NAME = "MahallaCache", STORE = "cache", KEY = "v1";\n'
+    + 'function log(m,c){try{console.log("%c[MCACHE]%c "+m,"color:#10b981;font-weight:bold","color:"+(c||"#aaa"))}catch(e){}}\n'
+    + 'function openDB(){return new Promise(function(res,rej){var rq=indexedDB.open(DB_NAME,1);rq.onupgradeneeded=function(e){e.target.result.createObjectStore(STORE,{keyPath:"key"});};rq.onsuccess=function(e){res(e.target.result);};rq.onerror=function(e){rej(e.target.error);};});}\n'
+    + 'function dbGet(){return openDB().then(function(db){return new Promise(function(res){var tx=db.transaction(STORE,"readonly");var rq=tx.objectStore(STORE).get(KEY);rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){res(null);};});});}\n'
+    + 'function dbPut(p){return openDB().then(function(db){return new Promise(function(res){var tx=db.transaction(STORE,"readwrite");tx.objectStore(STORE).put(Object.assign({key:KEY},p));tx.oncomplete=function(){res();};tx.onerror=function(){res();};});});}\n'
+    + 'function getMod(){if(!XL_URL)return Promise.resolve("");return fetch(XL_URL,{method:"HEAD"}).then(function(r){return r.headers.get("last-modified")||r.headers.get("etag")||r.headers.get("content-length")||"";}).catch(function(){return "";});}\n'
+    + 'var blockInput=false;\n'
+    + 'document.addEventListener("DOMContentLoaded",function(){var inps=document.querySelectorAll("input[type=file]");inps.forEach(function(inp){inp.addEventListener("change",function(ev){if(blockInput){log("input blocked","#fbbf24");ev.stopImmediatePropagation();}},true);});});\n'
+    + 'var hooked=false;\n'
+    + 'function hookLoad(){if(hooked||typeof window.loadData!=="function")return false;var orig=window.loadData;window.loadData=function(data){var r=orig.apply(this,arguments);if(data&&Array.isArray(data)&&data.length>0&&!blockInput){log("Saving "+data.length+" rows to cache...");getMod().then(function(mod){dbPut({data:data,fileMod:mod,ts:Date.now()}).then(function(){log("Cache saved. Next load instant.","#10b981");});});}return r;};hooked=true;log("loadData hooked","#10b981");return true;}\n'
+    + 'function waitFor(cb){var t=0;var iv=setInterval(function(){if(typeof window.loadData==="function"){clearInterval(iv);cb();}else if(++t>100){clearInterval(iv);log("loadData timeout","#ef4444");}},300);}\n'
+    + 'function info(rows,ts){var el=document.createElement("div");el.style.cssText="position:fixed;bottom:20px;right:20px;background:#10b981;color:white;padding:12px 18px;border-radius:10px;font-size:.85rem;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3)";var w=new Date(ts).toLocaleString("uz-UZ");el.innerHTML="⚡ Cache\\u0027dan yuklandi ("+rows+" qator)<br><span style=\"font-weight:400;font-size:.78rem;opacity:.9\">Saqlangan: "+w+"</span>";document.body.appendChild(el);setTimeout(function(){el.style.transition="opacity .5s";el.style.opacity="0";setTimeout(function(){el.remove();},500);},5000);}\n'
+    + 'Promise.all([dbGet(),getMod()]).then(function(a){var c=a[0],m=a[1];if(!c){log("No cache yet");hookLoad()||waitFor(hookLoad);return;}if(c.fileMod&&m&&c.fileMod!==m){log("Cache stale, re-parsing","#fbbf24");hookLoad()||waitFor(hookLoad);return;}log("Cache HIT — "+(c.data?c.data.length:0)+" rows","#10b981");waitFor(function(){blockInput=true;window.loadData(c.data);var up=document.querySelector(".upload-section");if(up)up.style.display="none";info(c.data.length,c.ts);});}).catch(function(e){log("Err: "+e.message,"#ef4444");});\n'
+    + '})();\n'
+    + '</scr'+'ipt>\n';
+  var lb = html.lastIndexOf('</body>');
+  if(lb>=0) return html.slice(0,lb)+sc+html.slice(lb);
+  return html+sc;
+}
+
 async function renderDash(lid,did,dbid){
   var db=fDb(lid,did,dbid);if(!db)return;
   _curDb={lid:lid,did:did,dbid:dbid};
@@ -2788,6 +2818,12 @@ async function renderDash(lid,did,dbid){
       if(db.id==='db_hr'){ try{ finalHtml=embedHRExtrasInHtml(finalHtml) }catch(e){ console.warn('HR extras embed xato:',e) } }
       /* VASH dashboard uchun CSV ni iframe ichida to'g'ridan-to'g'ri fetch qilish */
       if(db.id==='db_vash'){ try{ finalHtml=embedVASHAutoLoadInHtml(finalHtml, xlName||'VASH 2024-2025.csv') }catch(e){ console.warn('VASH auto-load embed xato:',e) } }
+      if(db.id==='db15' && xlPath){
+        try{
+          var xlAbsUrl = location.origin + '/' + xlPath.split('/').map(function(s){return encodeURIComponent(s)}).join('/');
+          finalHtml = embedMahallaCacheInHtml(finalHtml, xlAbsUrl);
+        }catch(e){ console.warn('Mahalla cache embed xato:',e) }
+      }
       fr.srcdoc=finalHtml;
       /* ═══ postMessage AUTO-LOAD: srcdoc hajm cheklovini bartaraf etish ═══
          Excel data'ni iframe'ga postMessage orqali yuborish (npl dashboard uchun)
