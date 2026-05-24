@@ -9298,4 +9298,25 @@ document.addEventListener('keydown',function(e){
     var muted = localStorage.getItem('mbb_no_greet') === '1';
     muteBtn.textContent = muted ? '🔇' : '🔔';
     muteBtn.onclick = function(){
-      var nowMuted = localStorage.getItem('m
+      var nowMuted = localStorage.getItem('mbb_no_greet') === '1';
+      if(nowMuted){
+        localStorage.removeItem('mbb_no_greet');
+        muteBtn.textContent = '🔔';
+        if(typeof toast === 'function') toast('Auto-salomlashish yoqildi','ok');
+      } else {
+        localStorage.setItem('mbb_no_greet','1');
+        muteBtn.textContent = '🔇';
+        if(window.speechSynthesis) window.speechSynthesis.cancel();
+        if(typeof toast === 'function') toast('Auto-salomlashish o\'chirildi','ok');
+      }
+    };
+    var closeBtn = hdr.querySelector('.mbb-close');
+    if(closeBtn) hdr.insertBefore(muteBtn, closeBtn);
+  }
+
+  console.log('🎙 Auto-greeting tizimi yuklandi (yagona panel ochilganda ovozli salomlashish)');
+})();
+
+</script>
+</body>
+</html>
