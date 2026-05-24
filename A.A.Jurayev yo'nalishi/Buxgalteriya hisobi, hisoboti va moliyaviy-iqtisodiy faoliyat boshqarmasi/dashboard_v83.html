@@ -1308,18 +1308,41 @@ function parseExcel(wb){
 /* ═════════════════════════════════════════════════════════════
    FILE UPLOAD
    ═════════════════════════════════════════════════════════════ */
+/* DOUBLE-VOICE FIX: Dedup state — XLEMBED iframe injection re-dispatches "change" event
+   bir nechta marta (loadingOverlay overlay-hidden check listida yo'q bo'lgani uchun).
+   Bu yerda biz har bir change event'ni file content hash bo'yicha tekshiramiz. */
+let _lastFileSig=null, _isProcessing=false, _autoAlertFired=false, _autoAlertTimer=null;
 document.getElementById('fileInput').addEventListener('change',function(e){
   const file=e.target.files[0];if(!file)return;
+  /* Bir xil faylni qayta-qayta yuklashni bloklash (XLEMBED retry'larini neytrallashtirish) */
+  const sig=(file.name||'')+'|'+(file.size||0)+'|'+(file.lastModified||0);
+  if(_isProcessing){console.log('[FileInput] Skip duplicate change — busy');return}
+  if(sig===_lastFileSig){console.log('[FileInput] Skip — same file already loaded:',sig);return}
+  _isProcessing=true;
+  _lastFileSig=sig;
   document.getElementById('loadingOverlay').classList.add('show');
   document.getElementById('uploadStatus').textContent=file.name;
   document.getElementById('uploadStatus').className='upload-status loaded';
   const reader=new FileReader();
   reader.onload=function(e){
-    try{const data=new Uint8Array(e.target.result);const workbook=XLSX.read(data,{type:'array'});D=parseExcel(workbook);rebuildCharts();document.getElementById('loadingOverlay').classList.remove('show');
-      /* Auto voice alert for low stock items after data load */
-      setTimeout(autoWarehouseAlert, 1500);
+    try{
+      const data=new Uint8Array(e.target.result);
+      const workbook=XLSX.read(data,{type:'array'});
+      D=parseExcel(workbook);
+      rebuildCharts();
+      document.getElementById('loadingOverlay').classList.remove('show');
+      /* Auto voice alert for low stock items after data load — ONLY ONCE per session */
+      if(_autoAlertTimer){clearTimeout(_autoAlertTimer);_autoAlertTimer=null}
+      if(!_autoAlertFired){
+        _autoAlertTimer=setTimeout(function(){
+          if(_autoAlertFired)return;
+          _autoAlertFired=true;
+          autoWarehouseAlert();
+        }, 1500);
+      }
     }
     catch(err){console.error(err);document.getElementById('loadingOverlay').classList.remove('show');alert("Xatolik: "+err.message)}
+    finally{_isProcessing=false}
   };reader.readAsArrayBuffer(file);
 });
 
@@ -2995,11 +3018,16 @@ function stopSpeaking(){
 }
 
 /* Avval Azure TTS ni sinab ko'ramiz, ishlamasa browser SpeechSynthesis */
+let _ttsCallId=0; /* Har bir speakText chaqiruvi uchun unique ID — race condition uchun */
 async function speakText(rawText){
-  if(isSpeaking){stopSpeaking();return}
+  /* Agar ovoz allaqachon o'ynamoqda — to'liq to'xtatish va keyin yangidan boshlash */
+  if(isSpeaking){stopSpeaking()}
+  /* Eski qoldiq audio'larni ham tozalash */
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  const myCall=++_ttsCallId; /* Hozirgi chaqiruvni belgilash */
   const text=cleanForTTS(rawText);
 
-  console.log('[TTS] Cleaned output:', text.slice(0,200));
+  console.log('[TTS] Cleaned output:', text.slice(0,200), '— callId=', myCall);
 
   isSpeaking=true;
   const btn=document.getElementById('voiceBtn');
@@ -3034,6 +3062,8 @@ async function speakText(rawText){
           headers:{'Ocp-Apim-Subscription-Key':AZURE_KEY,'Content-Type':'application/ssml+xml','X-Microsoft-OutputFormat':'audio-24khz-48kbitrate-mono-mp3'},
           body:ssml});
         if(res.ok){
+          /* Eskirgan chaqiruvni yangi bilan ustun qilmaslik */
+          if(myCall!==_ttsCallId){console.log('[TTS] Stale call',myCall,'— skip play (active:',_ttsCallId,')');return}
           const blob=await res.blob();
           const url=URL.createObjectURL(blob);
           const audio=new Audio(url);
@@ -3061,7 +3091,11 @@ async function speakText(rawText){
 
   /* Fallback: Browser SpeechSynthesis */
   if(!azureOk && 'speechSynthesis' in window){
+    /* Eskirgan chaqiruvni o'tkazib yuborish */
+    if(myCall!==_ttsCallId){console.log('[TTS] Stale call',myCall,'— skip fallback');return}
     try{
+      /* Yangi utterance oldidan oldingilarini to'liq tozalash — DOUBLE-VOICE FIX */
+      speechSynthesis.cancel();
       const utter=new SpeechSynthesisUtterance(text);
       utter.lang='uz-UZ';utter.rate=0.9;utter.pitch=1;
       const voices=speechSynthesis.getVoices();
