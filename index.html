@@ -1321,7 +1321,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:71,_cloudUrl:"",_skipCloud:false,leaders:[
+var INIT={_v:72,_cloudUrl:"",_skipCloud:false,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",firstName:"Jasur",patronymic:"Hakimovich",lastName:"Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1351,7 +1351,7 @@ var INIT={_v:71,_cloudUrl:"",_skipCloud:false,leaders:[
     {id:"db15",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v25_performance_optimized.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/mahallalar_compact.xlsx"}]}]},
 {id:"jurayev",name:"A.A.Jurayev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"AJ",ci:3,departments:[
   {id:"d10",name:"Naqd pul muomalasini tashkil etish boshqarmasi",boss:"Sobirov Sobitxon Saidburxon o'g'li",bossRole:"Boshqarma boshlig'i",dashboards:[
-    {id:"db16",name:"Naqd pullar dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar_v3.00.html",xl:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dasturlar_monitoring.xlsx"}]},
+    {id:"db16",name:"Naqd pullar dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar_v5_2026 (1).html",xl:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dastur uchun (3).xlsx"}]},
   {id:"d11",name:"To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi",boss:"Umarov Mirzoxid Mirxilolovich",bossRole:"Bo'lim boshlig'i",dashboards:[
     {id:"db_pay1",name:"To'lov tizimi dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/To'lov tizimi dashboard/banking_dashboard_pro (42).html",xl:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/To'lov tizimi dashboard/Ҳисоботлар илова Нилуфарга.+.xlsx"},
     {id:"db_pay2",name:"ATM Dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/atm dashboard/atm_dashboard_v3 (3).html",xl:"A.A.Jurayev yo'nalishi/To'lov tizimlari infratuzilmalari va axborot texnologiyalari bo'limi/atm dashboard/Ҳисоботлар_илова_Нилуфарга_банкомат.xlsx"},
@@ -1831,7 +1831,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 71; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 72; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* v44+: Supabase Storage'dan cloudPull() orqali oladi (gzip ochib) */
@@ -2346,13 +2346,17 @@ function embedExcelInHtml(html,xlData,xlName){
   +'function getFile(){\n'
   +'  if(_file)return _file;\n'
   +'  _arr=dec();\n'
-  +'  var mt=_N.match(/\\.xls$/i)?"application/vnd.ms-excel":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";\n'
+  +'  var lo=_N.toLowerCase();\n'
+  +'  var mt=lo.match(/\\.xls$/)?"application/vnd.ms-excel"\n'
+  +'        :lo.match(/\\.csv$/)?"text/csv"\n'
+  +'        :lo.match(/\\.prn$|\\.txt$/)?"text/plain"\n'
+  +'        :"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";\n'
   +'  try{_file=new File([_arr],_N,{type:mt})}catch(e){_file=new Blob([_arr],{type:mt});_file.name=_N}\n'
   +'  return _file;\n'
   +'}\n'
   +'function checkOverlayHidden(){\n'
   +'  /* Bir nechta dashboard turlari uchun: NPL (uploadOverlay), banking (uploadSection), atm (upload-screen, dropZone), buxgalteriya (loadingOverlay) */\n'
-  +'  var ids=["uploadOverlay","uploadSection","dropZone","uploader","upload","upload-screen","uploadScreen","upload_screen","file-upload","fileUpload","loadingOverlay"];\n'
+  +'  var ids=["uploadOverlay","uploadSection","dropZone","uploader","upload","upload-screen","uploadScreen","upload_screen","file-upload","fileUpload","loadingOverlay","noData"];\n'
   +'  for(var i=0;i<ids.length;i++){\n'
   +'    var ov=document.getElementById(ids[i]);\n'
   +'    if(ov && (ov.style.display==="none" || ov.offsetHeight===0 || ov.classList.contains("hidden")))return true;\n'
@@ -2360,6 +2364,9 @@ function embedExcelInHtml(html,xlData,xlName){
   +'  /* Class-based selector — har qanday element with class "hidden" */\n'
   +'  var hiddenUploaders=document.querySelectorAll(".upload-section.hidden, .upload-box.hidden, .upload-screen.hidden, [class*=\\"upload\\"].hidden");\n'
   +'  if(hiddenUploaders.length>0)return true;\n'
+  +'  /* VASH: dashboardContent.visible — content visible bo\\u0027lsa SUCCESS */\n'
+  +'  var dc=document.getElementById("dashboardContent");\n'
+  +'  if(dc && dc.classList.contains("visible"))return true;\n'
   +'  /* Hech qanday upload/loading overlay element yo\'q — dashboard charts yuklangan bo\'lsa muvaffaqiyat */\n'
   +'  if(document.querySelectorAll("canvas, svg, .chart, [id*=\\"chart\\"]").length>3)return true;\n'
   +'  return false;\n'
@@ -2405,8 +2412,9 @@ function embedExcelInHtml(html,xlData,xlName){
   +'function poll(){\n'
   +'  if(_D)return;\n'
   +'  _tries++;\n'
-  +'  /* Wait for XLSX library */\n'
-  +'  if(typeof XLSX==="undefined"){if(_tries<_MAX)setTimeout(poll,200);return}\n'
+  +'  /* Wait for XLSX library — but skip wait for CSV/PRN/TXT files (they don\\u0027t need XLSX) */\n'
+  +'  var isText=/\\.(csv|prn|txt)$/i.test(_N);\n'
+  +'  if(!isText && typeof XLSX==="undefined"){if(_tries<_MAX)setTimeout(poll,200);return}\n'
   +'  /* Wait for handler OR file input — qaysi birinchi tayyor bo\'lsa */\n'
   +'  var hasHandler=typeof handleFile!=="undefined"||typeof handleFileUpload!=="undefined"||typeof processExcelFile!=="undefined";\n'
   +'  var hasFileInput=!!(document.getElementById("fileInput")||document.querySelector("input[type=file]"));\n'
@@ -5602,7 +5610,7 @@ document.addEventListener('DOMContentLoaded',async function(){
             }
             /* v46+: Ma'lum dashboardlarning fayl yo'llari yangilangan bo'lsa — INIT'dan sinxronlash */
             if(id2.dashboards && dd.dashboards){
-              var _syncIds = ['db7','db8','db14','db15','db18','db_hr'];
+              var _syncIds = ['db7','db8','db14','db15','db16','db_vash','db18','db_hr'];
               dd.dashboards.forEach(function(udb){
                 if(_syncIds.indexOf(udb.id) >= 0){
                   var initDb = id2.dashboards.find(function(x){return x.id === udb.id;});
