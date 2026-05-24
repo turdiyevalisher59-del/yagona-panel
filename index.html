@@ -1345,8 +1345,8 @@ var INIT={_v:68,_cloudUrl:"",_skipCloud:false,leaders:[
     {id:"db12",name:"Parkentsoy Voice Assistant",type:"html",path:"I.R.Irgashev yo'nalishi/Hududlarni ijtimoiy-iqtisodiy rivojlantirish borasida tijorat banklari faoliyatini monitoring qilish bo'limi/parkentsoy/parkentsoy_voice.html"}]},
   {id:"d9",name:"Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi",boss:"Karshibaev Ulugbek Baxodir o'g'li",bossRole:"Bo'lim boshlig'i",dashboards:[
     {id:"db13",name:"Tadbirkorlik monitoringi",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/index.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/eng_ohiri_dasturlar_2_lotin.xlsx"},
-    {id:"db14",name:"Banklar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_dashboard (5).html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_data.xlsx"},
-    {id:"db15",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v20_all_filters_fixed.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/mahallalar_data.xlsx"}]}]},
+    {id:"db14",name:"Banklar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/banklar_dashboard_v6.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/banklar tahlili/23,05 режа Банк ва филиаллари.xlsx"},
+    {id:"db15",name:"Mahallalar tahlili",type:"html",path:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/kredit_dashboard_v25_performance_optimized.html",xl:"I.R.Irgashev yo'nalishi/Tadbirkorlikni qo'llab-quvvatlash va aholi bandligini ta'minlash bo'limi/mahallalar tahlili dastur bo'yicha/++++энг охири дастурлар 01.05.xlsx"}]}]},
 {id:"jurayev",name:"A.A.Jurayev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"AJ",ci:3,departments:[
   {id:"d10",name:"Naqd pul muomalasini tashkil etish boshqarmasi",boss:"Sobirov Sobitxon Saidburxon o'g'li",bossRole:"Boshqarma boshlig'i",dashboards:[
     {id:"db16",name:"Naqd pullar dashboard",type:"html",path:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/naqd_pullar_v3.00.html",xl:"A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dasturlar_monitoring.xlsx"}]},
@@ -5491,6 +5491,29 @@ document.addEventListener('DOMContentLoaded',async function(){
               _migratedAny = true;
               console.log('🔄 ' + dd.name + ' uchun ' + dd.dashboards.length + ' ta yangi dashboard qo\'shildi (INIT dan)');
             }
+            /* v46+: Ma'lum dashboardlarning fayl yo'llari yangilangan bo'lsa — INIT'dan sinxronlash */
+            if(id2.dashboards && dd.dashboards){
+              var _syncIds = ['db14','db15'];
+              dd.dashboards.forEach(function(udb){
+                if(_syncIds.indexOf(udb.id) >= 0){
+                  var initDb = id2.dashboards.find(function(x){return x.id === udb.id;});
+                  if(initDb){
+                    if(udb.path !== initDb.path){
+                      console.log('🔄 ' + udb.id + ' HTML yo\'l yangilandi: ' + initDb.path.split('/').pop());
+                      udb.path = initDb.path;
+                      udb._xlCache = null; udb._htmlCache = null;
+                      _migratedAny = true;
+                    }
+                    if(udb.xl !== initDb.xl){
+                      console.log('🔄 ' + udb.id + ' Excel yo\'l yangilandi: ' + initDb.xl.split('/').pop());
+                      udb.xl = initDb.xl;
+                      udb._xlCache = null;
+                      _migratedAny = true;
+                    }
+                  }
+                }
+              });
+            }
           }
         }
         /* v45+: agar INIT'da yangi department mavjud (D'da yo'q) — qo'shish */
@@ -5525,8 +5548,7 @@ document.addEventListener('DOMContentLoaded',async function(){
         }, 3000);
       }
     }
-    }
-    
+
     /* Kontaktlar migratsiyasi */
     if(!D._contacts) D._contacts = null;
     
@@ -8300,11 +8322,27 @@ document.addEventListener('keydown',function(e){
      }},
     {q: ['nechta dashboard', 'qancha dashboard', 'dashboard soni', 'modullar soni'],
      a: function(){
-       return `📊 Hozirda <b>${getDashboardCount()} ta dashboard</b> mavjud, 4 yo'nalish bo'yicha:\n\n` +
-              `• <b>J.X.Fayzullaxo'jayev</b> — Scoring, Sirli mijoz, Angren xarita, Murojatlar, Korrupsiya\n` +
-              `• <b>B.F.Nuraliyev</b> — Eksport-Import, Valyuta XPU, VASH, NPL Risk Rating, NPL Dashboard v3\n` +
-              `• <b>Sh.R.Irgashev</b> — Parkentsoy Voice, Tadbirkorlik, Banklar tahlili, Mahallalar tahlili\n` +
-              `• <b>A.A.Jurayev</b> — Naqd pullar, Buxgalteriya Tahlili`;
+       /* v46+: dashboardlarni D.leaders'dan dinamik chiqarish (hardcoded emas) */
+       var total = 0;
+       var lines = [];
+       try {
+         if(typeof D !== 'undefined' && D && Array.isArray(D.leaders)){
+           D.leaders.forEach(function(l){
+             var names = [];
+             (l.departments||[]).forEach(function(dep){
+               (dep.dashboards||[]).forEach(function(db){ names.push(db.name); });
+             });
+             total += names.length;
+             if(names.length > 0){
+               lines.push('• <b>'+l.name+'</b> — ' + names.join(', '));
+             } else {
+               lines.push('• <b>'+l.name+'</b> — (hozircha dashboard yo\'q)');
+             }
+           });
+         }
+       } catch(e){}
+       if(lines.length === 0) return '📊 Dashboardlar haqida maʼlumot hozircha mavjud emas.';
+       return '📊 Hozirda <b>' + total + ' ta dashboard</b> mavjud, ' + D.leaders.length + ' yoʻnalish boʻyicha:\n\n' + lines.join('\n');
      }},
     {q: ['rahbarlar', 'kim ishlaydi', 'kimlar bor', 'leaderlar'],
      a: function(){
