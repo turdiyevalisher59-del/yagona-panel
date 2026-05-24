@@ -1321,7 +1321,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:70,_cloudUrl:"",_skipCloud:false,leaders:[
+var INIT={_v:71,_cloudUrl:"",_skipCloud:false,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",firstName:"Jasur",patronymic:"Hakimovich",lastName:"Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1330,7 +1330,9 @@ var INIT={_v:70,_cloudUrl:"",_skipCloud:false,leaders:[
   {id:"d3",name:"Ijro apparati",boss:"Axatjanov Abduraxmon Kudratillaevich",bossRole:"Apparat boshlig'i",dashboards:[
     {id:"db5",name:"Murojatlar dashboard",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/murojatlar_dashboard (1).html",xl:"J.X.Fayzullaxo'jayev yo'nalishi/Ijro apparati/murojatlar_data.xlsx"}]},
   {id:"d_komplaens",name:"Komplaens Nazorati",boss:"Turdiyev A.T",bossRole:"Bo'lim boshlig'i",dashboards:[
-    {id:"db_komplaens",name:"Korrupsiya Monitoring",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Komplaens Nazorati/corruption-monitoring.html"}]}]},
+    {id:"db_komplaens",name:"Korrupsiya Monitoring",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Komplaens Nazorati/corruption-monitoring.html"}]},
+  {id:"d_hr",name:"Inson resurslarini boshqarish bo'limi",boss:"—",bossRole:"Bo'lim boshlig'i",dashboards:[
+    {id:"db_hr",name:"HR Dashboard",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Inson resurslarini boshqarish bo'limi/HR_Dashboard_v2.7 (1).html",xl:"J.X.Fayzullaxo'jayev yo'nalishi/Inson resurslarini boshqarish bo'limi/Svod умумий 01.xlsx"}]}]},
 {id:"nuraliyev",name:"B.F.Nuraliyev",role:"Bosh boshqarma boshlig'i o'rinbosari",ini:"BN",ci:1,departments:[
   {id:"d5",name:"Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi",boss:"Matboboev Utkirjon Rustamovich",bossRole:"Bo'lim boshlig'i",dashboards:[
     {id:"db7",name:"Eksport-Import valyuta",type:"html",path:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/eksport import/EksportImport_dashboard_2025_2026 (1).html",xl:"B.F.Nuraliyev yo'nalishi/Kredit tashkilotlarida moliyaviy monitoringni muvofiqlashtirish va valyuta nazorati bo'limi/eksport import/1 май ҳолатига 2.xlsx"},
@@ -1829,7 +1831,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 70; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 71; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* v44+: Supabase Storage'dan cloudPull() orqali oladi (gzip ochib) */
@@ -2446,6 +2448,83 @@ function embedExcelInHtml(html,xlData,xlName){
   return html+sc;
 }
 
+/* ═══ HR EXTRAS EMBED: Resume Word fayllar + Sertifikatlarni iframe ichiga avtomatik yuklash ═══
+   HR_Dashboard_v2.7 uchun — state.obyektivkaFiles ga relativ URL link'larni qo'shadi.
+   PDF/DOCX content base64'siz, faqat URL — localStorage'ni to'ldirmaydi. */
+function embedHRExtrasInHtml(html){
+  if(!html) return html;
+  if(html.indexOf('__HR_EXTRAS__')>=0) return html;
+  var sc = '\n<scr'+'ipt>\n'
+    + '/* __HR_EXTRAS__ v1 — HR auto-resume + certificate loader */\n'
+    + '(function(){\n'
+    + '__MANIFEST_PLACEHOLDER__\n'
+    + 'function enc(p){return p.split("/").map(function(s){return encodeURIComponent(s)}).join("/")}\n'
+    + 'function buildResumeUrl(fn){return "resume/" + encodeURIComponent(fn).replace(/%2F/g,"/")}\n'
+    + 'function buildCertUrl(folder, fn){return enc("Сертификат") + "/" + encodeURIComponent(folder) + "/" + encodeURIComponent(fn)}\n'
+    + 'function getEmpSurname(em){return (em.fullName||"").split(/[\\s.]/)[0].toUpperCase()}\n'
+    + 'function matchEmp(surnameLat){\n'
+    + '  if(typeof state==="undefined" || !state.employees) return null;\n'
+    + '  return state.employees.find(function(em){\n'
+    + '    var es=getEmpSurname(em);\n'
+    + '    return es===surnameLat || (surnameLat.length>4 && es.indexOf(surnameLat.slice(0,5))===0);\n'
+    + '  });\n'
+    + '}\n'
+    + 'var _tries=0;\n'
+    + 'function tryInject(){\n'
+    + '  _tries++;\n'
+    + '  if(typeof state==="undefined" || !state.employees || state.employees.length===0){\n'
+    + '    if(_tries<60) setTimeout(tryInject,500); else console.warn("[HR_EXTRAS] state.employees timeout");\n'
+    + '    return;\n'
+    + '  }\n'
+    + '  if(!state.obyektivkaFiles) state.obyektivkaFiles={};\n'
+    + '  var rMatched=0, cMatched=0;\n'
+    + '  /* Resumes */\n'
+    + '  HR_MANIFEST.r.forEach(function(item){\n'
+    + '    var fn=item[0], sn=item[1], size=item[2];\n'
+    + '    var emp=matchEmp(sn);\n'
+    + '    if(!emp) return;\n'
+    + '    if(!state.obyektivkaFiles[emp.id]) state.obyektivkaFiles[emp.id]=[];\n'
+    + '    if(state.obyektivkaFiles[emp.id].some(function(f){return f.name===fn})) return;\n'
+    + '    var ext=fn.split(".").pop().toLowerCase();\n'
+    + '    var mt = ext==="docx"?"application/vnd.openxmlformats-officedocument.wordprocessingml.document"\n'
+    + '          : ext==="doc"?"application/msword"\n'
+    + '          : ext==="pdf"?"application/pdf" : "application/octet-stream";\n'
+    + '    state.obyektivkaFiles[emp.id].push({\n'
+    + '      name: fn, size: size, type: mt,\n'
+    + '      uploadedAt: "Avto-yuklangan", dataUrl: buildResumeUrl(fn)\n'
+    + '    });\n'
+    + '    rMatched++;\n'
+    + '  });\n'
+    + '  /* Certificate files — show alongside in dossier obyektivka tab */\n'
+    + '  HR_MANIFEST.c.forEach(function(item){\n'
+    + '    var fn=item[0], folder=item[1], sn=item[2], size=item[3];\n'
+    + '    var emp=matchEmp(sn);\n'
+    + '    if(!emp) return;\n'
+    + '    if(!state.obyektivkaFiles[emp.id]) state.obyektivkaFiles[emp.id]=[];\n'
+    + '    var label = "[Sertifikat] " + fn;\n'
+    + '    if(state.obyektivkaFiles[emp.id].some(function(f){return f.name===label})) return;\n'
+    + '    var ext=fn.split(".").pop().toLowerCase();\n'
+    + '    var mt = ext==="pdf"?"application/pdf" : (ext==="jpg"||ext==="jpeg")?"image/jpeg" : (ext==="png")?"image/png" : "application/octet-stream";\n'
+    + '    state.obyektivkaFiles[emp.id].push({\n'
+    + '      name: label, size: size, type: mt,\n'
+    + '      uploadedAt: "Avto-yuklangan", dataUrl: buildCertUrl(folder, fn)\n'
+    + '    });\n'
+    + '    cMatched++;\n'
+    + '  });\n'
+    + '  console.log("[HR_EXTRAS] resume:"+rMatched+" sertifikat:"+cMatched+" / total:"+HR_MANIFEST.r.length+"+"+HR_MANIFEST.c.length);\n'
+    + '  if(typeof renderEmployees==="function") try{renderEmployees()}catch(e){}\n'
+    + '}\n'
+    + 'setTimeout(tryInject,1500);\n'
+    + '})();\n'
+    + '</scr'+'ipt>\n';
+  /* Manifest'ni insert qilish */
+  sc = sc.replace('__MANIFEST_PLACEHOLDER__', "var HR_MANIFEST = {\"r\": [[\"Axrorov Oybek - malumotnoma.docx\", \"AXROROV\", 33553], [\"Cолиев Ж.Р справка-обективка.docx\", \"COLIEV\", 24538], [\"Ortiqov Maxammadjon Adxamjon o'g'li 2024й.docx\", \"ORTIQOV\", 133176], [\"А.Амиров справка-объективка.doc\", \"A\", 612864], [\"Аббосов С.Р. справка-объективка.doc\", \"ABBOSOV\", 367616], [\"Абдиқодиров Ш.С. справка-объективка.doc\", \"ABDIQODIROV\", 209408], [\"Абдувалиев Х справка-объективка.docx\", \"ABDUVALIEV\", 83593], [\"Абдувалиев Э.У справка-объективка.doc\", \"ABDUVALIEV\", 190464], [\"Абдуллаев А.А. справка-объективка.doc\", \"ABDULLAEV\", 186368], [\"Абдуллаева М.И. объективка.doc\", \"ABDULLAEVA\", 80384], [\"Абдурахмонов М.М. справка-объективка.doc\", \"ABDURAXMONOV\", 428032], [\"Абдухаликов Т.А. справка-объективка.doc\", \"ABDUXALIKOV\", 223744], [\"Азимбердиев У.Э. справка-объективка.doc\", \"AZIMBERDIEV\", 186368], [\"Акмалова Н.А  справка-объективка.doc\", \"AKMALOVA\", 168960], [\"Алаев Р.Х. справка-объективка.doc\", \"ALAEV\", 1902592], [\"Алиев Ж.Г  справка-объективка.doc\", \"ALIEV\", 561152], [\"Алиматова М.В.справка-объективка.doc\", \"ALIMATOVA\", 274432], [\"Алиматова Н.С.справка-объективка.docx\", \"ALIMATOVA\", 75502], [\"Алимходжаева Д.М справка-объективка.doc\", \"ALIMXODJAEVA\", 11490816], [\"Арипова Н.Ю. справка-объективка.doc\", \"ARIPOVA\", 143872], [\"Асамитдинов Х.С. справка-объективка.doc\", \"ASAMITDINOV\", 210944], [\"Ахатжанов А.К справка-объективка.doc\", \"AXATJANOV\", 226304], [\"Ахмедова Х.Р. объективка.doc\", \"AXMEDOVA\", 71168], [\"Ахроров Ш.Р. справка-объективка.doc\", \"AXROROV\", 236544], [\"Аширалиев Бобурмирзо Ботиржон угли.doc\", \"ASHIRALIEV\", 191488], [\"Бахромова Г.К  справка-объективка.doc\", \"BAXROMOVA\", 949760], [\"Бекмуродов Ф.А. справка-объективка.doc\", \"BEKMURODOV\", 98304], [\"Бердияров Ж.А. справка-объективка.doc\", \"BERDIYAROV\", 94208], [\"Болтаев Ш.Х справка-объективка.docx\", \"BOLTAEV\", 48653], [\"Гапуров Ж.Т  справка-объективка.doc\", \"GAPUROV\", 514048], [\"Гафурова З.Б  справка-объективка.doc\", \"GAFUROVA\", 68096], [\"Гулямова Н.Л. объективка.doc\", \"GULYAMOVA\", 72704], [\"Д.Исраилова маълумотнома охирги.docx\", \"D\", 56869], [\"Д.Ишанкулова справка-объективка.doc\", \"D\", 79872], [\"Давронбеков Ж.К справка-объективка.docx\", \"DAVRONBEKOV\", 34960], [\"Жумаева Х.Н. справка-объективка.doc\", \"JUMAEVA\", 181760], [\"Жураев Ж.Х.  справка-объективка.doc\", \"JURAEV\", 181760], [\"Жўраев А.А. справка-объективка.doc\", \"JO'RAEV\", 224768], [\"Заитова Дилфуза Турсунбой кизи.doc\", \"ZAITOVA\", 117248], [\"Закирова Ш.А  справка-объективка.doc\", \"ZAKIROVA\", 326656], [\"Захидова Ш.Х. объективка.doc\", \"ZAXIDOVA\", 80384], [\"Ибрагимов Дж справка-объективка.doc\", \"IBRAGIMOV\", 663552], [\"Ибрагимова П.Т. объективка.doc\", \"IBRAGIMOVA\", 89088], [\"Икрамова Д.Б. справка-объективка.doc\", \"IKRAMOVA\", 158720], [\"Иргашев Ш.Р. справка-объективка.docx\", \"IRGASHEV\", 57756], [\"Ирджанова М.Х. объективка.doc\", \"IRDJANOVA\", 69120], [\"Исмаилов Рустам Эгамбердиевич.doc\", \"ISMAILOV\", 617984], [\"Йўлдошхонов А.А.  справка-объективка.doc\", \"YO'LDOSHXONOV\", 483840], [\"Кадиров Л.Ш. справка-объективка.docx\", \"KADIROV\", 167608], [\"Кадирова Ш.А. справка-объективка.doc\", \"KADIROVA\", 434688], [\"Кадиршаева М.А. объективка.doc\", \"KADIRSHAEVA\", 874496], [\"Камолов Х.М  справка-объективка.doc\", \"KAMOLOV\", 275456], [\"Караев Х.К. справка-объективка.doc\", \"KARAEV\", 359424], [\"Каримов А.С. справка-объективка.doc\", \"KARIMOV\", 483840], [\"Каримов И.И. объективка.doc\", \"KARIMOV\", 201728], [\"Каримов Ш.А  справка-объективка.doc\", \"KARIMOV\", 143872], [\"Латипова Г.А. объективка.doc\", \"LATIPOVA\", 60928], [\"Латипова Н.М.  объективка.doc\", \"LATIPOVA\", 82432], [\"М.Гафурова Справка-объективка.doc\", \"M\", 75264], [\"Мамасолиева К.Б. объективка.doc\", \"MAMASOLIEVA\", 162304], [\"Мансуров А.А.справка-объективка.doc\", \"MANSUROV\", 583680], [\"Марипов Р.Р. справка-объективка.doc\", \"MARIPOV\", 181248], [\"Матбобоев У.Р. справка-объективка.doc\", \"MATBOBOEV\", 172544], [\"Махаммадиев Х.Х. справка-объективка.doc\", \"MAXAMMADIEV\", 2351616], [\"Мирзакосимов Ш.Ф. объективка.doc\", \"MIRZAKOSIMOV\", 544256], [\"Мирзарахимова З.Г. - справка-объективка.doc\", \"MIRZARAXIMOVA\", 189440], [\"Мирсабитова Д.Х справка-объективка.doc\", \"MIRSABITOVA\", 149504], [\"Мирходжаева И.А Справка-объективка.docx\", \"MIRXODJAEVA\", 560692], [\"Мусаходжаева Д.К  справка-объективка.doc\", \"MUSAXODJAEVA\", 72704], [\"Мухсумов Ж. Р объективка.doc\", \"MUXSUMOV\", 371200], [\"Нишаналиев И.В. справка-объективка.doc\", \"NISHANALIEV\", 311808], [\"Нуралиев Б.Ф справка-объективка.doc\", \"NURALIEV\", 160768], [\"Обидова Н.А справка-объективка.doc\", \"OBIDOVA\", 214016], [\"Расулева Н.А  справка-объективка.doc\", \"RASULEVA\", 73216], [\"Расулова М.Б. справка-объективка.doc\", \"RASULOVA\", 254976], [\"Рахимов Х.В справка-объективка.docx\", \"RAXIMOV\", 143723], [\"Рахимова Г.Х объективка-справка.doc\", \"RAXIMOVA\", 71680], [\"Рахматов Ш.Ж справка-объективка.docx\", \"RAXMATOV\", 155853], [\"Рахмонова Д.С  справка-объективка.doc\", \"RAXMONOVA\", 528384], [\"Рўзиева Д.Ш. объективка.doc\", \"RO'ZIEVA\", 80384], [\"Саидрахмонова З.С. (1).doc\", \"SAIDRAXMONOVA\", 102912], [\"Самигова Ш.Н  справка-объективка.doc\", \"SAMIGOVA\", 716800], [\"Сандибаев З.Ш  справка-объективка.doc\", \"SANDIBAEV\", 214016], [\"Санокулов_Абдурасул_Ризокулович.docx\", \"SANOKULOV_ABDURASUL_RIZOKULOVICH\", 118021], [\"Сарикулова Д.И справка-объективка.doc\", \"SARIKULOVA\", 462336], [\"Собиров Собитхон Саидбурхон угли.docx\", \"SOBIROV\", 426847], [\"Султонходжаев Х.Т. объективка.doc\", \"SULTONXODJAEV\", 71168], [\"Тагаева Р.Х объективка.doc\", \"TAGAEVA\", 574976], [\"Тангиров Хасан Давлатбоевич.doc\", \"TANGIROV\", 1289728], [\"Тошева С.С. объективка.doc\", \"TOSHEVA\", 85504], [\"Тошниязов И.Р спрака-объективка.docx\", \"TOSHNIYAZOV\", 75648], [\"Туляков Ф.Ю справка-объективка.docx\", \"TULYAKOV\", 37185], [\"Турдиев А.Т справка-объективка.doc\", \"TURDIEV\", 77824], [\"Турсунов Н.А. спрвка-объективка.doc\", \"TURSUNOV\", 96256], [\"Убаева Д.Г. справка-объективка.doc\", \"UBAEVA\", 505856], [\"Умарджанов Х.Х. объективка.doc\", \"UMARDJANOV\", 462336], [\"Умаров М.М. справка-объективка.docx\", \"UMAROV\", 45084], [\"Урманов Р.Р. справка-объективка.doc\", \"URMANOV\", 190464], [\"Урунова Нигора МАЪЛУМОТНОМА.docx\", \"URUNOVA\", 68023], [\"Файзуллаев Қ.Б объективка.docx\", \"FAYZULLAEV\", 48154], [\"Хаитов М.А. справка-объективка.doc\", \"XAITOV\", 106496], [\"Хакимов Б.Э. справка-объективка.doc\", \"XAKIMOV\", 748544], [\"Хакимов К.Р. объективка.doc\", \"XAKIMOV\", 215552], [\"Хакимова С  объективка.doc\", \"XAKIMOVA\", 439808], [\"Халмухамедов Д.М справка-объективка.docx\", \"XALMUXAMEDOV\", 199271], [\"Хатамов А.А. справка-объективка.doc\", \"XATAMOV\", 181760], [\"Хатамова Г.Ф. справка-объективка.doc\", \"XATAMOVA\", 198144], [\"Хашимов М.М справка-объективка.docx\", \"XASHIMOV\", 38763], [\"Худойбердиев А.Р. объективка.doc\", \"XUDOYBERDIEV\", 67584], [\"Хусомиддинов К.С.справка-объективка.docx\", \"XUSOMIDDINOV\", 44599], [\"Шарипов Х.Дж. справка-объективка.doc\", \"SHARIPOV\", 159744], [\"Шаубаев Р.Х. объективка.doc\", \"SHAUBAEV\", 77824], [\"Шомиров А.А. справка-объективка.doc\", \"SHOMIROV\", 120832], [\"Эшмуратова_Нилуфар_Джурабаевна23042025.docx\", \"ESHMURATOVA_NILUFAR_DJURABAEVNA23042025\", 54688], [\"Юнусова М объективка.doc\", \"YUNUSOVA\", 541696], [\"Юсупов М.А. справка-объективка.doc\", \"YUSUPOV\", 161792], [\"Юсупова В.Л. объективка.doc\", \"YUSUPOVA\", 82432], [\"Яминова Г.Т. объективка.doc\", \"YAMINOVA\", 77312], [\"Ярматов А справка-объективка.doc\", \"YARMATOV\", 977408], [\"Қаршибаев У.Б. справка-объективка.doc\", \"QARSHIBAEV\", 295936], [\"Қодиржонова Ф. объективка.doc\", \"QODIRJONOVA\", 670720]], \"c\": [[\"202605201120.pdf\", \"Абдиқодиров Шерзод\", \"ABDIQODIROV\", 863143], [\"photo_2025-11-05_18-01-31.jpg\", \"Алиев Жамшид\", \"ALIEV\", 295698], [\"IMG_0001.pdf\", \"Алиматова Мавсиля\", \"ALIMATOVA\", 107027], [\"photo_2025-11-05_18-00-41.jpg\", \"Гапуров Жасур\", \"GAPUROV\", 294708], [\"photo_2026-05-20_11-18-14.jpg\", \"Жўраев Жахонгир\", \"JO'RAEV\", 125211], [\"Д.Икрамова сертификат.pdf\", \"Икрамова Дилноза\", \"IKRAMOVA\", 826417], [\"Меҳнат муҳофазаси сертификат.pdf\", \"Икрамова Дилноза\", \"IKRAMOVA\", 208419], [\"сертификат.pdf\", \"Икрамова Дилноза\", \"IKRAMOVA\", 722251], [\"photo_2025-11-08_14-04-07.jpg\", \"Каримов Шерзод\", \"KARIMOV\", 293410], [\"IMG_0001.pdf\", \"Мирсабитова Дилдора\", \"MIRSABITOVA\", 202949], [\"Coursera Autodesk cam.pdf\", \"Пазилбеков Аваз\", \"PAZILBEKOV\", 301978], [\"Coursera Getting started with essay writing.pdf\", \"Пазилбеков Аваз\", \"PAZILBEKOV\", 327336], [\"Coursera Learn to speak Korean.pdf\", \"Пазилбеков Аваз\", \"PAZILBEKOV\", 412576], [\"Coursera Making Architecture.pdf\", \"Пазилбеков Аваз\", \"PAZILBEKOV\", 427340], [\"Alisher Turdiev.pdf\", \"Турдиев Алишер\", \"TURDIEV\", 197539], [\"RM_1_statement (1).pdf\", \"Турдиев Алишер\", \"TURDIEV\", 683581], [\"photo_2024-08-03_10-52-33 (2).jpg\", \"Турдиев Алишер\", \"TURDIEV\", 189901], [\"photo_2024-08-03_10-52-33.jpg\", \"Турдиев Алишер\", \"TURDIEV\", 287781], [\"photo_2024-08-03_10-52-34.jpg\", \"Турдиев Алишер\", \"TURDIEV\", 231860], [\"photo_2025-09-16_12-58-02.jpg\", \"Турдиев Алишер\", \"TURDIEV\", 269155], [\"photo_2026-05-20_11-14-26.jpg\", \"Хаитов Музаффар\", \"XAITOV\", 171115], [\"photo_2026-05-20_11-15-27.jpg\", \"Хаитов Музаффар\", \"XAITOV\", 163968], [\"photo_2026-05-20_11-15-44.jpg\", \"Хаитов Музаффар\", \"XAITOV\", 144127], [\"photo_2026-05-20_11-20-12.jpg\", \"Хаитов Музаффар\", \"XAITOV\", 130958], [\"photo_2026-05-20_18-08-05.jpg\", \"Хаитов Музаффар\", \"XAITOV\", 179862], [\"photo_2026-05-20_18-09-29.jpg\", \"Шарипов Хасан\", \"SHARIPOV\", 284699]]};");
+  var lastBody = html.lastIndexOf('</body>');
+  if(lastBody >= 0) return html.slice(0, lastBody) + sc + html.slice(lastBody);
+  return html + sc;
+}
+
+
 async function renderDash(lid,did,dbid){
   var db=fDb(lid,did,dbid);if(!db)return;
   _curDb={lid:lid,did:did,dbid:dbid};
@@ -2535,6 +2614,8 @@ async function renderDash(lid,did,dbid){
     if(htmlContent&&htmlContent.trim().length>10){
       var finalHtml=addBaseTag(htmlContent,db.path);
       if(xlData)finalHtml=embedExcelInHtml(finalHtml,xlData,xlName);
+      /* HR dashboard uchun resume + sertifikat avtomatik link'lash */
+      if(db.id==='db_hr'){ try{ finalHtml=embedHRExtrasInHtml(finalHtml) }catch(e){ console.warn('HR extras embed xato:',e) } }
       fr.srcdoc=finalHtml;
       /* ═══ postMessage AUTO-LOAD: srcdoc hajm cheklovini bartaraf etish ═══
          Excel data'ni iframe'ga postMessage orqali yuborish (npl dashboard uchun)
@@ -5521,7 +5602,7 @@ document.addEventListener('DOMContentLoaded',async function(){
             }
             /* v46+: Ma'lum dashboardlarning fayl yo'llari yangilangan bo'lsa — INIT'dan sinxronlash */
             if(id2.dashboards && dd.dashboards){
-              var _syncIds = ['db7','db8','db14','db15','db18'];
+              var _syncIds = ['db7','db8','db14','db15','db18','db_hr'];
               dd.dashboards.forEach(function(udb){
                 if(_syncIds.indexOf(udb.id) >= 0){
                   var initDb = id2.dashboards.find(function(x){return x.id === udb.id;});
@@ -9209,13 +9290,4 @@ document.addEventListener('keydown',function(e){
     var muted = localStorage.getItem('mbb_no_greet') === '1';
     muteBtn.textContent = muted ? '🔇' : '🔔';
     muteBtn.onclick = function(){
-      var nowMuted = localStorage.getItem('mbb_no_greet') === '1';
-      if(nowMuted){
-        localStorage.removeItem('mbb_no_greet');
-        muteBtn.textContent = '🔔';
-        if(typeof toast === 'function') toast('Auto-salomlashish yoqildi','ok');
-      } else {
-        localStorage.setItem('mbb_no_greet','1');
-        muteBtn.textContent = '🔇';
-        if(window.speechSynthesis) window.speechSynthesis.cancel();
-     
+      var nowMuted = localStorage.getItem('m
