@@ -1731,8 +1731,9 @@ body::before {
           🎤 Овозли қидирув
         </button>
         <input type="text" class="voice-search-input" id="voiceSearchInput"
-               placeholder="Банк ёки филиал номи..."
+               placeholder="Bank yoki filial nomini ayting yoki yozing..."
                oninput="onVoiceSearchInput(this.value)">
+        <button class="btn" onclick="clearVoiceSearch()" title="Tozalash" style="padding:9px 14px;border-radius:var(--r-pill)">✕</button>
         <span class="voice-status" id="voiceStatus">Тайёр</span>
       </div>
       <div class="table-card">
@@ -2629,17 +2630,15 @@ function renderKPIs() {
   const ml = m.toLowerCase();
   const grid = document.getElementById('kpiGrid');
 
-  // Aggregate all metrics from filtered data — same logic as before
   const annualPlan = aggregateMetric('annualPlan');
-  const ytdPlan = aggregateMetric('ytdPlan');
-  const ytdAlloc = aggregateMetric('totalAllocated');
-  const ytdExec = aggregateMetric('ytdExecSum');
-  const monthPlan = aggregateMetric('monthPlan');
-  const monthAlloc = aggregateMetric('monthAllocated');
-  const monthExec = aggregateMetric('monthExecSum');
-  const ytdExecPct = computePct(ytdExec, ytdPlan);
-  const monthExecPct = computePct(monthExec, monthPlan);
-  const annualPct = computePct(ytdAlloc, annualPlan);
+  const ytdPlan    = aggregateMetric('ytdPlan');
+  const ytdAlloc   = aggregateMetric('totalAllocated');  // YTD actual (to'g'ri)
+  const monthPlan  = aggregateMetric('monthPlan');
+  const monthAlloc = aggregateMetric('monthAllocated');  // Oy actual (to'g'ri)
+  // ytdExecPct = totalAllocated / ytdPlan  (ytdExecSum = farq, ishlatmaymiz)
+  const ytdExecPct   = computePct(ytdAlloc, ytdPlan);
+  const monthExecPct = computePct(monthAlloc, monthPlan);
+  const annualPct    = computePct(ytdAlloc, annualPlan);
 
   // Build hero (the dramatic primary metric) and rail (supporting metrics)
   // based on which view mode is active. Hero is always a percentage —
@@ -2657,10 +2656,10 @@ function renderKPIs() {
       pctMark: heroPct != null,
       status: heroStatus,
       statusText: heroStatus === 'up' ? 'режадан юқори' : (heroStatus === 'neutral' ? 'режа атрофида' : 'режадан паст'),
-      detail: monthExec > 0
-        ? `<strong>${fmtSum(monthExec)}</strong> млн сўм ажратилиб, <strong>${m}</strong> ойи режасининг <strong>${heroPct.toFixed(1)}%</strong> бажарилди.`
+      detail: monthAlloc > 0
+        ? `<strong>${fmtSum(monthAlloc)}</strong> млн сўм ажратилиб, <strong>${m}</strong> ойи режасининг <strong>${heroPct.toFixed(1)}%</strong> бажарилди.`
         : `<strong>${m}</strong> ойи учун маълумот мавжуд эмас.`,
-      metric: 'monthExecSum',
+      metric: 'monthAllocated',
       label: `${m} ойи бажарилиши`
     };
     rail = [
@@ -2694,24 +2693,24 @@ function renderKPIs() {
       { label: `Январ-${m} режа`, value: fmtSum(ytdPlan), unit: 'млн сўм', sub: '', metric: 'ytdPlan' },
       { label: `${m} ойи бажарилиши`,
         value: monthExecPct != null ? monthExecPct.toFixed(1) + '%' : '—', unit: '',
-        sub: `<strong>${fmtSum(monthExec)}</strong> млн сўм`, metric: 'monthExecSum' }
+        sub: `<strong>${fmtSum(monthAlloc)}</strong> млн сўм`, metric: 'monthAllocated' }
     ];
   } else {
     // Default YTD view: hero is YTD execution percentage —
     // most actionable insight for a Central Bank monitoring report
     const heroPct = ytdExecPct;
     const heroStatus = statusFor(heroPct, 100, 75);
-    const overflow = ytdExec - ytdPlan;
+    const overflow = ytdAlloc - ytdPlan;
     hero = {
       eyebrow: `Январ-${m} режа бажарилиши`,
       number: heroPct != null ? heroPct.toFixed(1) : '—',
       pctMark: heroPct != null,
       status: heroStatus,
       statusText: heroStatus === 'up' ? 'режадан юқори' : (heroStatus === 'neutral' ? 'режа атрофида' : 'режадан паст'),
-      detail: ytdExec > 0
-        ? `Январдан <strong>${m.toLowerCase()}гача</strong> жами <strong>${fmtSum(ytdExec)}</strong> млн сўм ажратилди — режанинг <strong>${heroPct.toFixed(1)}%</strong>${overflow > 0 ? `, режадан <strong>${fmtSum(overflow)}</strong> млн сўм ортиқча` : ''}.`
+      detail: ytdAlloc > 0
+        ? `Январдан <strong>${m.toLowerCase()}гача</strong> жами <strong>${fmtSum(ytdAlloc)}</strong> млн сўм ажратилди — режанинг <strong>${heroPct.toFixed(1)}%</strong>${overflow > 0 ? `, режадан <strong>${fmtSum(overflow)}</strong> млн сўм ортиқча` : ''}.`
         : 'Бажарилиш маълумоти мавжуд эмас.',
-      metric: 'ytdExecSum',
+      metric: 'totalAllocated',
       label: `Январ-${m} бажарилиши`
     };
     // Rail order: 1-Йиллик режа  2-Январ-m режа  3-Амалда  4-Бажарилиши%
@@ -2725,8 +2724,8 @@ function renderKPIs() {
         metric: 'totalAllocated' },
       { label: `Бажарилиши`,
         value: ytdExecPct != null ? ytdExecPct.toFixed(1) + '%' : '—', unit: '',
-        sub: `<strong>${fmtSum(ytdExec)}</strong> млн сўм`,
-        metric: 'ytdExecSum' }
+        sub: `<strong>${fmtSum(ytdAlloc)}</strong> млн сўм`,
+        metric: 'totalAllocated' }
     ];
   }
 
@@ -2785,6 +2784,15 @@ function fmtPct(n) {
   return n.toFixed(1) + '%';
 }
 
+// Highlight matched text in search results
+function highlightMatch(text, query) {
+  if (!query) return escapeHtml(text);
+  const escaped = escapeHtml(text);
+  const escapedQ = escapeHtml(query);
+  const rx = new RegExp('(' + escapedQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return escaped.replace(rx, '<mark style="background:#fef08a;color:#713f12;border-radius:2px;padding:0 2px">$1</mark>');
+}
+
 // ============================================================================
 // PROGRAM CARDS RENDER
 // ============================================================================
@@ -2794,20 +2802,22 @@ function renderProgramCards() {
   const m = bankData.meta.month;
   const cards = [];
   bankData.programs.forEach((p, idx) => {
-    if (p.isAggregate) return; // skip aggregate in cards (it's a summary)
-    // Sum across selected banks/hududs for this specific program
-    const ytdPlan = sumProgramMetric(idx, 'ytdPlan');
-    const ytdAlloc = sumProgramMetric(idx, 'totalAllocated');
-    const ytdExec = sumProgramMetric(idx, 'ytdExecSum');
-    const monthExec = sumProgramMetric(idx, 'monthExecSum');
-    const monthPlan = sumProgramMetric(idx, 'monthPlan');
+    if (p.isAggregate) return;
+    const ytdPlan    = sumProgramMetric(idx, 'ytdPlan');
+    const ytdAlloc   = sumProgramMetric(idx, 'totalAllocated');  // YTD actual (to'g'ri)
+    const monthPlan  = sumProgramMetric(idx, 'monthPlan');
+    const monthAlloc = sumProgramMetric(idx, 'monthAllocated');  // Oy actual (to'g'ri)
     const annualPlan = sumProgramMetric(idx, 'annualPlan');
-    const ytdPct = computePct(ytdExec, ytdPlan);
-    const monthPct = computePct(monthExec, monthPlan);
-    const fillW = ytdPct != null ? Math.min(150, ytdPct) : 0;
-    const phClass = p.isPlaceholder ? 'placeholder' : '';
-    const unit = p.unit || 'млн сўм';
-    const unitLabel = unit === 'млн сўм' ? '<span style="font-size:0.65rem;color:var(--text-3);font-weight:500">млн сўм</span>' : `<span style="font-size:0.65rem;color:var(--text-3);font-weight:500">${unit}</span>`;
+    // PROGRESS: totalAllocated / ytdPlan  (ytdExecSum = farq, emas amalda)
+    const ytdPct   = computePct(ytdAlloc, ytdPlan);
+    const monthPct = computePct(monthAlloc, monthPlan);
+    const fillW    = ytdPct != null ? Math.min(200, ytdPct) : 0;
+    const phClass  = p.isPlaceholder ? 'placeholder' : '';
+    const unit     = p.unit || 'млн сўм';
+    const unitSpan = `<span style="font-size:0.65rem;color:var(--text-3);font-weight:500">${unit}</span>`;
+    const pctColor = monthPct != null
+      ? (monthPct >= 100 ? 'var(--pos)' : (monthPct >= 75 ? 'var(--warn)' : 'var(--neg)'))
+      : 'var(--text-3)';
 
     cards.push(`
       <div class="program-card ${phClass} has-detail"
@@ -2820,27 +2830,27 @@ function renderProgramCards() {
         <div class="pc-stats" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
           <div class="pc-stat">
             <div class="pc-stat-label">Йиллик режа</div>
-            <div class="pc-stat-value">${p.cols.hasAnnual ? fmtByUnit(annualPlan, unit) : '—'} ${p.cols.hasAnnual ? unitLabel : ''}</div>
+            <div class="pc-stat-value">${p.cols.hasAnnual ? fmtByUnit(annualPlan, unit) : '—'} ${p.cols.hasAnnual ? unitSpan : ''}</div>
           </div>
           <div class="pc-stat" style="background:rgba(99,102,241,0.06)">
             <div class="pc-stat-label">Йиллик амалда</div>
-            <div class="pc-stat-value">${fmtByUnit(ytdAlloc, unit)} ${unitLabel}</div>
+            <div class="pc-stat-value">${fmtByUnit(ytdAlloc, unit)} ${unitSpan}</div>
           </div>
           <div class="pc-stat">
             <div class="pc-stat-label">Январ-${m} режа</div>
-            <div class="pc-stat-value">${fmtByUnit(ytdPlan, unit)} ${unitLabel}</div>
+            <div class="pc-stat-value">${fmtByUnit(ytdPlan, unit)} ${unitSpan}</div>
           </div>
           <div class="pc-stat" style="background:rgba(99,102,241,0.06)">
             <div class="pc-stat-label">Январ-${m} амалда</div>
-            <div class="pc-stat-value">${fmtByUnit(ytdExec, unit)} ${unitLabel}</div>
+            <div class="pc-stat-value">${fmtByUnit(ytdAlloc, unit)} ${unitSpan}</div>
           </div>
           <div class="pc-stat">
             <div class="pc-stat-label">${m} ойи режа</div>
-            <div class="pc-stat-value">${fmtByUnit(monthPlan, unit)} ${unitLabel}</div>
+            <div class="pc-stat-value">${fmtByUnit(monthPlan, unit)} ${unitSpan}</div>
           </div>
-          <div class="pc-stat" style="background:rgba(99,102,241,0.06)">
+          <div class="pc-stat" style="background:rgba(16,185,129,0.06)">
             <div class="pc-stat-label">${m} ойи амалда</div>
-            <div class="pc-stat-value">${fmtByUnit(monthExec, unit)} ${unitLabel}</div>
+            <div class="pc-stat-value" style="color:${pctColor}">${fmtByUnit(monthAlloc, unit)} ${unitSpan}</div>
           </div>
         </div>
         <div class="pc-progress">
@@ -2849,11 +2859,11 @@ function renderProgramCards() {
             <span class="pct">${ytdPct != null ? ytdPct.toFixed(1) + '%' : '—'}</span>
           </div>
           <div class="pc-progress-bar">
-            <div class="pc-progress-fill" style="width:${fillW}%"></div>
+            <div class="pc-progress-fill" style="width:${Math.min(100, fillW)}%"></div>
           </div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.72rem;color:var(--text-3)">
-          <span>${m} ойи: <strong style="color:${monthPct != null ? (monthPct >= 100 ? 'var(--pos)' : (monthPct >= 75 ? 'var(--warn)' : 'var(--neg)')) : 'var(--text-3)'}">${monthPct != null ? monthPct.toFixed(1) + '%' : '—'}</strong></span>
+          <span>${m} ойи: <strong style="color:${pctColor}">${monthPct != null ? monthPct.toFixed(1) + '%' : '—'}</strong></span>
           <span>Батафсил кўриш учун босинг →</span>
         </div>
       </div>
@@ -3024,25 +3034,21 @@ function renderBanksTab() {
   const m = bankData.meta.month;
   const banks = getActiveBanks();
   const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
-  // Build rows
+  // Build rows — % computed from totalAllocated/monthAllocated (to'g'ri)
   const rows = banks.map(b => {
     const plan = getBankTotal(b, progIdx, 'ytdPlan');
     const actual = getBankTotal(b, progIdx, 'totalAllocated');
-    const exec = getBankTotal(b, progIdx, 'ytdExecSum');
     const monthAlloc = getBankTotal(b, progIdx, 'monthAllocated');
-    const monthExec = getBankTotal(b, progIdx, 'monthExecSum');
     const monthPlan = getBankTotal(b, progIdx, 'monthPlan');
     return {
       name: b.name,
       branchCount: b.branches.length,
       ytdPlan: plan,
       totalAllocated: actual,
-      ytdExecSum: exec,
-      ytdPct: computePct(exec, plan),
+      ytdPct: computePct(actual, plan),          // totalAllocated / ytdPlan
       monthPlan,
       monthAllocated: monthAlloc,
-      monthExecSum: monthExec,
-      monthPct: computePct(monthExec, monthPlan)
+      monthPct: computePct(monthAlloc, monthPlan) // monthAllocated / monthPlan
     };
   });
   // Sort
@@ -3359,12 +3365,74 @@ function renderDetailsTab() {
 
   // Apply voice search filter
   const q = (voiceSearchQuery || '').trim().toLowerCase();
+  // When voice query is active → always show ONLY bajarmagan with bank names
+  const voiceMode = q.length > 0;
 
   // Build rows HTML
   const rowsHtml = [];
   let i = 0;
 
-  if (triggerSortActive) {
+  if (voiceMode) {
+    // ===== VOICE SEARCH MODE: only bajarmagan, filtered by query, bank name shown =====
+    const branchRows = allBranchRows.filter(r => r.type === 'branch');
+    const badBranches = branchRows.filter(r => r.ytdPct == null || r.ytdPct < 100);
+    const matched = badBranches.filter(r => {
+      const brName = r.br.name.toLowerCase();
+      const bankName = (r.bankName || '').toLowerCase();
+      const hudud = (r.br.hudud || '').toLowerCase();
+      return brName.includes(q) || bankName.includes(q) || hudud.includes(q);
+    });
+
+    // Count unique banks in results
+    const uniqueBanks = [...new Set(matched.map(r => r.bankName))];
+    rowsHtml.push(`<tr style="background:linear-gradient(90deg,#ede9fe,#fff);">
+      <td colspan="12" style="padding:10px 16px;font-weight:800;color:#6d28d9;font-size:0.8rem;letter-spacing:0.04em;text-transform:uppercase">
+        🎤 «${escapeHtml(voiceSearchQuery)}» — БАЖАРМАГАН: ${matched.length} та филиал · ${uniqueBanks.length} та банк
+      </td></tr>`);
+
+    if (matched.length === 0) {
+      rowsHtml.push(`<tr><td colspan="12" style="text-align:center;padding:24px;color:var(--text-3)">Mos келадиган бажармаган филиал топилмади</td></tr>`);
+    } else {
+      // Group by bank for cleaner display
+      const byBank = {};
+      matched.forEach(r => {
+        if (!byBank[r.bankName]) byBank[r.bankName] = [];
+        byBank[r.bankName].push(r);
+      });
+      Object.entries(byBank).forEach(([bankName, branches]) => {
+        // Bank group header row
+        rowsHtml.push(`<tr style="background:linear-gradient(90deg,rgba(239,68,68,0.08),transparent);">
+          <td colspan="12" style="padding:8px 16px 6px;font-weight:700;color:#dc2626;font-size:0.82rem;border-left:4px solid #ef4444;">
+            🏦 ${escapeHtml(bankName)} — ${branches.length} та филиал бажармади
+          </td></tr>`);
+        branches.forEach(r => {
+          i++;
+          // Highlight matched text
+          const hlBr = highlightMatch(r.br.name, q);
+          rowsHtml.push(`
+            <tr class="row-bad">
+              <td class="center">${i}</td>
+              <td class="name-cell">
+                <div style="font-weight:600;color:var(--neg)">${hlBr}</div>
+                <div style="font-size:0.7rem;color:var(--text-3);margin-top:2px">${escapeHtml(r.br.hudud || '')} · МФО ${escapeHtml(r.br.mfo || '—')}</div>
+              </td>
+              <td>${escapeHtml(r.br.hudud || '—')}</td>
+              <td class="center">${escapeHtml(r.br.mfo || '—')}</td>
+              <td class="num">${fmtSum(r.aPlan)}</td>
+              <td class="num">${fmtSum(r.ytdPlan)}</td>
+              <td class="num">${fmtSum(r.alloc)}</td>
+              <td class="num">${fmtSum(r.mAlloc)}</td>
+              <td class="num">${fmtSum(r.exec)}</td>
+              <td class="center">${pctCell(r.ytdPct)}</td>
+              <td class="num">${fmtSum(r.mExec)}</td>
+              <td class="center">${pctCell(r.mPct)}</td>
+            </tr>
+          `);
+        });
+      });
+    }
+
+  } else if (triggerSortActive) {
     // === TRIGGER SORT MODE: bajarmagan (red) first, then bajargan (green) ===
     const bankRows = allBranchRows.filter(r => r.type === 'bank');
     const branchRows = allBranchRows.filter(r => r.type === 'branch');
@@ -3373,20 +3441,17 @@ function renderDetailsTab() {
     const badBranches = branchRows.filter(r => r.ytdPct == null || r.ytdPct < 100);
     const goodBranches = branchRows.filter(r => r.ytdPct != null && r.ytdPct >= 100);
 
-    // Apply search filter within each group
-    const filterByQ = (arr) => !q ? arr : arr.filter(r => {
-      const name = r.type === 'bank' ? r.bank.name.toLowerCase() : r.br.name.toLowerCase();
-      return name.includes(q) || (r.bankName && r.bankName.toLowerCase().includes(q));
-    });
-
     // Bad rows first — red header
     rowsHtml.push(`<tr style="background:linear-gradient(90deg,#fee2e2,#fff);"><td colspan="12" style="padding:10px 16px;font-weight:800;color:#dc2626;font-size:0.8rem;letter-spacing:0.04em;text-transform:uppercase">🔴 БАЖАРМАГАНЛАР — ${badBranches.length} та филиал</td></tr>`);
-    filterByQ(badBranches).forEach(r => {
+    badBranches.forEach(r => {
       i++;
       rowsHtml.push(`
         <tr class="row-bad">
           <td class="center">${i}</td>
-          <td class="name-cell branch-name">${escapeHtml(r.br.name)}</td>
+          <td class="name-cell">
+            <div style="font-weight:600">${escapeHtml(r.br.name)}</div>
+            <div style="font-size:0.7rem;color:var(--text-3);margin-top:1px">🏦 ${escapeHtml(r.bankName || '')}</div>
+          </td>
           <td>${escapeHtml(r.br.hudud || '—')}</td>
           <td class="center">${escapeHtml(r.br.mfo || '—')}</td>
           <td class="num">${fmtSum(r.aPlan)}</td>
@@ -3403,12 +3468,15 @@ function renderDetailsTab() {
 
     // Good rows — green header
     rowsHtml.push(`<tr style="background:linear-gradient(90deg,#d1fae5,#fff);"><td colspan="12" style="padding:10px 16px;font-weight:800;color:#059669;font-size:0.8rem;letter-spacing:0.04em;text-transform:uppercase">✅ БАЖАРГАНЛАР — ${goodBranches.length} та филиал</td></tr>`);
-    filterByQ(goodBranches).forEach(r => {
+    goodBranches.forEach(r => {
       i++;
       rowsHtml.push(`
         <tr class="row-good">
           <td class="center">${i}</td>
-          <td class="name-cell branch-name">${escapeHtml(r.br.name)}</td>
+          <td class="name-cell">
+            <div style="font-weight:600">${escapeHtml(r.br.name)}</div>
+            <div style="font-size:0.7rem;color:var(--text-3);margin-top:1px">🏦 ${escapeHtml(r.bankName || '')}</div>
+          </td>
           <td>${escapeHtml(r.br.hudud || '—')}</td>
           <td class="center">${escapeHtml(r.br.mfo || '—')}</td>
           <td class="num">${fmtSum(r.aPlan)}</td>
@@ -3568,17 +3636,22 @@ function openProgramDetails(idx) {
   const p = bankData.programs[idx];
   if (!p) return;
   const m = bankData.meta.month;
+  const unit = p.unit || 'млн сўм';
+  const unitSpan = `<span style="font-size:0.7rem;color:var(--text-3);font-weight:500">${unit}</span>`;
+  const isMoney = unit === 'млн сўм';
 
   // Compute totals for this specific program (not affected by selectedProgram)
-  const annual = sumProgramMetric(idx, 'annualPlan');
-  const ytdPlan = sumProgramMetric(idx, 'ytdPlan');
-  const monthPlan = sumProgramMetric(idx, 'monthPlan');
-  const totalAlloc = sumProgramMetric(idx, 'totalAllocated');
-  const monthAlloc = sumProgramMetric(idx, 'monthAllocated');
-  const ytdExec = sumProgramMetric(idx, 'ytdExecSum');
-  const monthExec = sumProgramMetric(idx, 'monthExecSum');
-  const ytdPct = computePct(ytdExec, ytdPlan);
-  const monthPct = computePct(monthExec, monthPlan);
+  const annual     = sumProgramMetric(idx, 'annualPlan');
+  const ytdPlan    = sumProgramMetric(idx, 'ytdPlan');
+  const monthPlan  = sumProgramMetric(idx, 'monthPlan');
+  const totalAlloc = sumProgramMetric(idx, 'totalAllocated'); // YTD actual (to'g'ri)
+  const monthAlloc = sumProgramMetric(idx, 'monthAllocated'); // Oy actual (to'g'ri)
+  // ytdExecSum/monthExecSum = farq (surplus), modaling sub-labellarida qo'llaymiz
+  const ytdExec    = sumProgramMetric(idx, 'ytdExecSum');
+  const monthExec  = sumProgramMetric(idx, 'monthExecSum');
+  // Foizlar totalAllocated asosida
+  const ytdPct    = computePct(totalAlloc, ytdPlan);
+  const monthPct  = computePct(monthAlloc, monthPlan);
   const annualPct = computePct(totalAlloc, annual);
 
   // Bank-level breakdown for this program
@@ -3608,8 +3681,8 @@ function openProgramDetails(idx) {
     return {
       name: b.name, branchCount: b.branches.length,
       ytdPlan: bYtdPlan, alloc: bAlloc, exec: bExec, monthAlloc: bMonthAlloc,
-      ytdPct: computePct(bExec, bYtdPlan),
-      monthPct: computePct(bMonthExec, bMonthPlan)
+      ytdPct: computePct(bAlloc, bYtdPlan),   // totalAllocated / ytdPlan (to'g'ri)
+      monthPct: computePct(bMonthAlloc, bMonthPlan) // monthAllocated / monthPlan (to'g'ri)
     };
   }).filter(b => b.alloc > 0 || b.ytdPlan > 0).sort((a, b) => b.alloc - a.alloc);
 
@@ -3635,24 +3708,30 @@ function openProgramDetails(idx) {
   // Build HTML
   let html = '';
 
-  // Section 1: Key stats
+  // Section 1: Key stats — totalAllocated / monthAllocated are the correct actual values
   html += `
     <div class="modal-section">
       <div class="modal-section-title">Асосий кўрсаткичлар</div>
       <div class="modal-stats-grid">
-        ${p.cols.hasAnnual ? modalStat('Йиллик режа', fmtSum(annual) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
+        ${p.cols.hasAnnual ? modalStat('Йиллик режа',
+          fmtByUnit(annual, unit) + ' ' + unitSpan,
           annualPct != null ? `Йиллик бажарилиши: <strong>${annualPct.toFixed(1)}%</strong>` : '', 'dark') : ''}
-        ${modalStat(`Январ-${m} режаси`, fmtSum(ytdPlan) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>', '', '')}
-        ${modalStat('Жами ажратилган', fmtSum(totalAlloc) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
+        ${modalStat(`Январ-${m} режаси`,
+          fmtByUnit(ytdPlan, unit) + ' ' + unitSpan, '', '')}
+        ${modalStat('Жами амалга оширилган',
+          fmtByUnit(totalAlloc, unit) + ' ' + unitSpan,
           ytdPlan > 0 ? `Январ-${m} режасининг <strong>${(totalAlloc/ytdPlan*100).toFixed(1)}%</strong>` : '', 'success')}
-        ${modalStat(`Январ-${m} бажарилиши`, fmtSum(ytdExec) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
-          ytdPct != null ? `<strong>${ytdPct.toFixed(1)}%</strong> режанинг` : '',
-          ytdPct >= 100 ? 'success' : (ytdPct >= 75 ? 'warning' : 'danger'))}
-        ${modalStat(`${m} ойи режа`, fmtSum(monthPlan) + ' <span style="font-size:0.7rem;color:var(--text-3)">млн сўм</span>',
-          monthAlloc > 0 ? `<strong>${fmtSum(monthAlloc)}</strong> ажратилган` : '', '')}
-        ${modalStat(`${m} ойи бажарилиши`, monthPct != null ? monthPct.toFixed(1) + '%' : '—',
-          `<strong>${fmtSum(monthExec)}</strong> млн сўм`,
-          monthPct >= 100 ? 'success' : (monthPct >= 75 ? 'warning' : 'danger'))}
+        ${modalStat(`Январ-${m} бажарилиши`,
+          ytdPct != null ? ytdPct.toFixed(1) + '%' : '—',
+          `<strong>${fmtByUnit(totalAlloc, unit)}</strong> ${unit}`,
+          ytdPct != null && ytdPct >= 100 ? 'success' : (ytdPct != null && ytdPct >= 75 ? 'warning' : 'danger'))}
+        ${modalStat(`${m} ойи режа`,
+          fmtByUnit(monthPlan, unit) + ' ' + unitSpan,
+          monthAlloc > 0 ? `<strong>${fmtByUnit(monthAlloc, unit)}</strong> амалга оширилган` : '', '')}
+        ${modalStat(`${m} ойи бажарилиши`,
+          monthPct != null ? monthPct.toFixed(1) + '%' : '—',
+          `<strong>${fmtByUnit(monthAlloc, unit)}</strong> ${unit}`,
+          monthPct != null && monthPct >= 100 ? 'success' : (monthPct != null && monthPct >= 75 ? 'warning' : 'danger'))}
       </div>
     </div>
   `;
@@ -3678,7 +3757,7 @@ function openProgramDetails(idx) {
         <div class="modal-section-title">${m} ойи ҳафталик режаси</div>
         <div class="modal-stats-grid">
           ${weekLabels.map((lbl, i) => modalStat(`${lbl} ${m.toLowerCase()}`,
-            fmtSum(weekSums[i]) + ' <span style="font-size:0.7rem">млн</span>',
+            fmtByUnit(weekSums[i], unit) + ' ' + unitSpan,
             monthPlan > 0 ? `${(weekSums[i] / monthPlan * 100).toFixed(1)}% ой режасининг` : '',
             '')).join('')}
         </div>
@@ -3698,7 +3777,7 @@ function openProgramDetails(idx) {
             <thead>
               <tr>
                 <th>Банк</th>
-                <th class="num">Жами ажр.</th>
+                <th class="num">Жами ажр. (${unit})</th>
                 <th class="center">% YTD</th>
               </tr>
             </thead>
@@ -3706,7 +3785,7 @@ function openProgramDetails(idx) {
               ${bankBreakdown.map(b => `
                 <tr style="cursor:pointer" onclick="closeModal();setTimeout(()=>openBankDetails('${escapeAttr(b.name)}'),100)">
                   <td>${escapeHtml(b.name)}</td>
-                  <td class="num">${fmtSum(b.alloc)}</td>
+                  <td class="num">${fmtByUnit(b.alloc, unit)}</td>
                   <td class="center">${pctCell(b.ytdPct)}</td>
                 </tr>
               `).join('')}
@@ -3733,13 +3812,14 @@ function openProgramDetails(idx) {
 
   // After modal opens, render charts
   setTimeout(() => {
-    if (p.cols.hasWeekly) renderProgramWeeklyChart(p, allHududsSelected);
-    renderProgramBanksChart(bankBreakdown, p);
-    renderProgramHududsChart(hududList, p);
+    if (p.cols.hasWeekly) renderProgramWeeklyChart(p, allHududsSelected, unit);
+    renderProgramBanksChart(bankBreakdown, p, unit);
+    renderProgramHududsChart(hududList, p, unit);
   }, 100);
 }
 
-function renderProgramWeeklyChart(p, allHududsSelected) {
+function renderProgramWeeklyChart(p, allHududsSelected, unit) {
+  unit = unit || p.unit || 'млн сўм';
   const m = bankData.meta.month;
   const weekSums = [0, 0, 0, 0];
   getActiveBanks().forEach(b => {
@@ -3771,13 +3851,14 @@ function renderProgramWeeklyChart(p, allHududsSelected) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtSum(c.raw) } } },
-      scales: { y: { ticks: { callback: (v) => fmtSum(v) } } }
+      plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtByUnit(c.raw, unit) + ' ' + unit } } },
+      scales: { y: { ticks: { callback: (v) => fmtByUnit(v, unit) } } }
     }
   });
 }
 
-function renderProgramBanksChart(banks, p) {
+function renderProgramBanksChart(banks, p, unit) {
+  unit = unit || p.unit || 'млн сўм';
   const ctx = document.getElementById('modal_progBanksChart');
   if (!ctx) return;
   const top = banks.slice(0, 12);
@@ -3795,14 +3876,15 @@ function renderProgramBanksChart(banks, p) {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top', labels: { font: { size: 10 } } },
-        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtSum(c.raw) } }
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtByUnit(c.raw, unit) + ' ' + unit } }
       },
-      scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+      scales: { x: { ticks: { callback: (v) => fmtByUnit(v, unit), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
     }
   });
 }
 
-function renderProgramHududsChart(hududs, p) {
+function renderProgramHududsChart(hududs, p, unit) {
+  unit = unit || p.unit || 'млн сўм';
   const ctx = document.getElementById('modal_progHududsChart');
   if (!ctx) return;
   const top = hududs.slice(0, 22);
@@ -3820,9 +3902,9 @@ function renderProgramHududsChart(hududs, p) {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top', labels: { font: { size: 10 } } },
-        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtSum(c.raw) } }
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + fmtByUnit(c.raw, unit) + ' ' + unit } }
       },
-      scales: { x: { ticks: { callback: (v) => fmtSum(v), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
+      scales: { x: { ticks: { callback: (v) => fmtByUnit(v, unit), font: { size: 10 } } }, y: { ticks: { font: { size: 10 } } } }
     }
   });
 }
@@ -4055,26 +4137,23 @@ function openBankDetails(bankName) {
   if (!bank) return;
   const progIdx = selectedProgram === 'all' ? 'all' : parseInt(selectedProgram);
 
-  // Bank totals (across all programs, respecting filter)
+  // Bank totals — % from totalAllocated/monthAllocated (to'g'ri)
   const allHududsSelected = bankData.hududs.every(h => selectedHududs.includes(h));
-  const ytdPlan = getBankTotal(bank, progIdx, 'ytdPlan');
+  const ytdPlan    = getBankTotal(bank, progIdx, 'ytdPlan');
   const totalAlloc = getBankTotal(bank, progIdx, 'totalAllocated');
-  const ytdExec = getBankTotal(bank, progIdx, 'ytdExecSum');
   const monthAlloc = getBankTotal(bank, progIdx, 'monthAllocated');
-  const monthExec = getBankTotal(bank, progIdx, 'monthExecSum');
-  const monthPlan = getBankTotal(bank, progIdx, 'monthPlan');
+  const monthPlan  = getBankTotal(bank, progIdx, 'monthPlan');
   const annualPlan = getBankTotal(bank, progIdx, 'annualPlan');
-  const ytdPct = computePct(ytdExec, ytdPlan);
-  const monthPct = computePct(monthExec, monthPlan);
+  const ytdPct   = computePct(totalAlloc, ytdPlan);
+  const monthPct = computePct(monthAlloc, monthPlan);
 
   // Per-program for this bank
   const progBreakdown = bankData.programs.map(p => {
-    let pPlan = 0, pAlloc = 0, pExec = 0, pMonthAlloc = 0;
+    let pPlan = 0, pAlloc = 0, pMonthAlloc = 0;
     if (allHududsSelected) {
       const d = bank.programs[p.name] || {};
       pPlan = d.ytdPlan || 0;
       pAlloc = d.totalAllocated || 0;
-      pExec = d.ytdExecSum || 0;
       pMonthAlloc = d.monthAllocated || 0;
     } else {
       bank.branches.forEach(br => {
@@ -4082,13 +4161,12 @@ function openBankDetails(bankName) {
         const d = br.programs[p.name] || {};
         pPlan += d.ytdPlan || 0;
         pAlloc += d.totalAllocated || 0;
-        pExec += d.ytdExecSum || 0;
         pMonthAlloc += d.monthAllocated || 0;
       });
     }
     return {
-      program: p, ytdPlan: pPlan, alloc: pAlloc, exec: pExec, monthAlloc: pMonthAlloc,
-      ytdPct: computePct(pExec, pPlan)
+      program: p, ytdPlan: pPlan, alloc: pAlloc, exec: pAlloc, monthAlloc: pMonthAlloc,
+      ytdPct: computePct(pAlloc, pPlan)
     };
   }).filter(x => !x.program.isPlaceholder && (x.alloc > 0 || x.ytdPlan > 0));
 
@@ -4135,11 +4213,11 @@ function openBankDetails(bankName) {
         ${modalStat('Жами ажратилган', fmtSum(totalAlloc) + ' <span style="font-size:0.7rem">млн</span>',
           ytdPlan > 0 ? `Режанинг <strong>${(totalAlloc/ytdPlan*100).toFixed(1)}%</strong>` : '', 'success')}
         ${modalStat(`Январ-${m} бажарилиши`, ytdPct != null ? ytdPct.toFixed(1) + '%' : '—',
-          `<strong>${fmtSum(ytdExec)}</strong> млн сўм`,
-          ytdPct >= 100 ? 'success' : (ytdPct >= 75 ? 'warning' : 'danger'))}
+          `<strong>${fmtSum(totalAlloc)}</strong> млн сўм`,
+          ytdPct != null && ytdPct >= 100 ? 'success' : (ytdPct != null && ytdPct >= 75 ? 'warning' : 'danger'))}
         ${modalStat(`${m} ойи бажарилиши`, monthPct != null ? monthPct.toFixed(1) + '%' : '—',
-          `<strong>${fmtSum(monthExec)}</strong> млн сўм`,
-          monthPct >= 100 ? 'success' : (monthPct >= 75 ? 'warning' : 'danger'))}
+          `<strong>${fmtSum(monthAlloc)}</strong> млн сўм`,
+          monthPct != null && monthPct >= 100 ? 'success' : (monthPct != null && monthPct >= 75 ? 'warning' : 'danger'))}
       </div>
     </div>
   `;
@@ -4431,6 +4509,30 @@ function onVoiceSearchInput(val) {
   renderDetailsTab();
 }
 
+function clearVoiceSearch() {
+  voiceSearchQuery = '';
+  const input = document.getElementById('voiceSearchInput');
+  const status = document.getElementById('voiceStatus');
+  if (input) input.value = '';
+  if (status) { status.textContent = 'Тайёр'; status.classList.remove('active'); }
+  renderDetailsTab();
+}
+
+function switchToDetailsTab() {
+  // Switch to the details tab programmatically
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const detailsTab = document.getElementById('tab-details');
+  const detailsBtn = document.querySelector('.tab-btn[onclick*="details"]');
+  if (detailsTab) detailsTab.classList.add('active');
+  if (detailsBtn) detailsBtn.classList.add('active');
+  // Scroll to table
+  setTimeout(() => {
+    const toolbar = document.querySelector('.details-toolbar');
+    if (toolbar) toolbar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
 async function toggleVoiceSearch() {
   if (isListening) {
     stopVoiceSearch();
@@ -4462,10 +4564,12 @@ async function startVoiceSearch() {
       speechRecognizer.recognizeOnceAsync(
         result => {
           if (result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-            const text = result.text.replace(/[.،,]/g, '').trim();
+            const text = result.text.replace(/[.،,؟?!]/g, '').trim();
             input.value = text;
             voiceSearchQuery = text;
             statusEl.textContent = `✅ "${text}"`;
+            // Auto-switch to details tab
+            switchToDetailsTab();
             renderDetailsTab();
           } else {
             statusEl.textContent = '⚠ Ovoz aniqlanmadi';
@@ -4515,6 +4619,8 @@ function startWebSpeech(btn, statusEl, input) {
     voiceSearchQuery = transcript;
     if (event.results[event.results.length - 1].isFinal) {
       statusEl.textContent = `✅ "${transcript}"`;
+      // Auto-switch to details tab to show results
+      switchToDetailsTab();
       renderDetailsTab();
     } else {
       statusEl.textContent = `🎤 "${transcript}"...`;
