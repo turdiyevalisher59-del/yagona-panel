@@ -1321,7 +1321,7 @@ console.log('☁️ GitHub integratsiya yuklandi');
 
 
 /* ═══ DATA MODEL — barcha 14 dashboard, 4 rahbar, 11 bo'lim ═══ */
-var INIT={_v:85,_cloudUrl:"",_skipCloud:false,leaders:[
+var INIT={_v:86,_cloudUrl:"",_skipCloud:false,leaders:[
 {id:"fayzullaxojayev",name:"J.X.Fayzullaxo'jayev",firstName:"Jasur",patronymic:"Hakimovich",lastName:"Fayzullaxo'jayev",role:"Bosh boshqarma boshlig'i",ini:"JF",ci:0,departments:[
   {id:"d1",name:"Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi",boss:"Nishanaliev Islombek Valisherovich",bossRole:"Shu'ba mudiri",dashboards:[
     {id:"db1",name:"Scoring Banking",type:"html",path:"J.X.Fayzullaxo'jayev yo'nalishi/Bank xizmatlari iste'molchilarining huquqlarini himoya qilish, moliyaviy savodxonlik va ommaboplikni oshirish shu'basi/scoring_banking.html"},
@@ -1433,9 +1433,38 @@ function load(){
     "A.A.Jurayev yo'nalishi/Buxgalteriya hisobi, hisoboti va moliyaviy-iqtisodiy faoliyat boshqarmasi/umumiy jadval - 2026 (3).xlsx":"_data/umumiy_jadval.xlsx",
     "A.A.Jurayev yo'nalishi/Naqd pul muomalasini tashkil etish boshqarmasi/Dastur_uchun.xlsx":"_data/Dastur_uchun.xlsx"
   };
-  if(d.leaders){var _xlFixed=0;d.leaders.forEach(function(l){if(l.departments)l.departments.forEach(function(dep){if(dep.dashboards)dep.dashboards.forEach(function(db){if(db.xl&&_xlMap[db.xl]){db.xl=_xlMap[db.xl];_xlFixed++}})})});if(_xlFixed>0){console.log('🔄 '+_xlFixed+' ta Excel yo\'l yangilandi (_data/ ga)');try{localStorage.setItem('cbNE',JSON.stringify(d))}catch(e){}}}
+  if(d.leaders){var _xlFixed=0;d.leaders.forEach(function(l){if(l.departments)l.departments.forEach(function(dep){if(dep.dashboards)dep.dashboards.forEach(function(db){if(db.xl&&_xlMap[db.xl]){db.xl=_xlMap[db.xl];_xlFixed++}})})});if(_xlFixed>0){console.log('🔄 '+_xlFixed+' ta Excel yo\'l yangilandi (_data/ ga)');try{localStorage.setItem('cbNE',JSON.stringify(d, _stripCaches))}catch(e){}}}
   return d;
 }
+/* Strip session-only caches before serializing D — prevents 555KB+ bloat in localStorage/cloud */
+function _stripCaches(key, val){
+  if(key === '_xlCache' || key === '_htmlCache') return undefined;
+  return val;
+}
+/* v86: One-time cleanup of existing bloated localStorage cbNE (strip _xlCache + _htmlCache from old saves) */
+(function _v86CleanupBloat(){
+  try{
+    var raw = localStorage.getItem('cbNE');
+    if(!raw || raw.length < 200000) return; /* Already small */
+    var data = JSON.parse(raw);
+    var fixed = false;
+    if(data && data.leaders){
+      data.leaders.forEach(function(l){
+        (l.departments||[]).forEach(function(dep){
+          (dep.dashboards||[]).forEach(function(db){
+            if(db._xlCache){ delete db._xlCache; fixed = true; }
+            if(db._htmlCache){ delete db._htmlCache; fixed = true; }
+          });
+        });
+      });
+    }
+    if(fixed){
+      var newRaw = JSON.stringify(data, _stripCaches);
+      localStorage.setItem('cbNE', newRaw);
+      console.log('🧹 v86: localStorage cbNE tozalandi: '+(raw.length/1024).toFixed(0)+' KB → '+(newRaw.length/1024).toFixed(0)+' KB');
+    }
+  }catch(e){ console.warn('v86 cleanup err:', e); }
+})();
 function save(){
   /* v40: D null bo'lsa xato bermaydi */
   if(!D || !D.leaders){
@@ -1458,7 +1487,7 @@ function save(){
   
   /* localStorage ga saqlash */
   try{
-    localStorage.setItem('cbNE', JSON.stringify(D));
+    localStorage.setItem('cbNE', JSON.stringify(D, _stripCaches));
     console.log('💾 localStorage ga saqlandi ✓');
   }catch(e){
     console.error('💾 localStorage xatosi:', e);
@@ -1525,7 +1554,7 @@ async function cloudPush(){
   console.log('☁️ Supabase\'ga yuklanmoqda...');
 
   try{
-    var jsonStr = JSON.stringify(D);
+    var jsonStr = JSON.stringify(D, _stripCaches);
     var origSize = jsonStr.length;
 
     // Gzip siqish (4.5MB Vercel body limitiga moslashish uchun)
@@ -1705,7 +1734,7 @@ async function saveRequiredCloud(){
       await fetch(url, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(D)
+        body: JSON.stringify(D, _stripCaches)
       });
       
       toast('✅ Bulut ulandi! Ma\'lumotlar sinxronlandi.', 'ok');
@@ -1820,7 +1849,7 @@ async function syncOnLoad(){
     if(cloudVersion>localVersion || cloudSync>localSync){
       console.log('☁ Bulutdan yangilanmoqda (cloud v'+cloudVersion+' > local v'+localVersion+')');
       D=cloudData;
-      try{localStorage.setItem('cbNE',JSON.stringify(D))}catch(e){}
+      try{localStorage.setItem('cbNE',JSON.stringify(D, _stripCaches))}catch(e){}
       renderHome();
       toast('☁ Bulutdan sinxronlandi','ok');
     }else{
@@ -1831,7 +1860,7 @@ async function syncOnLoad(){
 
 /* Bulutdan MAJBURIY sinxronlash - har doim bulutdagi ma'lumotni oladi
    v42: agar bulut versiyasi v < 42 bo'lsa, eski (sinik yo'llari bor) ma'lumotni ishlatmaymiz */
-var LOCAL_MIN_VERSION = 85; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
+var LOCAL_MIN_VERSION = 86; /* Bulut ma'lumoti shu versiyadan past bo'lsa — chetlanadi */
 
 async function forceSyncFromCloud(){
   /* v44+: Supabase Storage'dan cloudPull() orqali oladi (gzip ochib) */
@@ -1863,7 +1892,7 @@ async function forceSyncFromCloud(){
       
       /* LocalStorage ga saqlash */
       try{
-        localStorage.setItem('cbNE', JSON.stringify(D));
+        localStorage.setItem('cbNE', JSON.stringify(D, _stripCaches));
         console.log('💾 LocalStorage yangilandi');
       }catch(e){
         console.warn('LocalStorage xatosi:', e);
@@ -4132,7 +4161,7 @@ async function testCloud(){
 async function pushAllToCloud(){
   var url=_getCloudUrl();if(!url){toast('Avval URL kiriting','er');return}
   toast('⬆ Yuklanmoqda...','nf');D._v=(D._v||0)+1;
-  try{var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(D)});
+  try{var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(D, _stripCaches)});
   if(r.ok){toast('✅ Barcha ma\'lumot bulutga yuklandi (v'+D._v+')','ok');var ind=$('cloudInd');if(ind){ind.textContent='☁ Sinxronlandi ✓';ind.style.color='#22c55e'}}
   else{toast('❌ Yuklash xatosi: '+r.status,'er')}}catch(e){toast('❌ Xato: '+e.message,'er')}
 }
@@ -5738,7 +5767,7 @@ document.addEventListener('DOMContentLoaded',async function(){
       
       /* localStorage ga zaxira sifatida saqlash */
       try{ 
-        localStorage.setItem('cbNE', JSON.stringify(D));
+        localStorage.setItem('cbNE', JSON.stringify(D, _stripCaches));
         console.log('💾 localStorage ga zaxiralandi');
       }catch(e){
         console.warn('💾 localStorage saqlash xatosi:', e);
@@ -5855,7 +5884,7 @@ document.addEventListener('DOMContentLoaded',async function(){
         /* _v ni bump qilish, shunda boshqa qurilmalar yangilanadi */
         D._v = (D._v || 0) + 1;
         D._lastSync = Date.now();
-        try { localStorage.setItem('cbNE', JSON.stringify(D)); console.log('💾 Migratsiya localStorage ga saqlandi (v'+D._v+')'); } catch(e){}
+        try { localStorage.setItem('cbNE', JSON.stringify(D, _stripCaches)); console.log('💾 Migratsiya localStorage ga saqlandi (v'+D._v+')'); } catch(e){}
         /* Bulutga ham yuborish (background, kechiktirilgan) */
         setTimeout(function(){
           if(typeof cloudPush === 'function'){
@@ -5912,7 +5941,7 @@ document.addEventListener('DOMContentLoaded',async function(){
       var cloud=await cloudPull();
       if(cloud&&cloud.leaders&&cloud._v&&cloud._v>(D._v||0)){
         D=cloud;
-        try{localStorage.setItem('cbNE',JSON.stringify(D))}catch(e){}
+        try{localStorage.setItem('cbNE',JSON.stringify(D, _stripCaches))}catch(e){}
         go('home');
         console.log('☁ Bulutdan yangilandi (v'+cloud._v+')');
       }
